@@ -7,7 +7,7 @@ export default function LoginScreen() {
         <div style={{width: "100%", height: "100%", display:"flex", flexDirection: "row", justifyContent:"space-evenly", alignItems:"center"}}>
             
             <div 
-            style={{width: "40%", height: "80%", backgroundColor: "orange", 
+            style={{width: "40%", height: "80%", backgroundColor: "white", 
             padding: "20px", display:"flex", flexDirection:"column", justifyContent:"center"}}>
                 <h1 className="HeaderFont">Login</h1>
                 <div style={{display:"flex", flexDirection:"column", marginBottom: "2%"}}>

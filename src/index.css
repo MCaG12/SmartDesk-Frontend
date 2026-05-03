@@ -6,7 +6,7 @@
 
 #container 
 {
-  width: 100wh;
+  width: 100vw;
   height: 100vh;
 }
 
@@ -96,6 +96,7 @@
 }
 
 
+/* DASHBOARD SCREEN */
 .header {
   width: 100%;
   height: 60px;
@@ -117,4 +118,66 @@
   padding: 1.5rem 0;
   box-sizing: border-box;
   border-right: 1px solid #e5e7eb;
+}
+
+
+.tab-btn {
+  width: 100%;
+  padding: 0.75rem 1.5rem;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  font-family: "Nunito", sans-serif;
+  font-size: 0.9375rem;
+  font-weight: 500;
+  color: white;
+  background-color: #4a7fcb;
+  margin-bottom: 4%;  border: none;
+  border-left: 2px solid transparent;
+  text-align: left;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  box-sizing: border-box;
+  border-radius: 10px;
+}
+
+.stat-card {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 1rem 1.25rem;
+  background-color: #ffffff;
+  border-radius: 36px;
+  border: 1px solid #f0f0f0;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.06);
+  width: 20%;
+  height: 60%
+}
+
+.DashBoard-Title {
+  font-family: "Nunito", sans-serif;
+  font-size: 2rem;
+  font-weight: 700;
+  color: #003A7F;
+  letter-spacing: -0.01em;
+  line-height: 1.2;
+}
+
+.DashBoardScreen-ItemFont {
+  font-family: "Nunito", sans-serif;
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #003A7F;
+  letter-spacing: -0.01em;
+  line-height: 1.2;
+}
+
+.table-container {
+  width: 100%;
+  height: 30%;
+  background-color: #ffffff;
+  border-radius: 12px;
+  border: 1px solid #f0f0f0;
+  overflow: hidden;
+  box-sizing: border-box;
 }
