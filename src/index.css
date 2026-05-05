@@ -141,7 +141,8 @@
   border-radius: 10px;
 }
 
-.stat-card {
+.stat-card 
+{
   display: flex;
   align-items: center;
   gap: 1rem;
@@ -151,7 +152,9 @@
   border: 1px solid #f0f0f0;
   box-shadow: 0 1px 4px rgba(0,0,0,0.06);
   width: 20%;
-  height: 60%
+  height: 60%;
+  display: flex;
+  flex-direction: row;
 }
 
 .DashBoard-Title {
@@ -179,5 +182,198 @@
   border-radius: 12px;
   border: 1px solid #f0f0f0;
   overflow: hidden;
+  box-sizing: border-box;
+}
+
+/** DASHBOARD HEADER ITEMS*/
+
+.btn-novo-chamado {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 1.25rem;
+  background-color: #1a7fd4;
+  color: #ffffff;
+  font-family: "Nunito", sans-serif;
+  font-size: 0.9375rem;
+  font-weight: 600;
+  border: none;
+  border-radius: 9999px;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+  width:10%;
+  height: 90%;
+  text-align: center;
+}
+
+.btn-novo-chamado:hover {
+  background-color: #1567b0;
+}
+
+.btn-novo-chamado__icon {
+  font-size: 1rem;
+  font-weight: 700;
+}
+
+/* Search input */
+.search-input-wrapper {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.4rem 1rem;
+  background-color: #f3f4f6;
+  border-radius: 9999px;
+  border: 1px solid #e5e7eb;
+  width:10%;
+  height: 60%;
+  text-align: center;
+}
+
+.search-input {
+  background: transparent;
+  border: none;
+  outline: none;
+  font-family: "Nunito", sans-serif;
+  font-size: 0.875rem;
+  color: #111827;
+  width: 140px;
+}
+
+.search-input::placeholder {
+  color: #9ca3af;
+}
+
+.search-icon {
+  color: #9ca3af;
+  font-size: 0.875rem;
+}
+
+/* Notification bell */
+.icon-btn {
+  width: 45px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: #e9e9e9;
+  border: none;
+  cursor: pointer;
+  border-radius: 50%;
+  transition: background-color 0.2s ease;
+  color: #6b7280;
+  font-size: 1.1rem;
+}
+
+.icon-btn:hover {
+  background-color: #dfdfdf;
+}
+
+/* Avatar */
+.avatar {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background-color: #1a7fd4;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #ffffff;
+  font-size: 1.1rem;
+  cursor: pointer;
+  border: none;
+  transition: opacity 0.2s ease;
+}
+
+.avatar:hover {
+  opacity: 0.85;
+}
+
+.NotificationsTab
+{
+  width: 40%;
+  height: 80%;
+  position: absolute;
+  background-color: white;
+  align-self: flex-end;
+  padding: 20px;
+  border-style: solid;
+  border-width: 4px;
+  border-color: #4a7fcb;
+  
+}
+
+.notificationContainer
+{
+  width: 100%;
+  height:80%;
+  background-color: #dfdfdf;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-evenly;
+  align-items: center;
+}
+
+.notificationBody
+{
+  Width: 90%;
+  height: 40%;
+  background-color: white;
+  border-radius: 30px;
+  display: flex;
+  flex-direction: column;
+}
+
+.NewTicketTab
+{
+  width: 40%;
+  height: 80%;
+  position: absolute;
+  background-color: white;
+  align-self: flex-start;
+  border-style: solid;
+  border-width: 4px;
+  border-color: #4a7fcb;
+  border-radius: 20%;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.NewTicketHeader
+{
+  width: 100%;
+  height: 20%;
+  background-color: #4a7fcb;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 10%;
+  
+}
+
+.input-group {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  height:auto;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 10%;
+}
+
+.input-label {
+  font-size: 14px;
+  font-weight: 500;
+  color: #333;
+}
+
+.input-field {
+  width: 60%;
+  padding: 8px 12px;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  font-size: 14px;
+  color: #aaa;
+  outline: none;
   box-sizing: border-box;
 }
