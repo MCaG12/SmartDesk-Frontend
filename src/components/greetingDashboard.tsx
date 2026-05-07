@@ -34,8 +34,8 @@ export default function GreetingDashboard({notificationIsActive, setNotification
                             <img src={DashBoardNewTicketsImage} alt="Greeting" style={{ width: "100%", height: "100%", objectFit: "cover", alignSelf: "center", marginBottom: "2%" }} />  
                         </div>
                         <div style={{display:"flex", flexDirection:"column", width:"80%"}}>
-                            <h1>test</h1>
-                            <h1>test</h1>
+                            <p className="card-title" style={{fontSize:"1.5rem", color:"#666666"}}>Aberto</p>
+                            <p className="card-meta">test</p>
                         </div>
                     </div>
 
@@ -44,8 +44,8 @@ export default function GreetingDashboard({notificationIsActive, setNotification
                             <img src={DashBoardTicketsInProgressImage} alt="Greeting" style={{ width: "100%", height: "100%", objectFit: "cover", alignSelf: "center", marginBottom: "2%" }} />  
                         </div>
                         <div style={{display:"flex", flexDirection:"column", width:"80%"}}>
-                            <h1>test</h1>
-                            <h1>test</h1>
+                            <p className="card-title" style={{fontSize:"1.5rem", color:"#666666"}}>Em Andamento</p>
+                            <p className="card-meta">test</p>
                         </div>
                     </div>
 
@@ -54,8 +54,8 @@ export default function GreetingDashboard({notificationIsActive, setNotification
                             <img src={DashBoardTicketAWaitingForConfirmationImage} alt="Greeting" style={{ width: "100%", height: "100%", objectFit: "cover", alignSelf: "center", marginBottom: "2%" }} />  
                         </div>
                         <div style={{display:"flex", flexDirection:"column", width:"80%"}}>
-                            <h1>test</h1>
-                            <h1>test</h1>
+                            <p className="card-title" style={{fontSize:"1.5rem", color:"#666666"}}>Ag.Terceiros</p>
+                            <p className="card-meta">test</p>
                         </div>
                     </div>
 
@@ -64,8 +64,8 @@ export default function GreetingDashboard({notificationIsActive, setNotification
                             <img src={DashBoardTicketsCompletedImage} alt="Greeting" style={{ width: "100%", height: "100%", objectFit: "cover", alignSelf: "center", marginBottom: "2%" }} />  
                         </div>
                         <div style={{display:"flex", flexDirection:"column", width:"80%"}}>
-                            <h1>test</h1>
-                            <h1>test</h1>
+                            <p className="card-title" style={{fontSize:"1.5rem", color:"#666666"}}>Concluídos</p>
+                            <p className="card-meta">test</p>
                         </div>
                     </div>
                 </div>

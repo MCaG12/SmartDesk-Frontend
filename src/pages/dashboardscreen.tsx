@@ -72,21 +72,21 @@ export default function DashScreenScreen() {
                     onClick={() => setDashBoardState(0)}
                     style={{ backgroundColor: dashBoardState === 0 ? "#1b54a3" : "#538fe4" }}
                     >
-                    PLACEHOLDER
+                    DashBoard
                     </button>
                     <button
                     className="tab-btn"
                     onClick={() => setDashBoardState(1)}
                     style={{ backgroundColor: dashBoardState === 1? "#1b54a3" : "#538fe4" }}
                     >
-                    PLACEHOLDER
+                    Chamados
                     </button>
                         <button
                     className="tab-btn"
                     onClick={() => setDashBoardState(2)}
                     style={{ backgroundColor: dashBoardState === 2 ? "#1b54a3" : "#538fe4" }}
                     >
-                    PLACEHOLDER
+                    Usuário
                     </button>
                 </div>
                 { drawDashBoard(dashBoardState) }
