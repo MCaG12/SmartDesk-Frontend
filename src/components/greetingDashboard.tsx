@@ -11,7 +11,7 @@ interface i_greetingDashboard
     setCreateNewTicketIsActive: React.Dispatch<React.SetStateAction<boolean>>
 }
 
-export default function greetingDashboard({notificationIsActive, setNotificationIsActive, createNewTicketActive, setCreateNewTicketIsActive} : i_greetingDashboard)
+export default function GreetingDashboard({notificationIsActive, setNotificationIsActive, createNewTicketActive, setCreateNewTicketIsActive} : i_greetingDashboard)
 {
     return(
     <>
