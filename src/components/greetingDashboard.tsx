@@ -2,6 +2,8 @@ import DashBoardNewTicketsImage from "../images/DashBoardNewTicketsImage.png"
 import DashBoardTicketAWaitingForConfirmationImage from "../images/DashBoardTicketAWaitingForConfirmationImage.png"
 import DashBoardTicketsCompletedImage from "../images/DashBoardTicketsCompletedImage.png"
 import DashBoardTicketsInProgressImage from "../images/DashBoardTicketsInProgressImage.png"
+import { Create_New_Ticket_Menu } from "./createNewTicketMenu";
+import { Notification_Menu } from "./notificationsMenu";
 
 interface i_greetingDashboard
 {
@@ -35,7 +37,7 @@ export default function GreetingDashboard({notificationIsActive, setNotification
                         </div>
                         <div style={{display:"flex", flexDirection:"column", width:"80%"}}>
                             <p className="card-title" style={{fontSize:"1.5rem", color:"#666666"}}>Aberto</p>
-                            <p className="card-meta">test</p>
+                            <p className="card-meta" style={{fontSize:"1.25rem", color:"#1f1f1f"}}>test</p>
                         </div>
                     </div>
 
@@ -45,7 +47,7 @@ export default function GreetingDashboard({notificationIsActive, setNotification
                         </div>
                         <div style={{display:"flex", flexDirection:"column", width:"80%"}}>
                             <p className="card-title" style={{fontSize:"1.5rem", color:"#666666"}}>Em Andamento</p>
-                            <p className="card-meta">test</p>
+                            <p className="card-meta" style={{fontSize:"1.25rem", color:"#1f1f1f"}}>test</p>
                         </div>
                     </div>
 
@@ -55,7 +57,7 @@ export default function GreetingDashboard({notificationIsActive, setNotification
                         </div>
                         <div style={{display:"flex", flexDirection:"column", width:"80%"}}>
                             <p className="card-title" style={{fontSize:"1.5rem", color:"#666666"}}>Ag.Terceiros</p>
-                            <p className="card-meta">test</p>
+                            <p className="card-meta" style={{fontSize:"1.25rem", color:"#1f1f1f"}}>test</p>
                         </div>
                     </div>
 
@@ -65,69 +67,23 @@ export default function GreetingDashboard({notificationIsActive, setNotification
                         </div>
                         <div style={{display:"flex", flexDirection:"column", width:"80%"}}>
                             <p className="card-title" style={{fontSize:"1.5rem", color:"#666666"}}>Concluídos</p>
-                            <p className="card-meta">test</p>
+                            <p className="card-meta" style={{fontSize:"1.25rem", color:"#1f1f1f",}}>test</p>
                         </div>
                     </div>
                 </div>
 
                 {
-                    notificationIsActive &&  
-                    <div className="NotificationsTab">
-                        <h1 className="HeaderFont" style={{color: "#4272b6"}}>Notificações</h1>  
-                        <hr></hr>
-                        <div className="notificationContainer">
-                            <div className="notificationBody">
-                                <div style={{width:"100%", height:"20%", backgroundColor:"#4a7fcb", borderRadius: "30px 30px 0 0"}}>
-                                    <h1 className="greetTitle" style={{textAlign:"center"}}> Titulo Ticket</h1>
-                                </div>
-                            </div>
-                            <div className="notificationBody">
-                                <div style={{width:"100%", height:"20%", backgroundColor:"#4a7fcb", borderRadius: "30px 30px 0 0"}}>
-                                    <h1 className="greetTitle" style={{textAlign:"center"}}> Titulo Ticket</h1>
-                                </div>
-                            </div>  
-                        </div>
-                    </div>
+                    notificationIsActive &&
+                        <Notification_Menu />
                 }
 
                 {
                     createNewTicketActive && 
-                    <div className="NewTicketTab">
-
-                        <div className="NewTicketHeader">
-                            <h1 className="HeaderFont" style={{color:"white"}}>Novo Chamado</h1>
-                        </div>
-
-                        <div style={{display:"flex", flexDirection:"column"}}>
-                            <div className="input-group">
-                                <label className="input-label">Título</label>
-                                <input className="input-field" type="text" placeholder="Placeholder" />
-
-                                <label className="input-label">Categoria</label>
-                                <select className="input-field">
-                                    <option value="">Placeholder</option>
-                                    <option value="1">Option 1</option>
-                                    <option value="2">Option 2</option>
-                                </select>
-
-                                <label className="input-label">Prioridade</label>
-                                <select className="input-field">
-                                    <option value="">Placeholder</option>
-                                    <option value="1">Option 1</option>
-                                    <option value="2">Option 2</option>
-                                </select>
-
-                                <label className="input-label">Descrição do Problema</label>
-                                <input className="input-field" type="text" placeholder="Placeholder" style={{height: "100%", flex: 1}}/>
-                            </div>
-                        </div>
-
-                        <div style={{display:"flex", flexDirection:"row", height: "10%", justifyContent:"space-evenly"}}>
-                            <button className="tab-btn" style={{width:"40%"}}>Criar Chamado</button>
-                            <button className="tab-btn" style={{width:"40%", backgroundColor:"red"}} onClick={() => setCreateNewTicketIsActive(!createNewTicketActive)}>Cancelar</button>
-                        </div>
-
-                    </div>
+                        <Create_New_Ticket_Menu 
+                            setCreateNewTicketIsActive={setCreateNewTicketIsActive}
+                            createNewTicketActive={createNewTicketActive} 
+                            
+                        />
                 }
 
                 {/* Charts */}

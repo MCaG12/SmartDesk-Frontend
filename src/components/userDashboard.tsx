@@ -1,8 +1,5 @@
 import { useState } from "react"
-import DashBoardNewTicketsImage from "../images/DashBoardNewTicketsImage.png"
-import DashBoardTicketAWaitingForConfirmationImage from "../images/DashBoardTicketAWaitingForConfirmationImage.png"
-import DashBoardTicketsCompletedImage from "../images/DashBoardTicketsCompletedImage.png"
-import DashBoardTicketsInProgressImage from "../images/DashBoardTicketsInProgressImage.png"
+import UserLogoImage from "../images/UserImage.png"
 
 
 
@@ -50,9 +47,14 @@ export default function UserDashBoard()
                         </div>
                         
                         <hr style={{ marginBottom: "2%" }}></hr>
-                        <div style={{display:"flex", flexDirection:"row", gap: "5%"}}>
-                            <div style={{width:"100px", height:"100px", backgroundColor:"lime"}}>
+                        <div style={{display:"flex", flexDirection:"row", gap: "5%", marginBottom:"2%"}}>
+                            <div style={{width:"100px", height:"100px", backgroundColor:"#f7f7f7",
+                                        borderRadius:"50px", display:"flex", flexDirection:"column", justifyContent:"center"}}>
+                                <img src={UserLogoImage} alt="NotificationBell" 
+                                     style={{ width: "80%", height: "80%", objectFit: "cover", alignSelf: "center",
+                                      marginBottom: "2%", borderRadius: "50%"  }}/>
                             </div>
+
                             <div style={{display:"flex", flexDirection:"column"}}>
                                 <h2 className="profile-name">Nome pessoas: TESTANDO FONTE</h2>
                                 <h2 className="profile-subtitle">Cargo: TESTANDO FONTE </h2>
