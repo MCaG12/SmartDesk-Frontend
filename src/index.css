@@ -28,6 +28,20 @@
   line-height: 1.5;
 }
 
+.input-error{
+    border-width: 0px 0px 0px 0px;
+    border-bottom: solid #e53935 !important;
+    color: #e53935;
+    width: 100%;
+    padding: 0.5rem 0;
+    font-size: 0.9375rem;
+    font-weight: 400;
+    background: transparent;
+    outline: none;
+    transition: border-color 0.2s ease;
+    margin-bottom: 3%;
+}
+
 .LoginItem
 {
   display: flex; 

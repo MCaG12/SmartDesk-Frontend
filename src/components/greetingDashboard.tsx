@@ -5,6 +5,7 @@ import DashBoardTicketsInProgressImage from "../images/DashBoardTicketsInProgres
 import type { i_Ticket } from "../interfaces/i_ticket";
 import type { i_TicketCategory } from "../interfaces/i_ticketCategory";
 import type { i_TicketPriority } from "../interfaces/i_ticketPriority";
+import type { i_UserLoginInfoResponse } from "../interfaces/i_UserResponse";
 import { Create_New_Ticket_Menu } from "./createNewTicketMenu";
 import { Notification_Menu } from "./notificationsMenu";
 
@@ -18,10 +19,11 @@ interface i_greetingDashboard
     setTickets: React.Dispatch<React.SetStateAction<i_Ticket[]>>;
     ticketCategories: i_TicketCategory[];
     ticketPriorities: i_TicketPriority[];
+    userInfo: i_UserLoginInfoResponse;
 }
 
 export default function GreetingDashboard({notificationIsActive, ticketPriorities, createNewTicketActive, 
-                                           setCreateNewTicketIsActive, tickets,setTickets,ticketCategories } : i_greetingDashboard)
+                                           setCreateNewTicketIsActive, tickets,setTickets,ticketCategories,userInfo } : i_greetingDashboard)
 {
     return(
     <>
@@ -93,6 +95,7 @@ export default function GreetingDashboard({notificationIsActive, ticketPrioritie
                             setTickets={setTickets}
                             ticketPriorities={ticketPriorities}
                             ticketCategories={ticketCategories}  
+                            userInfo={userInfo}
                         />
                 }
 

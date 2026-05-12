@@ -1,5 +1,7 @@
-import type { i_Ticket, TicketPriority } from "../interfaces/i_ticket";
+import type { i_Ticket } from "../interfaces/i_ticket";
 import type { i_TicketCategory } from "../interfaces/i_ticketCategory";
+import type { i_TicketPriority } from "../interfaces/i_ticketPriority";
+import type { i_UserLoginInfoResponse } from "../interfaces/i_UserResponse";
 import { Create_New_Ticket_Menu } from "./createNewTicketMenu";
 import { Notification_Menu } from "./notificationsMenu";
 import { Ticket_Table_Body } from "./ticketTableBody";
@@ -13,12 +15,13 @@ interface i_TicketTableDashboard
     setCreateNewTicketIsActive: React.Dispatch<React.SetStateAction<boolean>>,
     createNewTicketActive: boolean,
     tickets: i_Ticket[];
-    ticketPriorities: TicketPriority[];
+    ticketPriorities: i_TicketPriority[];
     ticketCategories: i_TicketCategory[];
+    userInfo: i_UserLoginInfoResponse;
 }
 
 export default function TicketTableDashboard({notificationIsActive,setTickets, setCreateNewTicketIsActive, 
-                                              createNewTicketActive, tickets, ticketPriorities, ticketCategories}: i_TicketTableDashboard)
+                                              createNewTicketActive, tickets, ticketPriorities, ticketCategories,userInfo}: i_TicketTableDashboard)
 {
 
     return(
@@ -48,6 +51,7 @@ export default function TicketTableDashboard({notificationIsActive,setTickets, s
                         setTickets={setTickets}
                         ticketPriorities={ticketPriorities}
                         ticketCategories={ticketCategories}
+                        userInfo={userInfo}
                     />
             }
 

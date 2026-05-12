@@ -10,6 +10,7 @@ import UserDashBoard from "../components/userDashboard";
 import GreetingDashboard from "../components/greetingDashboard";
 import TicketTableDashboard from "../components/ticketTableDashboard";
 import type { i_TicketCategory } from "../interfaces/i_ticketCategory";
+import { useLocation } from "react-router-dom";
 
 interface TicketStatus {
   id: number;
@@ -176,6 +177,8 @@ function fetchTicketCategories(setTicketCategories:React.Dispatch<React.SetState
 }
 
 export default function DashScreenScreen() {
+    const location = useLocation();
+    const { userFound } = location.state;
     const [dashBoardState, setDashBoardState] = useState(0)
     const [notificationIsActive, setNotificationIsActive] = useState(false)
     const [createNewTicketActive, setCreateNewTicketIsActive] = useState(false)
@@ -195,6 +198,10 @@ export default function DashScreenScreen() {
         fetchTicketCategories(setTicketCategories);
     }, []);
 
+    useEffect(() => {
+        console.log(userFound);
+    }, []);   
+
     function drawDashBoard(dashBoardState : number)
     {
         switch(dashBoardState)
@@ -210,6 +217,7 @@ export default function DashScreenScreen() {
                     setTickets={setTickets}
                     ticketCategories={ticketCategories}
                     ticketPriorities={ticketPriorities}
+                    userInfo={userFound}
                 />
             }
             case 1:
@@ -222,6 +230,7 @@ export default function DashScreenScreen() {
                         tickets={tickets} 
                         ticketPriorities={ticketPriorities}
                         ticketCategories={ticketCategories}
+                        userInfo={userFound}
                     />
                 }
             case 2:

@@ -1,14 +1,18 @@
 import { useState } from "react"
-import type { i_Ticket, TicketCategory, TicketPriority, TicketStatus, TicketUser } from "../interfaces/i_ticket";
+import type { i_Ticket } from "../interfaces/i_ticket";
 import type { i_TicketCategory } from "../interfaces/i_ticketCategory";
+import type { i_UserLoginInfoResponse } from "../interfaces/i_UserResponse";
+import type { i_TicketPriority } from "../interfaces/i_ticketPriority";
+import type { i_TicketSolicitant } from "../interfaces/i_ticketSolicitant";
 
 interface i_Create_New_Ticket_Menu
 {
     setCreateNewTicketIsActive: React.Dispatch<React.SetStateAction<boolean>>;
     createNewTicketActive: boolean; 
     setTickets: React.Dispatch<React.SetStateAction<i_Ticket[]>>;
-    ticketPriorities: TicketPriority[];
+    ticketPriorities: i_TicketPriority[];
     ticketCategories: i_TicketCategory[];
+    userInfo:i_UserLoginInfoResponse;
 }
 
 interface NewTicket
@@ -17,13 +21,12 @@ interface NewTicket
     ticketCategory: string,
     ticketPriority: string,
     ticketProblemDescription: string,
-    ticketSolicantName: string,
-    ticketSolicantEmail: string,
+    ticketSolicitant: i_TicketSolicitant,
     setTickets: React.Dispatch<React.SetStateAction<i_Ticket[]>>
 }
 
 function create_new_ticket({ticketTitle, ticketCategory, ticketPriority, ticketProblemDescription,
-                             ticketSolicantName, ticketSolicantEmail, setTickets}: NewTicket)
+                             ticketSolicitant, setTickets}: NewTicket)
 {
     const NewTicket: i_Ticket = {
         Id: 15,
@@ -34,22 +37,23 @@ function create_new_ticket({ticketTitle, ticketCategory, ticketPriority, ticketP
         ticketDescription: ticketProblemDescription,
         ticketDateOpen: new Date(),
         ticketDateClose: null,
-        ticketSolicitant: { id: 1, name: ticketSolicantName, email: ticketSolicantEmail },
+        ticketSolicitant: ticketSolicitant,
         ticketAgent: null
     };
 
     setTickets((prevTickets) => [...prevTickets, NewTicket])
+    console.log(NewTicket)
 }
 
 export function Create_New_Ticket_Menu
-    ({setCreateNewTicketIsActive, createNewTicketActive, setTickets, ticketPriorities, ticketCategories}:i_Create_New_Ticket_Menu)
+    ({setCreateNewTicketIsActive, createNewTicketActive, setTickets, ticketPriorities, ticketCategories, userInfo}:i_Create_New_Ticket_Menu)
 {
     const [ticketTitle, setTicketTitle] = useState("");
     const [ticketCategory, setTicketCategory] = useState("");
     const [ticketPriority, setTicketPriority]= useState("");
     const [ticketProblemDescription, setTicketProblemDescription] = useState("");
-    const [ticketSolicantName, setTicketSolicitant] = useState("InternalValue");
-    const [ticketSolicantEmail, setTicketSolicitantEmail] = useState("email");
+
+    const ticketSolicitant = {id: userInfo.Id, name: userInfo.usuarNome, email: userInfo.usuarEmail};
 
     return (
         <div className="NewTicketTab">
@@ -61,7 +65,7 @@ export function Create_New_Ticket_Menu
                         <div style={{display:"flex", flexDirection:"column"}}>
                             <div className="input-group">
                                 <label className="input-label">Título</label>
-                                <input className="input-field" type="text" placeholder="Placeholder" onChange={(e) => setTicketTitle(e.target.value)}/>
+                                <input className="input-field" type="text" placeholder="Digite o titulo do chamado" onChange={(e) => setTicketTitle(e.target.value)}/>
 
                                 <label className="input-label">Categoria</label>
                                 <select className="input-field" onChange={(e) => setTicketCategory(e.target.value)}>
@@ -72,14 +76,13 @@ export function Create_New_Ticket_Menu
 
                                 <label className="input-label">Prioridade</label>
                                 <select className="input-field" onChange={(e) => setTicketPriority(e.target.value)}>
-                                    <option key={"Selecione uma Prioridade"} value={""}></option>
                                     {ticketPriorities.map(priority => (
                                         <option key={priority.name} value={priority.id}>{priority.name}</option>
                                     ))}
                                 </select>
 
                                 <label className="input-label">Descrição do Problema</label>
-                                <input className="input-field" type="text" placeholder="Placeholder" style={{height: "100%", flex: 1}} 
+                                <input className="input-field" type="text" placeholder="Digite a descrição do problema" style={{height: "100%", flex: 1}} 
                                        onChange={(e) => setTicketProblemDescription(e.target.value)}/>
                             </div>
                         </div>
@@ -88,7 +91,7 @@ export function Create_New_Ticket_Menu
                             <button className="tab-btn" style={{width:"40%"}} 
                             onClick={
                                 () => 
-                                {create_new_ticket({ticketTitle,ticketCategory,ticketPriority,ticketProblemDescription,ticketSolicantName, ticketSolicantEmail,setTickets})}
+                                {create_new_ticket({ticketTitle,ticketCategory,ticketPriority,ticketProblemDescription,ticketSolicitant,setTickets})}
                                 }>Criar Chamado</button>
                             <button className="tab-btn" style={{width:"40%", backgroundColor:"red"}} onClick={() => setCreateNewTicketIsActive(!createNewTicketActive)}>Cancelar</button>
                         </div>
