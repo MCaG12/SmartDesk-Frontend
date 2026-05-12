@@ -1,3 +1,4 @@
+import { useState } from "react";
 import type { i_Ticket } from "../interfaces/i_ticket";
 import type { i_TicketCategory } from "../interfaces/i_ticketCategory";
 import type { i_TicketPriority } from "../interfaces/i_ticketPriority";
@@ -5,6 +6,7 @@ import type { i_UserLoginInfoResponse } from "../interfaces/i_UserResponse";
 import { Create_New_Ticket_Menu } from "./createNewTicketMenu";
 import { Notification_Menu } from "./notificationsMenu";
 import { Ticket_Table_Body } from "./ticketTableBody";
+import DetailedTicketInfo from "./detailedTicketInfo";
 
 
 
@@ -23,6 +25,8 @@ interface i_TicketTableDashboard
 export default function TicketTableDashboard({notificationIsActive,setTickets, setCreateNewTicketIsActive, 
                                               createNewTicketActive, tickets, ticketPriorities, ticketCategories,userInfo}: i_TicketTableDashboard)
 {
+    const [showDetailedTicket, setShowDetailedTicket] = useState(false);
+    const [infoDetailedTicket, setInfoDetailedTicket] = useState<i_Ticket>()
 
     return(
     <>
@@ -37,6 +41,14 @@ export default function TicketTableDashboard({notificationIsActive,setTickets, s
                 padding: "1%",
                 boxSizing: "border-box"
                 }}>
+
+            {
+                (showDetailedTicket && infoDetailedTicket) &&
+                    <DetailedTicketInfo 
+                        ticketInfo={infoDetailedTicket}
+                        setShowDetailedTicket={setShowDetailedTicket}
+                    />
+            }
 
             {
                 notificationIsActive &&
@@ -69,15 +81,12 @@ export default function TicketTableDashboard({notificationIsActive,setTickets, s
                 </div>
                 {
                     tickets.filter(ticket => {return ticket.ticketStatus.name == "Open"}).map(ticket => (
-                        Ticket_Table_Body({
-                        id: ticket.Id,
-                        title: ticket.ticketTitle,
-                        openingDate: ticket.ticketDateOpen,
-                        closingDate: ticket.ticketDateClose,
-                        department: ticket.ticketSolicitant.name,
-                        problemCategory: ticket.ticketCategory.name,
-                        priority: ticket.ticketPriority.name,
-                        })
+                        <Ticket_Table_Body 
+                            ticketInfo={ticket}
+                            setInfoDetailedTicket={setInfoDetailedTicket}
+                            setShowDetailedTicket={setShowDetailedTicket}
+                            showDetailedTicket={showDetailedTicket}
+                        />
                     ))
                 }
             </div>
@@ -89,15 +98,11 @@ export default function TicketTableDashboard({notificationIsActive,setTickets, s
                 </div>
                 {
                     tickets.filter(ticket => {return ticket.ticketStatus.name == "In Progress"}).map(ticket => (
-                        Ticket_Table_Body({
-                        id: ticket.Id,
-                        title: ticket.ticketTitle,
-                        openingDate: ticket.ticketDateOpen,
-                        closingDate: ticket.ticketDateClose,
-                        department: ticket.ticketSolicitant.name,
-                        problemCategory: ticket.ticketCategory.name,
-                        priority: ticket.ticketPriority.name,
-                        })
+                        <Ticket_Table_Body 
+                            ticketInfo={ticket}
+                            setInfoDetailedTicket={setInfoDetailedTicket}
+                            setShowDetailedTicket={setShowDetailedTicket}
+                        />
                     ))
                 }
             </div>
@@ -110,14 +115,9 @@ export default function TicketTableDashboard({notificationIsActive,setTickets, s
                 {
                     tickets.filter(ticket => {return ticket.ticketStatus.name == "Awaiting Confirmation"}).map(ticket => (
                         <Ticket_Table_Body
-                            key={ticket.Id}
-                            id={ticket.Id}
-                            title={ticket.ticketTitle}
-                            openingDate={ticket.ticketDateOpen}
-                            closingDate={ticket.ticketDateClose}
-                            department={ticket.ticketSolicitant.name}
-                            problemCategory={ticket.ticketCategory.name}
-                            priority={ticket.ticketPriority.name}
+                            ticketInfo={ticket}
+                            setShowDetailedTicket={setShowDetailedTicket}
+                            setInfoDetailedTicket={setInfoDetailedTicket}
                         />
                     ))
                 }       
@@ -130,15 +130,11 @@ export default function TicketTableDashboard({notificationIsActive,setTickets, s
                 </div>
                 {
                     tickets.filter(ticket => {return ticket.ticketStatus.name == "Resolved"}).map(ticket => (
-                        Ticket_Table_Body({
-                        id: ticket.Id,
-                        title: ticket.ticketTitle,
-                        openingDate: ticket.ticketDateOpen,
-                        closingDate: ticket.ticketDateClose,
-                        department: ticket.ticketSolicitant.name,
-                        problemCategory: ticket.ticketCategory.name,
-                        priority: ticket.ticketPriority.name,
-                        })
+                        <Ticket_Table_Body 
+                            ticketInfo={ticket}
+                            setInfoDetailedTicket={setInfoDetailedTicket}
+                            setShowDetailedTicket={setShowDetailedTicket}
+                        />
                     ))
                 }   
             </div>

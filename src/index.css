@@ -457,3 +457,150 @@
   color: #6b7280;
 }
 
+.tableTicketBody
+{
+  background-color: #ffffff;
+  border: 0.5px solid #c2c2c2;
+  border-Radius: var(--border-radius-lg);
+  padding: 14px 16px;
+  display: flex;
+  flex-Direction: column;
+  gap: 8px;
+  width: 100%;
+  box-Sizing: border-box;
+  
+}
+
+.tableTicketBody:hover
+{
+  cursor: pointer;
+  background-color:rgb(207, 207, 207);
+}
+
+/* Modal Overlay */
+.detailed-ticket-overlay {
+  position: fixed;
+  inset: 0;
+  background-color: rgba(0, 0, 0, 0.55);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+/* Modal Container */
+.detailed-ticket-modal {
+  background-color: #ffffff;
+  border-radius: 12px;
+  width: 620px;
+  max-width: 95vw;
+  max-height: 90vh;
+  overflow-y: auto;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.18);
+  display: flex;
+  flex-direction: column;
+}
+
+/* Header */
+.detailed-ticket-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 18px 24px 14px 24px;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.detailed-ticket-header h2 {
+  font-size: 18px;
+  font-weight: 600;
+  color: #1e3a5f;
+  margin: 0;
+}
+
+.detailed-ticket-header h2 span.ticket-id {
+  color: #1e3a5f;
+}
+
+.detailed-ticket-close-btn {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  border: 2px solid #e24b4a;
+  background: transparent;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #e24b4a;
+  font-size: 16px;
+  line-height: 1;
+  transition: background 0.15s, color 0.15s;
+}
+
+.detailed-ticket-close-btn:hover {
+  background: #e24b4a;
+  color: #ffffff;
+}
+
+/* Body */
+.detailed-ticket-body {
+  padding: 20px 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+/* Fields Grid */
+.detailed-ticket-fields {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px 32px;
+  padding-bottom: 20px;
+  border-bottom: 1px solid #e5e7eb;
+  margin-bottom: 20px;
+}
+
+.detailed-ticket-field {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.detailed-ticket-field label {
+  font-size: 13px;
+  font-weight: 600;
+  color: #111827;
+}
+
+.detailed-ticket-field span {
+  font-size: 13px;
+  color: #6b7280;
+}
+
+/* Attachments Section */
+.detailed-ticket-attachments h3 {
+  font-size: 14px;
+  font-weight: 600;
+  color: #111827;
+  margin: 0 0 12px 0;
+}
+
+.detailed-ticket-attachments-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.detailed-ticket-attachment-thumb {
+  width: 160px;
+  height: 100px;
+  border-radius: 8px;
+  object-fit: cover;
+  border: 1px solid #e5e7eb;
+  cursor: pointer;
+  transition: opacity 0.15s;
+}
+
+.detailed-ticket-attachment-thumb:hover {
+  opacity: 0.85;
+}

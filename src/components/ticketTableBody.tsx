@@ -1,33 +1,23 @@
+import type { i_Ticket } from "../interfaces/i_ticket";
+
 interface interface_ticket_table_body
 {
-    id: number;
-    title: string;
-    openingDate : Date;
-    closingDate : Date | null;
-    department : string;
-    problemCategory: string;
-    priority:string
+    ticketInfo : i_Ticket
+    setShowDetailedTicket: React.Dispatch<React.SetStateAction<boolean>>
+    setInfoDetailedTicket: React.Dispatch<React.SetStateAction<i_Ticket | undefined>>
+    showDetailedTicket: boolean
 }
 
-export function Ticket_Table_Body({ id, title, openingDate, closingDate, department, problemCategory, priority }: interface_ticket_table_body) {
+export function Ticket_Table_Body({ ticketInfo, 
+                                    setShowDetailedTicket, setInfoDetailedTicket, showDetailedTicket}: interface_ticket_table_body) {
 
   const formatDate = (d: Date | null) =>
     d ? new Date(d).toLocaleDateString("pt-BR", { day: "2-digit", month: "2-digit", year: "numeric" }) : "—";
 
   return (
     <>
-      <div style={{
-        backgroundColor: "#ffffff",
-        border: "0.5px solid #c2c2c2",
-        borderRadius: "var(--border-radius-lg)",
-        padding: "14px 16px",
-        display: "flex",
-        flexDirection: "column",
-        gap: "8px",
-        width: "100%",
-        boxSizing: "border-box"
-      }}>
-
+      <div onClick={() => {setShowDetailedTicket(!showDetailedTicket); setInfoDetailedTicket(ticketInfo)}} 
+        className="tableTicketBody">
         {/* Header: status dot + title + avatar */}
         <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
           <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
@@ -38,7 +28,7 @@ export function Ticket_Table_Body({ id, title, openingDate, closingDate, departm
               flexShrink: 0
             }} />
             <span style={{ fontWeight: 500, fontSize: "14px", color: "var(--color-text-primary)" }}>
-              #{id} | {title}
+              #{ticketInfo.Id} | {ticketInfo.ticketTitle}
             </span>
           </div>
           {/* Initials avatar fallback */}
@@ -48,22 +38,21 @@ export function Ticket_Table_Body({ id, title, openingDate, closingDate, departm
             display: "flex", alignItems: "center", justifyContent: "center",
             fontSize: "12px", fontWeight: 500, color: "#1d4ed8"
           }}>
-            Ag
+            {ticketInfo.ticketAgent
+              ? ticketInfo.ticketAgent.name.slice(0, 2).toUpperCase()
+              : "??"}
           </div>
         </div>
-
         {/* Opening date */}
         <div style={{ display: "flex", alignItems: "center", gap: "6px", fontSize: "13px", color: "var(--color-text-secondary)" }}>
           <i className="ti ti-calendar" style={{ fontSize: "15px" }} aria-hidden="true" />
-          <span>{formatDate(openingDate)}</span>
+          <span>{formatDate(ticketInfo.ticketDateOpen)}</span>
         </div>
-
         {/* Department */}
         <div style={{ display: "flex", alignItems: "center", gap: "6px", fontSize: "13px", color: "var(--color-text-secondary)" }}>
           <i className="ti ti-map-pin" style={{ fontSize: "15px" }} aria-hidden="true" />
-          <span>{department}</span>
+          <span>{ticketInfo.ticketSolicitant.email}</span>
         </div>
-
         {/* Footer: tags + action button */}
         <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginTop: "4px" }}>
           <div style={{ display: "flex", gap: "6px" }}>
@@ -71,12 +60,12 @@ export function Ticket_Table_Body({ id, title, openingDate, closingDate, departm
               backgroundColor: "#dbeafe", color: "#1d4ed8",
               fontSize: "12px", fontWeight: 500,
               padding: "3px 10px", borderRadius: "6px"
-            }}>{problemCategory}</span>
+            }}>{ticketInfo.ticketCategory.name}</span>
             <span style={{
               backgroundColor: "#fef3c7", color: "#b45309",
               fontSize: "12px", fontWeight: 500,
               padding: "3px 10px", borderRadius: "6px"
-            }}>{priority}</span>
+            }}>{ticketInfo.ticketPriority.name}</span>
           </div>
           <button style={{
             width: "28px", height: "28px",
@@ -87,7 +76,6 @@ export function Ticket_Table_Body({ id, title, openingDate, closingDate, departm
             color: "white", fontSize: "18px", lineHeight: 1
           }}>+</button>
         </div>
-
       </div>
     </>
   );
