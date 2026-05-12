@@ -9,6 +9,7 @@ import UserBoardState from "../components/userDashboard";
 import UserDashBoard from "../components/userDashboard";
 import GreetingDashboard from "../components/greetingDashboard";
 import TicketTableDashboard from "../components/ticketTableDashboard";
+import type { i_TicketCategory } from "../interfaces/i_ticketCategory";
 
 interface TicketStatus {
   id: number;
@@ -20,10 +21,7 @@ interface TicketPriority {
   name: string;
 }
 
-interface TicketCategory {
-  id: number;
-  name: string;
-}
+
 
 interface TicketUser {
   id: number;
@@ -37,12 +35,28 @@ interface i_Ticket {
   ticketStatus: TicketStatus;
   ticketPriority: TicketPriority;
   ticketDescription: string;
-  ticketCategory: TicketCategory;
+  ticketCategory: i_TicketCategory;
   ticketDateOpen: Date;
   ticketDateClose: Date | null;
   ticketSolicitant: TicketUser;
   ticketAgent: TicketUser | null;
 }
+
+const ticketPriorities : TicketPriority[] = 
+[
+   { id: 1, name: "Low" }, 
+   { id: 2, name: "Medium" },
+   { id: 3, name: "High" },
+   { id: 4, name: "Critical" } 
+]
+
+const ticketCategories : i_TicketCategory[] =
+[
+    {id:1, name: "Bug"},
+    {id:2, name: "Feature Request"},
+    {id:3, name: "Performance"},
+    {id:4, name: "Printer"}
+]
 
 const tickets: i_Ticket[] = [
  {
@@ -149,15 +163,36 @@ function fetchTickets(setTickets:React.Dispatch<React.SetStateAction<i_Ticket[]>
     setTickets(ticketsFound);
 }
 
+function fetchTicketPriorities(setTicketPriorities:React.Dispatch<React.SetStateAction<TicketPriority[]>>)
+{
+    const ticketPriority = ticketPriorities;
+    setTicketPriorities(ticketPriority);
+}
+
+function fetchTicketCategories(setTicketCategories:React.Dispatch<React.SetStateAction<i_TicketCategory[]>>)
+{
+    const foundTicketCategories = ticketCategories;
+    setTicketCategories(foundTicketCategories);
+}
+
 export default function DashScreenScreen() {
     const [dashBoardState, setDashBoardState] = useState(0)
     const [notificationIsActive, setNotificationIsActive] = useState(false)
     const [createNewTicketActive, setCreateNewTicketIsActive] = useState(false)
     const [tickets, setTickets] = useState<i_Ticket[]>([]);
-
+    const [ticketPriorities, setTicketPriorities] = useState<TicketPriority[]>([]);
+    const [ticketCategories, setTicketCategories] = useState<i_TicketCategory[]>([]);
         
    useEffect(() => {
         fetchTickets(setTickets);
+    }, []);
+
+    useEffect(() => {
+        fetchTicketPriorities(setTicketPriorities);
+    }, []);
+
+    useEffect(() => {
+        fetchTicketCategories(setTicketCategories);
     }, []);
 
     function drawDashBoard(dashBoardState : number)
@@ -171,16 +206,22 @@ export default function DashScreenScreen() {
                     setNotificationIsActive={setNotificationIsActive}
                     createNewTicketActive={createNewTicketActive}
                     setCreateNewTicketIsActive={setCreateNewTicketIsActive}
+                    tickets={tickets}
+                    setTickets={setTickets}
+                    ticketCategories={ticketCategories}
+                    ticketPriorities={ticketPriorities}
                 />
             }
             case 1:
                 {
                     return <TicketTableDashboard
                         notificationIsActive={notificationIsActive}
-                        setNotificationIsActive={setNotificationIsActive}
+                        setTickets={setTickets}
                         setCreateNewTicketIsActive={setCreateNewTicketIsActive}
                         createNewTicketActive={createNewTicketActive}
                         tickets={tickets} 
+                        ticketPriorities={ticketPriorities}
+                        ticketCategories={ticketCategories}
                     />
                 }
             case 2:

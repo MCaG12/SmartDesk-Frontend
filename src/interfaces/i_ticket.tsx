@@ -1,14 +1,7 @@
+import type { i_TicketCategory } from "./i_ticketCategory";
+import type { i_TicketPriority } from "./i_ticketPriority";
+
 export interface TicketStatus {
-  id: number;
-  name: string;
-}
-
-export interface TicketPriority {
-  id: number;
-  name: string;
-}
-
-export interface TicketCategory {
   id: number;
   name: string;
 }
@@ -23,9 +16,9 @@ export interface i_Ticket {
   Id: number;
   ticketTitle: string;
   ticketStatus: TicketStatus;
-  ticketPriority: TicketPriority;
+  ticketPriority: i_TicketPriority;
   ticketDescription: string;
-  ticketCategory: TicketCategory;
+  ticketCategory: i_TicketCategory;
   ticketDateOpen: Date;
   ticketDateClose: Date | null;
   ticketSolicitant: TicketUser;

@@ -2,6 +2,9 @@ import DashBoardNewTicketsImage from "../images/DashBoardNewTicketsImage.png"
 import DashBoardTicketAWaitingForConfirmationImage from "../images/DashBoardTicketAWaitingForConfirmationImage.png"
 import DashBoardTicketsCompletedImage from "../images/DashBoardTicketsCompletedImage.png"
 import DashBoardTicketsInProgressImage from "../images/DashBoardTicketsInProgressImage.png"
+import type { i_Ticket } from "../interfaces/i_ticket";
+import type { i_TicketCategory } from "../interfaces/i_ticketCategory";
+import type { i_TicketPriority } from "../interfaces/i_ticketPriority";
 import { Create_New_Ticket_Menu } from "./createNewTicketMenu";
 import { Notification_Menu } from "./notificationsMenu";
 
@@ -11,9 +14,14 @@ interface i_greetingDashboard
     setNotificationIsActive: React.Dispatch<React.SetStateAction<boolean>>
     createNewTicketActive: boolean;
     setCreateNewTicketIsActive: React.Dispatch<React.SetStateAction<boolean>>
+    tickets: i_Ticket[];
+    setTickets: React.Dispatch<React.SetStateAction<i_Ticket[]>>;
+    ticketCategories: i_TicketCategory[];
+    ticketPriorities: i_TicketPriority[];
 }
 
-export default function GreetingDashboard({notificationIsActive, setNotificationIsActive, createNewTicketActive, setCreateNewTicketIsActive} : i_greetingDashboard)
+export default function GreetingDashboard({notificationIsActive, ticketPriorities, createNewTicketActive, 
+                                           setCreateNewTicketIsActive, tickets,setTickets,ticketCategories } : i_greetingDashboard)
 {
     return(
     <>
@@ -37,7 +45,7 @@ export default function GreetingDashboard({notificationIsActive, setNotification
                         </div>
                         <div style={{display:"flex", flexDirection:"column", width:"80%"}}>
                             <p className="card-title" style={{fontSize:"1.5rem", color:"#666666"}}>Aberto</p>
-                            <p className="card-meta" style={{fontSize:"1.25rem", color:"#1f1f1f"}}>test</p>
+                            <p className="card-meta" style={{fontSize:"1.25rem", color:"#1f1f1f"}}>{(tickets.filter((ticket) => {return ticket.ticketStatus.name == "Open"})).length}</p>
                         </div>
                     </div>
 
@@ -47,7 +55,7 @@ export default function GreetingDashboard({notificationIsActive, setNotification
                         </div>
                         <div style={{display:"flex", flexDirection:"column", width:"80%"}}>
                             <p className="card-title" style={{fontSize:"1.5rem", color:"#666666"}}>Em Andamento</p>
-                            <p className="card-meta" style={{fontSize:"1.25rem", color:"#1f1f1f"}}>test</p>
+                            <p className="card-meta" style={{fontSize:"1.25rem", color:"#1f1f1f"}}>{(tickets.filter((ticket) => {return ticket.ticketStatus.name == "In Progress"})).length}</p>
                         </div>
                     </div>
 
@@ -57,7 +65,7 @@ export default function GreetingDashboard({notificationIsActive, setNotification
                         </div>
                         <div style={{display:"flex", flexDirection:"column", width:"80%"}}>
                             <p className="card-title" style={{fontSize:"1.5rem", color:"#666666"}}>Ag.Terceiros</p>
-                            <p className="card-meta" style={{fontSize:"1.25rem", color:"#1f1f1f"}}>test</p>
+                            <p className="card-meta" style={{fontSize:"1.25rem", color:"#1f1f1f"}}>{(tickets.filter((ticket) => {return ticket.ticketStatus.name == "Awaiting Confirmation"})).length}</p>
                         </div>
                     </div>
 
@@ -67,7 +75,7 @@ export default function GreetingDashboard({notificationIsActive, setNotification
                         </div>
                         <div style={{display:"flex", flexDirection:"column", width:"80%"}}>
                             <p className="card-title" style={{fontSize:"1.5rem", color:"#666666"}}>Concluídos</p>
-                            <p className="card-meta" style={{fontSize:"1.25rem", color:"#1f1f1f",}}>test</p>
+                            <p className="card-meta" style={{fontSize:"1.25rem", color:"#1f1f1f"}}>{(tickets.filter((ticket) => {return ticket.ticketStatus.name == "Resolved"})).length}</p>
                         </div>
                     </div>
                 </div>
@@ -82,7 +90,9 @@ export default function GreetingDashboard({notificationIsActive, setNotification
                         <Create_New_Ticket_Menu 
                             setCreateNewTicketIsActive={setCreateNewTicketIsActive}
                             createNewTicketActive={createNewTicketActive} 
-                            
+                            setTickets={setTickets}
+                            ticketPriorities={ticketPriorities}
+                            ticketCategories={ticketCategories}  
                         />
                 }
 
