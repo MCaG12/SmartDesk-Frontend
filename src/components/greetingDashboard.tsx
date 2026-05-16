@@ -47,7 +47,7 @@ export default function GreetingDashboard({notificationIsActive, ticketPrioritie
                         </div>
                         <div style={{display:"flex", flexDirection:"column", width:"80%"}}>
                             <p className="card-title" style={{fontSize:"1.5rem", color:"#666666"}}>Aberto</p>
-                            <p className="card-meta" style={{fontSize:"1.25rem", color:"#1f1f1f"}}>{(tickets.filter((ticket) => {return ticket.ticketStatus.name == "Open"})).length}</p>
+                            <p className="card-meta" style={{fontSize:"1.25rem", color:"#1f1f1f"}}>{(tickets.filter((ticket) => {return ticket.ticketStatus.tickstaDescription == "NOVO TICKET"})).length}</p>
                         </div>
                     </div>
 
@@ -57,7 +57,7 @@ export default function GreetingDashboard({notificationIsActive, ticketPrioritie
                         </div>
                         <div style={{display:"flex", flexDirection:"column", width:"80%"}}>
                             <p className="card-title" style={{fontSize:"1.5rem", color:"#666666"}}>Em Andamento</p>
-                            <p className="card-meta" style={{fontSize:"1.25rem", color:"#1f1f1f"}}>{(tickets.filter((ticket) => {return ticket.ticketStatus.name == "In Progress"})).length}</p>
+                            <p className="card-meta" style={{fontSize:"1.25rem", color:"#1f1f1f"}}>{(tickets.filter((ticket) => {return ticket.ticketStatus.tickstaDescription == "EM ANDAMENTO"})).length}</p>
                         </div>
                     </div>
 
@@ -67,7 +67,7 @@ export default function GreetingDashboard({notificationIsActive, ticketPrioritie
                         </div>
                         <div style={{display:"flex", flexDirection:"column", width:"80%"}}>
                             <p className="card-title" style={{fontSize:"1.5rem", color:"#666666"}}>Ag.Terceiros</p>
-                            <p className="card-meta" style={{fontSize:"1.25rem", color:"#1f1f1f"}}>{(tickets.filter((ticket) => {return ticket.ticketStatus.name == "Awaiting Confirmation"})).length}</p>
+                            <p className="card-meta" style={{fontSize:"1.25rem", color:"#1f1f1f"}}>{(tickets.filter((ticket) => {return ticket.ticketStatus.tickstaDescription == "AGUARDANDO RESPOSTA"})).length}</p>
                         </div>
                     </div>
 
@@ -77,7 +77,7 @@ export default function GreetingDashboard({notificationIsActive, ticketPrioritie
                         </div>
                         <div style={{display:"flex", flexDirection:"column", width:"80%"}}>
                             <p className="card-title" style={{fontSize:"1.5rem", color:"#666666"}}>Concluídos</p>
-                            <p className="card-meta" style={{fontSize:"1.25rem", color:"#1f1f1f"}}>{(tickets.filter((ticket) => {return ticket.ticketStatus.name == "Resolved"})).length}</p>
+                            <p className="card-meta" style={{fontSize:"1.25rem", color:"#1f1f1f"}}>{(tickets.filter((ticket) => {return ticket.ticketStatus.tickstaDescription == "FINALIZADO"})).length}</p>
                         </div>
                     </div>
                 </div>

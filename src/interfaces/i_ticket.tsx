@@ -2,25 +2,25 @@ import type { i_TicketCategory } from "./i_ticketCategory";
 import type { i_TicketPriority } from "./i_ticketPriority";
 
 export interface TicketStatus {
-  id: number;
-  name: string;
+  Id: number;
+  tickstaDescription: string;
 }
 
 export interface TicketUser {
   Id: number;
-  name: string;
-  email: string;
+  usuarNome: string;
+  usuarEmail: string;
 }
 
 export interface i_Ticket {
   Id: number;
   ticketTitle: string;
   ticketStatus: TicketStatus;
-  ticketPriority: i_TicketPriority;
+  ticketPriority: i_TicketPriority;   
   ticketDescription: string;
-  ticketCategory: i_TicketCategory;
-  ticketDateOpen: Date;
-  ticketDateClose: Date | null;
+  ticketCategory: i_TicketCategory;   
+  ticketDateOpen: string;             
+  ticketDateClose: string | null;     
   ticketSolicitant: TicketUser;
   ticketAgent: TicketUser | null;
 }

@@ -80,7 +80,7 @@ export default function TicketTableDashboard({notificationIsActive,setTickets, s
                 <h1 className="greetTitle" style={{ fontSize: "1.5rem" }}>Novos Chamados</h1>
                 </div>
                 {
-                    tickets.filter(ticket => {return ticket.ticketStatus.name == "Open"}).map(ticket => (
+                    tickets.filter(ticket => {return ticket.ticketStatus.tickstaDescription == "NOVO TICKET"}).map(ticket => (
                         <Ticket_Table_Body 
                             ticketInfo={ticket}
                             setInfoDetailedTicket={setInfoDetailedTicket}
@@ -97,11 +97,12 @@ export default function TicketTableDashboard({notificationIsActive,setTickets, s
                 <h1 className="greetTitle" style={{ fontSize: "1.5rem" }}>Em Andamento</h1>
                 </div>
                 {
-                    tickets.filter(ticket => {return ticket.ticketStatus.name == "In Progress"}).map(ticket => (
+                    tickets.filter(ticket => {return ticket.ticketStatus.tickstaDescription == "EM ANDAMENTO"}).map(ticket => (
                         <Ticket_Table_Body 
                             ticketInfo={ticket}
                             setInfoDetailedTicket={setInfoDetailedTicket}
                             setShowDetailedTicket={setShowDetailedTicket}
+                            showDetailedTicket={showDetailedTicket}
                         />
                     ))
                 }
@@ -113,11 +114,12 @@ export default function TicketTableDashboard({notificationIsActive,setTickets, s
                 <h1 className="greetTitle" style={{ fontSize: "1.5rem" }}>Ag. Terceiros</h1>
                 </div>
                 {
-                    tickets.filter(ticket => {return ticket.ticketStatus.name == "Awaiting Confirmation"}).map(ticket => (
+                    tickets.filter(ticket => {return ticket.ticketStatus.tickstaDescription == "AGUARDANDO RESPOSTA"}).map(ticket => (
                         <Ticket_Table_Body
                             ticketInfo={ticket}
                             setShowDetailedTicket={setShowDetailedTicket}
                             setInfoDetailedTicket={setInfoDetailedTicket}
+                            showDetailedTicket={showDetailedTicket}
                         />
                     ))
                 }       
@@ -129,11 +131,12 @@ export default function TicketTableDashboard({notificationIsActive,setTickets, s
                 <h1 className="greetTitle" style={{ fontSize: "1.5rem" }}>Concluídos</h1>
                 </div>
                 {
-                    tickets.filter(ticket => {return ticket.ticketStatus.name == "Resolved"}).map(ticket => (
+                    tickets.filter(ticket => {return ticket.ticketStatus.tickstaDescription == "FINALIZADO"}).map(ticket => (
                         <Ticket_Table_Body 
                             ticketInfo={ticket}
                             setInfoDetailedTicket={setInfoDetailedTicket}
                             setShowDetailedTicket={setShowDetailedTicket}
+                            showDetailedTicket={showDetailedTicket}
                         />
                     ))
                 }   

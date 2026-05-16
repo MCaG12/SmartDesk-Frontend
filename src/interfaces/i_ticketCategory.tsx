@@ -1,4 +1,4 @@
 export interface i_TicketCategory {
-  id: number;
-  name: string;
+  Id: number;
+  tickcatDescription: string;
 }

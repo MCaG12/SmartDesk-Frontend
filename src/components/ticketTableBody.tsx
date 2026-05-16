@@ -11,9 +11,6 @@ interface interface_ticket_table_body
 export function Ticket_Table_Body({ ticketInfo, 
                                     setShowDetailedTicket, setInfoDetailedTicket, showDetailedTicket}: interface_ticket_table_body) {
 
-  const formatDate = (d: Date | null) =>
-    d ? new Date(d).toLocaleDateString("pt-BR", { day: "2-digit", month: "2-digit", year: "numeric" }) : "—";
-
   return (
     <>
       <div onClick={() => {setShowDetailedTicket(!showDetailedTicket); setInfoDetailedTicket(ticketInfo)}} 
@@ -38,20 +35,20 @@ export function Ticket_Table_Body({ ticketInfo,
             display: "flex", alignItems: "center", justifyContent: "center",
             fontSize: "12px", fontWeight: 500, color: "#1d4ed8"
           }}>
-            {ticketInfo.ticketAgent
-              ? ticketInfo.ticketAgent.name.slice(0, 2).toUpperCase()
+            {ticketInfo.ticketAgent  
+              ? ticketInfo.ticketAgent.usuarNome.slice(0, 2).toUpperCase()
               : "??"}
           </div>
         </div>
         {/* Opening date */}
         <div style={{ display: "flex", alignItems: "center", gap: "6px", fontSize: "13px", color: "var(--color-text-secondary)" }}>
           <i className="ti ti-calendar" style={{ fontSize: "15px" }} aria-hidden="true" />
-          <span>{formatDate(ticketInfo.ticketDateOpen)}</span>
+          <span>{ticketInfo.ticketDateOpen}</span>
         </div>
         {/* Department */}
         <div style={{ display: "flex", alignItems: "center", gap: "6px", fontSize: "13px", color: "var(--color-text-secondary)" }}>
           <i className="ti ti-map-pin" style={{ fontSize: "15px" }} aria-hidden="true" />
-          <span>{ticketInfo.ticketSolicitant.email}</span>
+          <span>{ticketInfo.ticketSolicitant.usuarEmail}</span>
         </div>
         {/* Footer: tags + action button */}
         <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginTop: "4px" }}>
@@ -60,12 +57,12 @@ export function Ticket_Table_Body({ ticketInfo,
               backgroundColor: "#dbeafe", color: "#1d4ed8",
               fontSize: "12px", fontWeight: 500,
               padding: "3px 10px", borderRadius: "6px"
-            }}>{ticketInfo.ticketCategory.name}</span>
+            }}>{ticketInfo.ticketCategory.tickcatDescription}</span>
             <span style={{
               backgroundColor: "#fef3c7", color: "#b45309",
               fontSize: "12px", fontWeight: 500,
               padding: "3px 10px", borderRadius: "6px"
-            }}>{ticketInfo.ticketPriority.name}</span>
+            }}>{ticketInfo.ticketPriority.typepriDescription}</span>
           </div>
           <button style={{
             width: "28px", height: "28px",
