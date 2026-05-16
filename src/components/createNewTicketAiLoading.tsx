@@ -1,4 +1,9 @@
-export function NewTicketAiLoading()
+interface NewTicketAiLoadingProps {
+  LoadingText: string;
+}
+
+
+export function NewTicketAiLoading({LoadingText}:NewTicketAiLoadingProps)
 {
     return <div style={{ 
                     display: "flex", 
@@ -31,7 +36,7 @@ export function NewTicketAiLoading()
                         margin: 0,
                         textAlign: "center"
                     }}>
-                        A IA está preparando sugestões de solução para você
+                        {LoadingText}
                     </p>
                     <style>{`
                         @keyframes spin {

@@ -71,7 +71,7 @@ export default function TicketTableDashboard({notificationIsActive,setTickets, s
                 
             <h1 className="DashBoard-Title">Chamados</h1>
             <hr style={{ marginBottom: "2%" }}></hr>
-            <div style={{ display: "flex", flexDirection: "row", justifyContent: "space-evenly", height: "100%" }}>
+            <div style={{ display: "flex", flexDirection: "row", justifyContent: "space-evenly", height: "100%", flexWrap:"wrap", overflowX: "auto"}}>
 
             
             {/* Novos Chamados */}

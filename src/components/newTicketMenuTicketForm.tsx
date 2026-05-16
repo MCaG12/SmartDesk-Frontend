@@ -1,10 +1,16 @@
+import { useRef, useState } from "react";
 import type { i_NewTicketForm } from "../interfaces/i_NewTicket";
 
+function resolvePageStatus(pickedPriority: number): number {
+    return pickedPriority === 5 ? 3 : 1;
+}
 
 export function NewTicketForm({ ticketCategories, ticketPriorities, setTicketTitle, 
                                 setTicketCategory, setTicketPriority, 
                                 setTicketProblemDescription, setPageStatus, setCreateNewTicketIsActive
                             }: i_NewTicketForm) {
+    const [pickedPriority , setPickedPriority] = useState(0);
+    const pickedPriorityRef = useRef(0);
     return (
         <>
             <div className="NewTicketHeader">
@@ -26,8 +32,22 @@ export function NewTicketForm({ ticketCategories, ticketPriorities, setTicketTit
                     </select>
                     <label className="input-label">Prioridade</label>
                     <select className="input-field" defaultValue="" onChange={(e) => {
-                        const selected = ticketPriorities.find(c => c.Id === Number(e.target.value));
-                        if(selected){setTicketPriority(selected);}
+                        const pickedOption = Number(e.target.value);
+                        if(pickedOption == 5)
+                            {
+                              pickedPriorityRef.current = 5;  
+                            }
+                        else
+                        {
+                            const selected = ticketPriorities.find(c => c.Id === pickedOption);
+                            if(selected)
+                                {
+                                    setTicketPriority(selected);
+                                    setPickedPriority(selected.Id);
+                                    pickedPriorityRef.current = selected.Id;
+                                }
+                        }
+                        
                     }}>
                         <option value="" disabled>Selecione uma prioridade</option>
                         {ticketPriorities.map(priority => (
@@ -42,7 +62,9 @@ export function NewTicketForm({ ticketCategories, ticketPriorities, setTicketTit
                 </div>
             </div>
             <div style={{display:"flex", flexDirection:"row", height: "10%", justifyContent:"space-evenly"}}>
-                <button className="tab-btn" style={{width:"40%"}} onClick={() => setPageStatus(1)}>
+                <button className="tab-btn" style={{width:"40%"}} onClick={() => {const priority = pickedPriorityRef.current; 
+                                                                                    console.log("picked priority ->", priority);
+                                                                                    setPageStatus(resolvePageStatus(priority));}}>
                     Criar Chamado
                 </button>
                 <button className="tab-btn" style={{width:"40%", backgroundColor:"red"}} onClick={() => setCreateNewTicketIsActive(false)}>

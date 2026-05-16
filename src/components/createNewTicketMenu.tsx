@@ -9,6 +9,7 @@ import type { i_GetTroubleshootingSuggestion } from "../interfaces/i_TroubleShoo
 import { NewTicketForm } from "./newTicketMenuTicketForm";
 import { AiSuggestionBox } from "./createNewTicketAiSuggestion";
 import { NewTicketAiLoading } from "./createNewTicketAiLoading";
+import type { i_GetPrioritySuggestion } from "../interfaces/i_GetPrioritySuggestion";
 
 interface i_Create_New_Ticket_Menu
 {
@@ -39,6 +40,64 @@ interface SaveTicket
     ticketSolicitant: number,
     setTickets: React.Dispatch<React.SetStateAction<i_Ticket[]>>
 }
+
+async function getPrioritySuggestion({ticketCategoryDescription, ticketProblemDescription, ticketTitle, setAiTicketPrioritySuggestion, setLoadingAi}:i_GetPrioritySuggestion ) {
+  if (!ticketCategoryDescription  || !ticketProblemDescription) {console.log("Failed"); return;}
+  console.log(ticketTitle, ticketCategoryDescription, ticketProblemDescription)
+  setLoadingAi(true);
+  try {
+    const response = await fetch(
+      `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${import.meta.env.VITE_GEMINI_API_KEY}`,
+      {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          contents: [{
+            parts: [{
+              text: `You are an IT helpdesk assistant. A user has opened a support ticket with the following details:
+              
+              Title: ${ticketTitle}
+              Category: ${ticketCategoryDescription}
+              Description: ${ticketProblemDescription}
+              Choose the priority based on the following list of options
+                id: 1 - BAIXA PRIORIDADE
+                id: 2 - MEDIA PRIORIDADE
+                id: 3 - ALTA PRIORIDADE
+                id: 4 - CRITICA PRIORIDADE
+            
+              Respond with ONLY valid JSON, no markdown, no explanation:
+              {
+                    "Id": id of priority selected,
+                    "typepriDescription": "priority text"
+                }
+              `
+            }]
+          }]
+        })
+      }
+    );
+    const data = await response.json();
+    console.log("the suggested priority is -> ", data);
+    const raw = data.candidates[0].content.parts[0].text ?? "";
+    const clean = raw.replace(/```json|```/g, "").trim();
+
+    try {
+        const parsed : i_TicketPriority = JSON.parse(clean);
+        if (parsed.Id && [1, 2, 3, 4].includes(parsed.Id)) {
+            setAiTicketPrioritySuggestion(parsed);
+        } else {
+            console.error("Unexpected priority response:", parsed);
+        }
+    } catch {
+        console.error("Failed to parse priority JSON:", raw);
+    }
+  } catch (err) {
+    console.error(err);
+  } finally {
+    setLoadingAi(false);
+  }
+}
+
 
 async function getTroubleshootingSuggestion({ticketCategoryDescription, ticketPriorityDescription, ticketProblemDescription, ticketTitle, setAiSuggestion, setLoadingAi}:i_GetTroubleshootingSuggestion ) {
   if (!ticketCategoryDescription || !ticketPriorityDescription || !ticketProblemDescription) return;
@@ -175,13 +234,11 @@ export function Create_New_Ticket_Menu
     const [problemSolved, setProblemSolved] = useState(false);
     const ticketSolicitant: i_TicketSolicitant = {Id: userInfo.Id, usuarNome: userInfo.usuarNome, usuarEmail: userInfo.usuarEmail};
     const [pageStatus, setPageStatus] = useState(0);
+    const [aiTicketPrioritySuggestion, setAiTicketPrioritySuggestion] = useState<i_TicketPriority>();
 
     useEffect(() => {
-        if (pageStatus === 1 && ticketCategory && ticketPriority) {
-            console.log(  ticketCategory.tickcatDescription,
-                 ticketPriority.typepriDescription,
-                ticketProblemDescription,
-                ticketTitle,)
+    if (pageStatus === 1) {
+        if (ticketCategory && ticketPriority) {
             getTroubleshootingSuggestion({
                 ticketCategoryDescription: ticketCategory.tickcatDescription,
                 ticketPriorityDescription: ticketPriority.typepriDescription,
@@ -190,8 +247,34 @@ export function Create_New_Ticket_Menu
                 setAiSuggestion,
                 setLoadingAi
             }).then(() => setPageStatus(2));
+        } else {
+            console.log("failed calling suggestion", ticketCategory, ticketPriority);
+        }
+    }
+
+    if (pageStatus === 3) {
+        if (ticketCategory) {
+            getPrioritySuggestion({
+                ticketCategoryDescription: ticketCategory.tickcatDescription,
+                ticketProblemDescription,
+                ticketTitle,
+                setAiTicketPrioritySuggestion,
+                setLoadingAi
+            });
+      
+        } else {
+            console.log("failed", ticketCategory);
+        }
         }
     }, [pageStatus]);
+
+
+    useEffect(() => {
+        if (aiTicketPrioritySuggestion) {
+            setTicketPriority(aiTicketPrioritySuggestion);
+            setPageStatus(1);
+        }
+    }, [aiTicketPrioritySuggestion]);
     
     function renderPage(pageStatus: number, setPageStatus: React.Dispatch<React.SetStateAction<number>>)
     {
@@ -213,7 +296,9 @@ export function Create_New_Ticket_Menu
                 }
             case 1:
                 {
-                    return <NewTicketAiLoading />
+                    return <NewTicketAiLoading 
+                        LoadingText={"A IA está analisando seu problema!"}
+                    />
                 }
             case 2:
             {
@@ -223,7 +308,19 @@ export function Create_New_Ticket_Menu
                         setCreateNewTicketIsActive={setCreateNewTicketIsActive}
                     />
             }
+            case 3:
+                {
+                    return <NewTicketAiLoading
+                        LoadingText={"A IA está escolhendo a prioridade do problema"}
+                    />
+                }
+            case 5:
+                {
+                    return 
+                    // new ticket created interface
+                }
         }          
+
     }
 
     return (
