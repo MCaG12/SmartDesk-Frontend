@@ -9,4 +9,6 @@ export interface i_NewTicketForm {
     setTicketCategory: React.Dispatch<React.SetStateAction<i_TicketCategory | undefined>>;
     setTicketPriority: React.Dispatch<React.SetStateAction<i_TicketPriority | undefined>>;
     setTicketProblemDescription: React.Dispatch<React.SetStateAction<string>>;
+    setPageStatus: React.Dispatch<React.SetStateAction<number>>
+    setCreateNewTicketIsActive: React.Dispatch<React.SetStateAction<boolean>>
 }

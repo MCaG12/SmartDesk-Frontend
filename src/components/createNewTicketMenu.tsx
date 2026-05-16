@@ -1,4 +1,4 @@
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import type { i_Ticket } from "../interfaces/i_ticket";
 import type { i_TicketCategory } from "../interfaces/i_ticketCategory";
 import type { i_UserLoginInfoResponse } from "../interfaces/i_UserResponse";
@@ -8,6 +8,7 @@ import type { i_ticketAgentResponse } from "../interfaces/i_ticketAgentResponse"
 import type { i_GetTroubleshootingSuggestion } from "../interfaces/i_TroubleShootingInterface";
 import { NewTicketForm } from "./newTicketMenuTicketForm";
 import { AiSuggestionBox } from "./createNewTicketAiSuggestion";
+import { NewTicketAiLoading } from "./createNewTicketAiLoading";
 
 interface i_Create_New_Ticket_Menu
 {
@@ -161,6 +162,7 @@ async function create_new_ticket({ticketTitle, ticketCategory, ticketPriority, t
     }
 }
 
+
 export function Create_New_Ticket_Menu
     ({setCreateNewTicketIsActive, createNewTicketActive, setTickets, ticketPriorities, ticketCategories, userInfo}:i_Create_New_Ticket_Menu)
 {
@@ -172,26 +174,61 @@ export function Create_New_Ticket_Menu
     const [loadingAi, setLoadingAi] = useState(false);
     const [problemSolved, setProblemSolved] = useState(false);
     const ticketSolicitant: i_TicketSolicitant = {Id: userInfo.Id, usuarNome: userInfo.usuarNome, usuarEmail: userInfo.usuarEmail};
+    const [pageStatus, setPageStatus] = useState(0);
+
+    useEffect(() => {
+        if (pageStatus === 1 && ticketCategory && ticketPriority) {
+            console.log(  ticketCategory.tickcatDescription,
+                 ticketPriority.typepriDescription,
+                ticketProblemDescription,
+                ticketTitle,)
+            getTroubleshootingSuggestion({
+                ticketCategoryDescription: ticketCategory.tickcatDescription,
+                ticketPriorityDescription: ticketPriority.typepriDescription,
+                ticketProblemDescription,
+                ticketTitle,
+                setAiSuggestion,
+                setLoadingAi
+            }).then(() => setPageStatus(2));
+        }
+    }, [pageStatus]);
+    
+    function renderPage(pageStatus: number, setPageStatus: React.Dispatch<React.SetStateAction<number>>)
+    {
+        switch(pageStatus)
+        {   
+            case 0:
+                {
+                    return  <NewTicketForm
+                        ticketCategories={ticketCategories}
+                        ticketPriorities={ticketPriorities}
+                        ticketTitle={ticketTitle}
+                        setTicketTitle={setTicketTitle}
+                        setTicketCategory={setTicketCategory}
+                        setTicketPriority={setTicketPriority}
+                        setTicketProblemDescription={setTicketProblemDescription}
+                        setPageStatus={setPageStatus}
+                        setCreateNewTicketIsActive={setCreateNewTicketIsActive}
+                    />
+                }
+            case 1:
+                {
+                    return <NewTicketAiLoading />
+                }
+            case 2:
+            {
+                return <AiSuggestionBox
+                        aiSuggestion={aiSuggestion}
+                        setProblemSolved={setProblemSolved}
+                        setCreateNewTicketIsActive={setCreateNewTicketIsActive}
+                    />
+            }
+        }          
+    }
 
     return (
         <div className="NewTicketTab">
-            {aiSuggestion.trim() === "" 
-            ? 
-                <NewTicketForm
-                    ticketCategories={ticketCategories}
-                    ticketPriorities={ticketPriorities}
-                    ticketTitle={ticketTitle}
-                    setTicketTitle={setTicketTitle}
-                    setTicketCategory={setTicketCategory}
-                    setTicketPriority={setTicketPriority}
-                    setTicketProblemDescription={setTicketProblemDescription}
-                />
-            :
-                <AiSuggestionBox
-                    aiSuggestion={aiSuggestion}
-                    setProblemSolved={setProblemSolved}
-                />
-            }          
+            {renderPage(pageStatus, setPageStatus)}       
         </div>
     );
 }
