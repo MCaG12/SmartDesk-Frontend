@@ -1,5 +1,5 @@
 export interface i_AiSuggestionBox {
     aiSuggestion: string;
-    setProblemSolved: React.Dispatch<React.SetStateAction<boolean>>;
+    setPageStatus: React.Dispatch<React.SetStateAction<number>>;
     setCreateNewTicketIsActive: React.Dispatch<React.SetStateAction<boolean>>
 }

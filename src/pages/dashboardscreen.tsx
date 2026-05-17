@@ -14,21 +14,25 @@ import type { i_Ticket } from "../interfaces/i_ticket";
 
 
 
-async function fetchTickets(setTickets:React.Dispatch<React.SetStateAction<i_Ticket[]>>)
+async function fetchTickets(setTickets:React.Dispatch<React.SetStateAction<i_Ticket[]>>, userEmail: string)
 {
-    const url = "http://localhost:3000/Ticket/GetAll";
+    const url = "http://localhost:3000/Ticket/GetTicketsByEmail";
 
     try
     {
         const response = await fetch(url, {
-            method: "GET",
+            method: "POST",
             headers: {
                 "Content-Type": "application/json"
-            }
+            },
+            body: 
+            JSON.stringify({   
+                "email": userEmail
+              
+            })
         });
 
         const data = await response.json() as i_Ticket[]; 
-        console.log("data -> ", data);
         setTickets(data);
     }
     catch (error)
@@ -96,7 +100,7 @@ export default function DashScreenScreen() {
         
    useEffect(() => {
     const fetchData = async () => {
-        await fetchTickets(setTickets);
+        await fetchTickets(setTickets, userFound.usuarEmail);
         
     };
 

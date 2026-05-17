@@ -36,9 +36,11 @@ interface NewTicket
 
 interface SaveTicket
 {
-    ticket_info :i_Ticket,
-    ticketSolicitant: number,
-    setTickets: React.Dispatch<React.SetStateAction<i_Ticket[]>>
+    ticketTitle: string,
+    ticketCategory: i_TicketCategory,
+    ticketPriority: i_TicketPriority,
+    ticketProblemDescription: string,
+    ticketSolicitant: i_TicketSolicitant;
 }
 
 async function getPrioritySuggestion({ticketCategoryDescription, ticketProblemDescription, ticketTitle, setAiTicketPrioritySuggestion, setLoadingAi}:i_GetPrioritySuggestion ) {
@@ -137,7 +139,7 @@ async function getTroubleshootingSuggestion({ticketCategoryDescription, ticketPr
 }
 
 async function save_new_ticket({ticketTitle, ticketCategory, ticketPriority, ticketProblemDescription,
-                             ticketSolicitant}: NewTicket)
+                             ticketSolicitant}: SaveTicket)
 {
     const NewTicket: i_Ticket = {
     Id: 0,  
@@ -192,6 +194,10 @@ async function save_new_ticket({ticketTitle, ticketCategory, ticketPriority, tic
         if (!response.ok) {
             throw new Error(`HTTP error: ${response.status}`);
         }
+        else
+            {
+                console.log("post was a sucess!")
+            }
         
     } 
     catch (error) 
@@ -199,28 +205,6 @@ async function save_new_ticket({ticketTitle, ticketCategory, ticketPriority, tic
         console.error(error);
     }
 }
-                
-async function create_new_ticket({ticketTitle, ticketCategory, ticketPriority, ticketProblemDescription,
-                             ticketSolicitant,problemSolved, setProblemSolved, setAiSuggestion,setLoadingAi }: NewTicket)
-{
-    try 
-    {
-        const ticketCategoryDescription = ticketCategory.tickcatDescription;
-        const ticketPriorityDescription = ticketPriority.typepriDescription
-        await getTroubleshootingSuggestion({ticketCategoryDescription, ticketPriorityDescription, ticketProblemDescription, ticketTitle, setAiSuggestion, setLoadingAi})
-        // if(!problemSolved)
-        //     {
-        //         await save_new_ticket({ticketTitle, ticketCategory, ticketPriority, ticketProblemDescription,ticketSolicitant, problemSolved, setProblemSolved, setAiSuggestion,setLoadingAi})
-        //     }
-        
-        
-    } 
-    catch (error) 
-    {
-        console.error(error);
-    }
-}
-
 
 export function Create_New_Ticket_Menu
     ({setCreateNewTicketIsActive, createNewTicketActive, setTickets, ticketPriorities, ticketCategories, userInfo}:i_Create_New_Ticket_Menu)
@@ -268,13 +252,26 @@ export function Create_New_Ticket_Menu
         }
     }, [pageStatus]);
 
-
     useEffect(() => {
         if (aiTicketPrioritySuggestion) {
             setTicketPriority(aiTicketPrioritySuggestion);
             setPageStatus(1);
         }
     }, [aiTicketPrioritySuggestion]);
+
+    useEffect(() => {
+    if (pageStatus === 4) {
+        if (ticketCategory && ticketPriority) {
+            save_new_ticket({
+                ticketTitle,
+                ticketCategory,
+                ticketPriority,
+                ticketProblemDescription,
+                ticketSolicitant
+            }).then(() => setPageStatus(5));
+        }
+    }
+}, [pageStatus]);
     
     function renderPage(pageStatus: number, setPageStatus: React.Dispatch<React.SetStateAction<number>>)
     {
@@ -304,7 +301,7 @@ export function Create_New_Ticket_Menu
             {
                 return <AiSuggestionBox
                         aiSuggestion={aiSuggestion}
-                        setProblemSolved={setProblemSolved}
+                        setPageStatus={setPageStatus}
                         setCreateNewTicketIsActive={setCreateNewTicketIsActive}
                     />
             }
@@ -316,8 +313,84 @@ export function Create_New_Ticket_Menu
                 }
             case 5:
                 {
-                    return 
-                    // new ticket created interface
+                    return (
+                    <div
+                        className="NewTicketCreated"
+                        style={{
+                            display: "flex",
+                            flexDirection: "column",
+                            alignItems: "center",
+                            justifyContent: "center",
+                            gap: "1.5rem",
+                            padding: "3rem 2rem",
+                            textAlign: "center",
+                            transition: "opacity 0.4s ease, transform 0.4s ease",
+                        }}
+                    >
+                    
+                        <div
+                            style={{
+                                width: 72,
+                                height: 72,
+                                borderRadius: "50%",
+                                backgroundColor: "#22c55e",
+                                display: "flex",
+                                alignItems: "center",
+                                justifyContent: "center",
+                                boxShadow: "0 0 0 8px rgba(34,197,94,0.15)",
+                                fontSize: "2rem",
+                                color: "#fff",
+                                flexShrink: 0,
+                            }}
+                        >
+                            ✓
+                        </div>
+            
+               
+                        <div>
+                            <h2
+                                style={{
+                                    margin: "0 0 0.5rem",
+                                    fontSize: "1.4rem",
+                                    fontWeight: 700,
+                                    color: "var(--color-text, #1e293b)",
+                                }}
+                            >
+                                Ticket criado com sucesso!
+                            </h2>
+                            <p
+                                style={{
+                                    margin: 0,
+                                    fontSize: "0.95rem",
+                                    color: "var(--color-text-muted, #64748b)",
+                                    lineHeight: 1.5,
+                                }}
+                            >
+                                Seu chamado foi registrado e um agente foi atribuído.
+                                <br />
+                                Você receberá atualizações em breve.
+                            </p>
+                        </div>
+            
+                        <button
+                            onClick={() => setCreateNewTicketIsActive(false)}
+                            style={{
+                                marginTop: "0.5rem",
+                                padding: "0.6rem 2rem",
+                                borderRadius: "6px",
+                                border: "none",
+                                backgroundColor: "var(--color-primary, #3b82f6)",
+                                color: "#fff",
+                                fontSize: "0.95rem",
+                                fontWeight: 600,
+                                cursor: "pointer",
+                            }}
+                        >
+                            Fechar
+                        </button>
+                    </div>
+                );
+
                 }
         }          
 

@@ -1,6 +1,6 @@
 import type { i_AiSuggestionBox } from "../interfaces/i_AiSuggestion";
 
-export function AiSuggestionBox({ aiSuggestion, setProblemSolved, setCreateNewTicketIsActive }: i_AiSuggestionBox) {
+export function AiSuggestionBox({ aiSuggestion, setPageStatus, setCreateNewTicketIsActive }: i_AiSuggestionBox) {
     if (!aiSuggestion) return null;
     return (
         <div style={{
@@ -48,7 +48,7 @@ export function AiSuggestionBox({ aiSuggestion, setProblemSolved, setCreateNewTi
                     <i className="ti ti-check" aria-hidden="true"/> Problema resolvido
                 </button>
                 <button className="tab-btn" style={{ flex: 1, backgroundColor: "#e24b4a" }}
-                    onClick={() => setCreateNewTicketIsActive(false)}>
+                    onClick={() => setPageStatus(4)}>
                     <i className="ti ti-ticket" aria-hidden="true"/> Abrir Chamado
                 </button>
             </div>
