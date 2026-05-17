@@ -11,6 +11,30 @@ interface interface_ticket_table_body
 export function Ticket_Table_Body({ ticketInfo, 
                                     setShowDetailedTicket, setInfoDetailedTicket, showDetailedTicket}: interface_ticket_table_body) {
 
+  async function advanceTicket(ticketId: number)
+  {
+    const url = `http://localhost:3000/Ticket/advanceTicket/${ticketId}`;
+
+    try
+    {
+        const response = await fetch(url, {
+            method: "GET",
+            headers: {
+                "Content-Type": "application/json"
+            }
+        });
+
+        if (response.ok) {
+            window.location.reload(); 
+        }
+ 
+    }
+    catch (error)
+    {
+        console.error("Error:", error);
+    }
+  }
+
   return (
     <>
       <div onClick={() => {setShowDetailedTicket(!showDetailedTicket); setInfoDetailedTicket(ticketInfo)}} 
@@ -67,11 +91,17 @@ export function Ticket_Table_Body({ ticketInfo,
           <button style={{
             width: "28px", height: "28px",
             borderRadius: "8px",
-            backgroundColor: "#1e3a5f",
+            backgroundColor: "#9dfaa5",
             border: "none", cursor: "pointer",
             display: "flex", alignItems: "center", justifyContent: "center",
-            color: "white", fontSize: "18px", lineHeight: 1
-          }}>+</button>
+            color: "white", fontSize: "18px", lineHeight: 1,
+          }}
+          onClick={(e) => {
+            e.stopPropagation();
+            e.preventDefault(); 
+            advanceTicket(ticketInfo.Id);
+          }}
+          >+</button>
         </div>
       </div>
     </>
