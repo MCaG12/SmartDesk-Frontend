@@ -1,11 +1,69 @@
 import { useState } from "react"
 import UserLogoImage from "../images/UserImage.png"
 
+interface DashBoardUserInfo
+{
+    Name : string;
+    Email : string;
+    Type : string;
+    Role : string;
+    Department : string;
+}
 
+async function UpdateUserPassword(insertedEmail:string , insertedPassword:string, insertedNewPassword:string, userCheckNewPassword:string)
+{
+    try 
+        {
 
-export default function UserDashBoard()
+            if(insertedEmail.trim() == "" || insertedPassword.trim() == "" || insertedNewPassword.trim() == "" || userCheckNewPassword.trim() == "")
+                {
+                    return;
+                }
+
+            if(insertedNewPassword != userCheckNewPassword)
+                {
+                    return;
+                }
+            
+            const url = "http://localhost:3000/Usuario/UpdatePassword";
+
+            console.log(insertedEmail,insertedPassword,insertedNewPassword)
+    
+            const response = await fetch(url, {
+            method: 'POST', 
+            headers: {
+                'Content-Type': 'application/json' 
+            },
+            body: 
+                JSON.stringify({   
+                    "Email": insertedEmail,
+                    "Password": insertedPassword,
+                    "NewPassword":  insertedNewPassword
+                })
+            })   
+    
+            if (!response.ok) {
+                throw new Error(`HTTP error: ${response.status}`);
+            }
+            else
+                {
+                    console.log("post was a sucess!")
+                }
+            
+        } 
+        catch (error) 
+        {
+            console.error(error);
+        }
+}
+
+export default function UserDashBoard({Name, Email, Type, Role, Department}: DashBoardUserInfo)
 {
     const [userDashBoardState, setUserDashBoardState] = useState(0)
+    const [userEmail, setUserEmail] = useState("");
+    const [userPassword, setUserPassword] = useState("");
+    const [userNewPassword, setUserNewPassword] = useState("");
+    const [userCheckNewPassword, setUserCheckNewPassword] = useState("");
 
     function UserBoardState(userDashBoardState : number)
     {
@@ -56,9 +114,9 @@ export default function UserDashBoard()
                             </div>
 
                             <div style={{display:"flex", flexDirection:"column"}}>
-                                <h2 className="profile-name">Nome pessoas: TESTANDO FONTE</h2>
-                                <h2 className="profile-subtitle">Cargo: TESTANDO FONTE </h2>
-                                <h2 className="profile-subtitle">Matricula: TESTANDO FONTE</h2>
+                                <h2 className="profile-name">Nome: {Name}</h2>
+                                <h2 className="profile-subtitle">Cargo: {Role} </h2>
+                                <h2 className="profile-subtitle">Matricula: {Type}</h2>
                             </div>
                         </div>
 
@@ -67,31 +125,31 @@ export default function UserDashBoard()
                             <div style={{display:"flex", flexDirection:"row", justifyContent:"space-evenly"}}>
                                <div style={{ display: "flex", flexDirection: "column", width: "50%", paddingLeft: "10%" }}>
                                      <h2 className="field-label">Nome Completo: </h2>
-                                    <h2 className="field-value">Matricula: </h2> 
+                                    <h2 className="field-value">{Name} </h2> 
                                </div>
 
                                <div style={{ display: "flex", flexDirection: "column", width: "50%", paddingLeft: "10%" }}>
                                     <h2 className="field-label">Matricula: </h2>
-                                    <h2 className="field-value">Matricula: </h2> 
+                                    <h2 className="field-value">{Type} </h2> 
                                </div>
                             </div>
 
                             <div style={{display:"flex", flexDirection:"row", justifyContent:"center"}}>
                                <div style={{ display: "flex", flexDirection: "column", width: "50%", paddingLeft: "10%" }}>
                                      <h2 className="field-label">E-Mail: </h2>
-                                    <h2 className="field-value">Matricula: </h2> 
+                                    <h2 className="field-value">{Email} </h2> 
                                </div>
 
                                <div style={{ display: "flex", flexDirection: "column", width: "50%", paddingLeft: "10%" }}>
                                     <h2 className="field-label">Setor: </h2>
-                                    <h2 className="field-value">Matricula: </h2> 
+                                    <h2 className="field-value">{Department} </h2> 
                                </div>
                             </div>
 
                             <div style={{display:"flex", flexDirection:"row", justifyContent:"space-evenly"}}>
                                <div style={{ display: "flex", flexDirection: "column", width: "50%", paddingLeft: "10%" }}>
                                      <h2 className="field-label">Cargo: </h2>
-                                    <h2 className="field-value">Matricula: </h2> 
+                                    <h2 className="field-value">{Role}  </h2> 
                                </div>
 
                                <div style={{ display: "flex", flexDirection: "column", width: "50%", paddingLeft: "10%" }}>
@@ -124,30 +182,33 @@ export default function UserDashBoard()
                         <div style={{display:"flex", flexDirection:"row", justifyContent:"space-evenly", width:"100%"}}>
                             <div style={{ display: "flex", flexDirection: "column", width: "45%"}}>
                                 <h2 className="field-label">Email: </h2>
-                                <input className="input-field" placeholder="Email Atual"/> 
+                                <input className="input-field" placeholder="Email Atual" onChange={(e) => setUserEmail(e.target.value)}/> 
                             </div>
 
                             <div style={{ display: "flex", flexDirection: "column", width: "45%" }}>
                                 <h2 className="field-label">Senha Atual: </h2>
-                               <input className="input-field" placeholder="Senha Atual"/> 
+                               <input className="input-field" placeholder="Senha Atual" onChange={(e) => setUserPassword(e.target.value)}/> 
                             </div>
                         </div>
                         <div style={{display:"flex", flexDirection:"row", justifyContent:"space-evenly", width:"100%"}}>
                             <div style={{ display: "flex", flexDirection: "column", width: "45%"}}>
                                 <h2 className="field-label">Nova Senha: </h2>
-                                <input className="input-field" placeholder="Nova Senha"/> 
+                                <input className="input-field" placeholder="Nova Senha" onChange={(e) => setUserNewPassword(e.target.value)}/> 
                             </div>
 
                             <div style={{ display: "flex", flexDirection: "column", width: "45%" }}>
                                 <h2 className="field-label">Confirme Nova Senha: </h2>
-                                <input className="input-field" placeholder="Confirme Nova Senha"/> 
+                                <input className="input-field" placeholder="Confirme Nova Senha" onChange={(e) => setUserCheckNewPassword(e.target.value)}/> 
                             </div>
                         </div>
 
                     </div>  
                          <button
                         className="tab-btn"
-                        onClick={() => {setUserDashBoardState(0)}}
+                        onClick={() => 
+                        {
+                            UpdateUserPassword(userEmail,userPassword, userNewPassword,userCheckNewPassword);
+                        }}
                         style={{ width: "50%", marginRight:"25%", alignSelf:"center", marginTop:"5%" }}
                         >Confirmar alterações</button>
                 </div>

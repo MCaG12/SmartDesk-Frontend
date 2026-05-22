@@ -7,6 +7,7 @@ import type { i_TicketCategory } from "../interfaces/i_ticketCategory";
 import type { i_TicketPriority } from "../interfaces/i_ticketPriority";
 import type { i_UserLoginInfoResponse } from "../interfaces/i_UserResponse";
 import { Create_New_Ticket_Menu } from "./createNewTicketMenu";
+import { LasTicketsCall } from "./lastTicketsTableItem";
 import { Notification_Menu } from "./notificationsMenu";
 
 interface i_greetingDashboard
@@ -114,7 +115,17 @@ export default function GreetingDashboard({notificationIsActive, ticketPrioritie
                 {/* Recent tickets */}
                 <h3 className="DashBoardScreen-ItemFont">Ultimos Chamados</h3>
                 <div className="table-container">
-    
+                    <div style={{display:"flex", flexDirection: "row", justifyContent:"space-evenly"}}>
+                        <p className="table-header">ID</p>
+                        <p className="table-header">Categoria</p>
+                        <p className="table-header">Status</p>
+                        <p className="table-header">Responsável</p>
+                        <p className="table-header">Data de Abertura</p>
+                    </div>
+                    <hr></hr>
+                    {tickets
+                        .filter((ticket) => ticket.ticketStatus.tickstaDescription == "NOVO TICKET")
+                        .map((ticket) => LasTicketsCall(ticket))}
                 </div>
 
         </div>

@@ -160,7 +160,13 @@ export default function DashScreenScreen() {
                 }
             case 2:
             {
-                return <UserDashBoard />
+                return <UserDashBoard 
+                    Name={userFound.usuarNome}
+                    Email={userFound.usuarEmail}
+                    Type={userFound.usuarTipoUsuario.tipusuDescricao}
+                    Role={userFound.usuarCargo.carNome}
+                    Department={userFound.usuarDepartamento.depNomeDepartamento}
+                />
             }
         }
     }
@@ -173,7 +179,7 @@ export default function DashScreenScreen() {
             <div className= "header" style={{display: "flex", flexDirection:"row", justifyContent: "space-evenly"}}>
                  <div style={{display: "flex", flexDirection:"row", alignItems: "center",
                                 justifyContent: "space-evenly", height: "100%", width:"60%",}}>
-                    <img src={TickItLogo} alt="Greeting" style={{ width: "20%", height: "75%", objectFit: "cover", alignSelf: "center", marginBottom: "2%" }} />
+                    
                     <button className="btn-novo-chamado" style={{width:"25%"}} onClick={(() => {setCreateNewTicketIsActive(!createNewTicketActive)})}> Novo Chamado</button>
                 </div>
                 <div style={{display: "flex", flexDirection:"row", justifyContent: "space-evenly", height: "100%", width:"60%"}}>

@@ -197,6 +197,7 @@
   border: 1px solid #f0f0f0;
   overflow: hidden;
   box-sizing: border-box;
+  
 }
 
 /** DASHBOARD HEADER ITEMS*/
@@ -603,4 +604,20 @@
 
 .detailed-ticket-attachment-thumb:hover {
   opacity: 0.85;
+}
+
+.table-header {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  font-size: 20px;
+  font-weight: 600;
+  color: #c0c0c0;
+  letter-spacing: 0.01em;
+}
+
+.table-row {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  font-size: 14px;
+  font-weight: 400;
+  color: #1a1a1a;
+  letter-spacing: 0em;
 }

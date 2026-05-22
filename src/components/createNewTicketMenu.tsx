@@ -189,8 +189,6 @@ async function save_new_ticket({ticketTitle, ticketCategory, ticketPriority, tic
             })
         })   
 
-        
-
         if (!response.ok) {
             throw new Error(`HTTP error: ${response.status}`);
         }
