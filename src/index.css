@@ -1,111 +1,623 @@
-:root {
-  --text: #6b6375;
-  --text-h: #08060d;
-  --bg: #fff;
-  --border: #e5e4e7;
-  --code-bg: #f4f3ec;
-  --accent: #aa3bff;
-  --accent-bg: rgba(170, 59, 255, 0.1);
-  --accent-border: rgba(170, 59, 255, 0.5);
-  --social-bg: rgba(244, 243, 236, 0.5);
-  --shadow:
-    rgba(0, 0, 0, 0.1) 0 10px 15px -3px, rgba(0, 0, 0, 0.05) 0 4px 6px -2px;
-
-  --sans: system-ui, 'Segoe UI', Roboto, sans-serif;
-  --heading: system-ui, 'Segoe UI', Roboto, sans-serif;
-  --mono: ui-monospace, Consolas, monospace;
-
-  font: 18px/145% var(--sans);
-  letter-spacing: 0.18px;
-  color-scheme: light dark;
-  color: var(--text);
-  background: var(--bg);
-  font-synthesis: none;
-  text-rendering: optimizeLegibility;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-
-  @media (max-width: 1024px) {
-    font-size: 16px;
-  }
+*
+{
+  padding: 0px;
+  margin: 0px;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --text: #9ca3af;
-    --text-h: #f3f4f6;
-    --bg: #16171d;
-    --border: #2e303a;
-    --code-bg: #1f2028;
-    --accent: #c084fc;
-    --accent-bg: rgba(192, 132, 252, 0.15);
-    --accent-border: rgba(192, 132, 252, 0.5);
-    --social-bg: rgba(47, 48, 58, 0.5);
-    --shadow:
-      rgba(0, 0, 0, 0.4) 0 10px 15px -3px, rgba(0, 0, 0, 0.25) 0 4px 6px -2px;
-  }
-
-  #social .button-icon {
-    filter: invert(1) brightness(2);
-  }
+#container 
+{
+  width: 100vw;
+  height: 100vh;
 }
 
-#root {
-  width: 1126px;
-  max-width: 100%;
-  margin: 0 auto;
-  text-align: center;
-  border-inline: 1px solid var(--border);
-  min-height: 100svh;
-  display: flex;
+.HeaderFont
+{
+  font-family: 'Inter', sans-serif;
+  font-weight: 700;
+  letter-spacing: -0.03em;
+  line-height: 1.15;
+  padding-bottom: 40px;
+}
+
+.subtleFont {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  font-size: 1 rem;        
+  font-weight: 400;
+  color: #9ca3af;          
+  letter-spacing: 0.01em;
+  line-height: 1.5;
+}
+
+.input-error{
+    border-width: 0px 0px 0px 0px;
+    border-bottom: solid #e53935 !important;
+    color: #e53935;
+    width: 100%;
+    padding: 0.5rem 0;
+    font-size: 0.9375rem;
+    font-weight: 400;
+    background: transparent;
+    outline: none;
+    transition: border-color 0.2s ease;
+    margin-bottom: 3%;
+}
+
+.LoginItem
+{
+  display: flex; 
   flex-direction: column;
+
+}
+
+.input {
+  width: 100%;
+  padding: 0.5rem 0;
+  font-size: 0.9375rem;
+  font-weight: 400;
+  color: #111;
+  background: transparent;
+  border: none;
+  border-bottom: 1px solid #111111;
+  outline: none;
+  transition: border-color 0.2s ease;
+  margin-bottom: 3%;
+}
+
+.button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.625rem 1.5rem;
+  font-size: 1.2rem;
+  font-weight: 500;
+  color: #fff;
+  background-color: #0252bb;
+  border: none;
+  border-radius: 9999px;
+  cursor: pointer;
+  outline: none;
+  transition: background-color 0.2s ease, transform 0.1s ease;
+}
+
+.loginHelpFont 
+{
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  font-size: medium;        
+  font-weight: 400;
+  color: #c0c8d4;          
+  letter-spacing: 0.01em;
+  line-height: 1.5;
+}
+
+.greetTitle {
+  font-family: "Nunito", "Varela Round", sans-serif;
+  font-size: 2rem;
+  font-weight: 700;
+  color: #ffffff;
+  letter-spacing: -0.01em;
+  line-height: 1.2;
+  text-align: center;
+}
+
+.greetSubtitle {
+  font-family: "Nunito", "Varela Round", sans-serif;
+  font-size: 1rem;
+  font-weight: 400;
+  color: rgba(255, 255, 255, 0.85);
+  letter-spacing: 0.01em;
+  line-height: 1.6;
+  text-align: center;
+}
+
+
+/* DASHBOARD SCREEN */
+.header {
+  width: 100%;
+  height: 60px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 2rem;
+  background-color: #ffffff;
+  border-bottom: 3px solid #f0f0f0;
   box-sizing: border-box;
 }
 
-body {
-  margin: 0;
+.sidebar {
+  width: 220px;
+  height: 100%;
+  background-color: #f0f0f0;
+  display: flex;
+  flex-direction: column;
+  padding: 1.5rem 0;
+  box-sizing: border-box;
+  border-right: 1px solid #e5e7eb;
 }
 
-h1,
-h2 {
-  font-family: var(--heading);
+
+.tab-btn {
+  width: 100%;
+  padding: 0.75rem 1.5rem;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  font-family: "Nunito", sans-serif;
+  font-size: 0.9375rem;
   font-weight: 500;
-  color: var(--text-h);
+  color: white;
+  background-color: #4a7fcb;
+  margin-bottom: 4%;  border: none;
+  border-left: 2px solid transparent;
+  text-align: left;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  box-sizing: border-box;
+  border-radius: 10px;
 }
 
-h1 {
-  font-size: 56px;
-  letter-spacing: -1.68px;
-  margin: 32px 0;
-  @media (max-width: 1024px) {
-    font-size: 36px;
-    margin: 20px 0;
-  }
+.stat-card 
+{
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 1rem 1.25rem;
+  background-color: #ffffff;
+  border-radius: 36px;
+  border: 1px solid #f0f0f0;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.06);
+  width: 20%;
+  height: 60%;
+  display: flex;
+  flex-direction: row;
 }
-h2 {
-  font-size: 24px;
-  line-height: 118%;
-  letter-spacing: -0.24px;
-  margin: 0 0 8px;
-  @media (max-width: 1024px) {
-    font-size: 20px;
-  }
+
+.DashBoard-Title {
+  font-family: "Nunito", sans-serif;
+  font-size: 2rem;
+  font-weight: 700;
+  color: #003A7F;
+  letter-spacing: -0.01em;
+  line-height: 1.2;
 }
-p {
+
+.DashBoardScreen-ItemFont {
+  font-family: "Nunito", sans-serif;
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #003A7F;
+  letter-spacing: -0.01em;
+  line-height: 1.2;
+}
+
+.table-container {
+  width: 100%;
+  height: 30%;
+  background-color: #ffffff;
+  border-radius: 12px;
+  border: 1px solid #f0f0f0;
+  overflow: hidden;
+  box-sizing: border-box;
+  
+}
+
+/** DASHBOARD HEADER ITEMS*/
+
+.btn-novo-chamado {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 1.25rem;
+  background-color: #1a7fd4;
+  color: #ffffff;
+  font-family: "Nunito", sans-serif;
+  font-size: 0.9375rem;
+  font-weight: 600;
+  border: none;
+  border-radius: 9999px;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+  width:10%;
+  height: 90%;
+  text-align: center;
+}
+
+.btn-novo-chamado:hover {
+  background-color: #1567b0;
+}
+
+.btn-novo-chamado__icon {
+  font-size: 1rem;
+  font-weight: 700;
+}
+
+/* Search input */
+.search-input-wrapper {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.4rem 1rem;
+  background-color: #f3f4f6;
+  border-radius: 9999px;
+  border: 1px solid #e5e7eb;
+  width:10%;
+  height: 60%;
+  text-align: center;
+}
+
+.search-input {
+  background: transparent;
+  border: none;
+  outline: none;
+  font-family: "Nunito", sans-serif;
+  font-size: 0.875rem;
+  color: #111827;
+  width: 140px;
+}
+
+.search-input::placeholder {
+  color: #9ca3af;
+}
+
+.search-icon {
+  color: #9ca3af;
+  font-size: 0.875rem;
+}
+
+/* Notification bell */
+.icon-btn {
+  width: 45px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: #e9e9e9;
+  border: none;
+  cursor: pointer;
+  border-radius: 50%;
+  transition: background-color 0.2s ease;
+  color: #6b7280;
+  font-size: 1.1rem;
+}
+
+.icon-btn:hover {
+  background-color: #dfdfdf;
+}
+
+/* Avatar */
+.avatar {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background-color: #1a7fd4;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #ffffff;
+  font-size: 1.1rem;
+  cursor: pointer;
+  border: none;
+  transition: opacity 0.2s ease;
+}
+
+.avatar:hover {
+  opacity: 0.85;
+}
+
+.NotificationsTab
+{
+  width: 40%;
+  height: 80%;
+  position: absolute;
+  background-color: white;
+  align-self: flex-end;
+  padding: 20px;
+  border-style: solid;
+  border-width: 4px;
+  border-color: #4a7fcb;
+  
+}
+
+.Dashboard-ItemLabel
+{
+  font-size: 16px;
+  font-weight: 400;
+  color: #6b7280;
+}
+
+.notificationContainer
+{
+  width: 100%;
+  height:80%;
+  background-color: #dfdfdf;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-evenly;
+  align-items: center;
+}
+
+.notificationBody
+{
+  Width: 90%;
+  height: 40%;
+  background-color: white;
+  border-radius: 30px;
+  display: flex;
+  flex-direction: column;
+}
+
+.NewTicketTab
+{
+  width: 40%;
+  height: 80%;
+  position: absolute;
+  background-color: white;
+  align-self: flex-start;
+  border-style: solid;
+  border-width: 4px;
+  border-color: #4a7fcb;
+  border-radius: 20%;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.NewTicketHeader
+{
+  width: 100%;
+  height: 20%;
+  background-color: #4a7fcb;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 10%;
+  
+}
+
+.input-group {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  height:auto;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 10%;
+}
+
+.input-label {
+  font-size: 14px;
+  font-weight: 500;
+  color: #333;
+}
+
+.input-field {
+  width: 60%;
+  padding: 8px 12px;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  font-size: 14px;
+  color: #aaa;
+  outline: none;
+  box-sizing: border-box;
+}
+
+/*** userDashBoard ***/
+
+.field-label {
+    font-size: 2rem;
+    font-weight: 600;
+    color: #4a90d9;
+}
+
+.field-value {
+    font-size: 1.5rem;
+    font-weight: 400;
+    color: #4a4a4a;
+}
+
+.profile-name {
+    font-size: 2rem;
+    font-weight: 700;
+    color: #4a90d9;
+    margin: 0;
+}
+
+
+.profile-subtitle {
+    font-size: 1rem;
+    font-weight: 400;
+    color: #757575;
+    margin: 0;
+}
+
+.input-field {
+  width: 100%;
+  padding: 10px 14px;
+  border: 1px solid #d1d5db;
+  border-radius: 8px;
+  background-color: #f9fafb;
+  color: #374151;
+  font-size: 14px;
+  outline: none;
+  box-sizing: border-box;
+}
+
+/* Title line: "#123 | Internet não funciona..." */
+.card-title {
+  font-size: 18px;
+  font-weight: 300;
+  color: #5f5f5f;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Subtitle lines: date and department */
+.card-meta {
+  font-size: 16px;
+  font-weight: 400;
+  color: #6b7280;
+}
+
+.tableTicketBody
+{
+  background-color: #ffffff;
+  border: 0.5px solid #c2c2c2;
+  border-Radius: var(--border-radius-lg);
+  padding: 14px 16px;
+  display: flex;
+  flex-Direction: column;
+  gap: 8px;
+  width: 100%;
+  box-Sizing: border-box;
+  
+}
+
+.tableTicketBody:hover
+{
+  cursor: pointer;
+  background-color:rgb(207, 207, 207);
+}
+
+/* Modal Overlay */
+.detailed-ticket-overlay {
+  position: fixed;
+  inset: 0;
+  background-color: rgba(0, 0, 0, 0.55);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+/* Modal Container */
+.detailed-ticket-modal {
+  background-color: #ffffff;
+  border-radius: 12px;
+  width: 620px;
+  max-width: 95vw;
+  max-height: 90vh;
+  overflow-y: auto;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.18);
+  display: flex;
+  flex-direction: column;
+}
+
+/* Header */
+.detailed-ticket-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 18px 24px 14px 24px;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.detailed-ticket-header h2 {
+  font-size: 18px;
+  font-weight: 600;
+  color: #1e3a5f;
   margin: 0;
 }
 
-code,
-.counter {
-  font-family: var(--mono);
-  display: inline-flex;
-  border-radius: 4px;
-  color: var(--text-h);
+.detailed-ticket-header h2 span.ticket-id {
+  color: #1e3a5f;
 }
 
-code {
-  font-size: 15px;
-  line-height: 135%;
-  padding: 4px 8px;
-  background: var(--code-bg);
+.detailed-ticket-close-btn {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  border: 2px solid #e24b4a;
+  background: transparent;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #e24b4a;
+  font-size: 16px;
+  line-height: 1;
+  transition: background 0.15s, color 0.15s;
+}
+
+.detailed-ticket-close-btn:hover {
+  background: #e24b4a;
+  color: #ffffff;
+}
+
+/* Body */
+.detailed-ticket-body {
+  padding: 20px 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+/* Fields Grid */
+.detailed-ticket-fields {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px 32px;
+  padding-bottom: 20px;
+  border-bottom: 1px solid #e5e7eb;
+  margin-bottom: 20px;
+}
+
+.detailed-ticket-field {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.detailed-ticket-field label {
+  font-size: 13px;
+  font-weight: 600;
+  color: #111827;
+}
+
+.detailed-ticket-field span {
+  font-size: 13px;
+  color: #6b7280;
+}
+
+/* Attachments Section */
+.detailed-ticket-attachments h3 {
+  font-size: 14px;
+  font-weight: 600;
+  color: #111827;
+  margin: 0 0 12px 0;
+}
+
+.detailed-ticket-attachments-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.detailed-ticket-attachment-thumb {
+  width: 160px;
+  height: 100px;
+  border-radius: 8px;
+  object-fit: cover;
+  border: 1px solid #e5e7eb;
+  cursor: pointer;
+  transition: opacity 0.15s;
+}
+
+.detailed-ticket-attachment-thumb:hover {
+  opacity: 0.85;
+}
+
+.table-header {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  font-size: 20px;
+  font-weight: 600;
+  color: #c0c0c0;
+  letter-spacing: 0.01em;
+}
+
+.table-row {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  font-size: 14px;
+  font-weight: 400;
+  color: #1a1a1a;
+  letter-spacing: 0em;
 }
