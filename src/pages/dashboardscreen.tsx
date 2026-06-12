@@ -156,6 +156,8 @@ export default function DashScreenScreen() {
                         ticketPriorities={ticketPriorities}
                         ticketCategories={ticketCategories}
                         userInfo={userFound}
+                        fetchTickets={fetchTickets}
+
                     />
                 }
             case 2:

@@ -10,6 +10,12 @@ import { Create_New_Ticket_Menu } from "./createNewTicketMenu";
 import { LasTicketsCall } from "./lastTicketsTableItem";
 import { Notification_Menu } from "./notificationsMenu";
 
+interface i_category
+{
+    categoryTitle: string;
+    categoryColor : string;
+}
+
 interface i_greetingDashboard
 {
     notificationIsActive: boolean;
@@ -26,6 +32,16 @@ interface i_greetingDashboard
 export default function GreetingDashboard({notificationIsActive, ticketPriorities, createNewTicketActive, 
                                            setCreateNewTicketIsActive, tickets,setTickets,ticketCategories,userInfo } : i_greetingDashboard)
 {
+    const categories :i_category[] = [
+    { categoryTitle: "Hardware", categoryColor: "#E74C3C" },
+    { categoryTitle: "Software", categoryColor: "#3498DB" },
+    { categoryTitle: "Rede", categoryColor: "#2ECC71" },
+    { categoryTitle: "Acesso / Permissão", categoryColor: "#9B59B6" },
+    { categoryTitle: "Email", categoryColor: "#F39C12" },
+    { categoryTitle: "Erro no Sistema", categoryColor: "#E67E22" },
+    { categoryTitle: "Impressora", categoryColor: "#1ABC9C" },
+    { categoryTitle: "Outros", categoryColor: "#95A5A6" },
+];
     return(
     <>
         <div style={{
@@ -101,15 +117,48 @@ export default function GreetingDashboard({notificationIsActive, ticketPrioritie
                 }
 
                 {/* Charts */}
-                <div style={{display: "flex", flexDirection: "row", width: "100%", height: "45%", gap: "1%", marginBottom: "1%"}}>
+                <div style={{display: "flex", flexDirection: "row", width: "100%", height: "45vh", gap: "1%", marginBottom: "1%"}}>
+                    
                     <div style={{display: "flex", flexDirection: "column", width: "30%", height: "100%"}}>
-                    <h3 className="DashBoardScreen-ItemFont">Chamados por categoria</h3>
-                    <div style={{width: "100%", flex: 1, backgroundColor: "white"}}></div>
+                        <h3 className="DashBoardScreen-ItemFont">Categorias de Chamados</h3>
+                        <div style={{width: "100%", flex: 1, display: "grid", gridTemplateColumns:"repeat(3, 1fr)", backgroundColor: "white", overflowX: "scroll", alignItems: "center", gap: "12px"}}>
+                            {categories.map((category) => (
+                                <>
+                                    <div style={{minWidth: "20px", height: "50%", display: "flex", flexDirection: "column", justifyContent: "center", alignItems: "center", gap: "6px"}}>
+                                        <div style={{width: "50%", flex: 1, backgroundColor: category.categoryColor, borderRadius: "6px"}}/>
+                                        <span style={{fontSize: "10px", textAlign: "center"}}>{category.categoryTitle}</span>
+                                    </div>
+                                </>
+                            ))}
+                        </div>
                     </div>
+
                     <div style={{display: "flex", flexDirection: "column", width: "70%", height: "100%"}}>
-                    <h3 className="DashBoardScreen-ItemFont">Quantidade de Chamados por Dia</h3>
-                    <div style={{width: "100%", flex: 1, backgroundColor: "white"}}></div>
+                        <h3 className="DashBoardScreen-ItemFont">Quantidade de Chamados</h3>
+                        <div style={{width: "100%", flex: 1, backgroundColor: "white"}}>
+                            <div style={{width: "100%", height: "100%", display: "flex", backgroundColor: "white", flexDirection: "row", overflowX: "scroll", alignItems: "center", justifyContent: "space-evenly"}}>
+                                {categories.map((category) => {
+                                    const categoryTickets = tickets.filter((ticket) => ticket.ticketCategory.tickcatDescription == category.categoryTitle && ticket.ticketAgent?.usuarEmail == userInfo.usuarEmail);
+                                    console.log(categoryTickets)
+                                    if(categoryTickets.length > 0)
+                                        {
+                                            return (
+                                                <>
+                                                    <div style={{minWidth: "20px", maxHeight: "50%",height: "50%", display: "flex", flexDirection: "column", justifyContent: "center", alignItems: "center", gap: "6px"}}>
+                                                        <div style={{width: "100%", flex: 1, backgroundColor: category.categoryColor, borderRadius: "6px"}}/>
+                                                        <span style={{fontSize: "10px", textAlign: "center"}}>{category.categoryTitle}</span>
+                                                        <span style={{fontSize: "10px", textAlign: "center"}}>{categoryTickets.length}</span>
+                                                    </div>
+                                                </>
+                                            );
+                                        }
+                                    return <></>
+                                    
+                                })}
+                            </div>
+                        </div>
                     </div>
+
                 </div>
 
                 {/* Recent tickets */}
