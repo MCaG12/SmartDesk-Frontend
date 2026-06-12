@@ -20,10 +20,11 @@ interface i_TicketTableDashboard
     ticketPriorities: i_TicketPriority[];
     ticketCategories: i_TicketCategory[];
     userInfo: i_UserLoginInfoResponse;
+    fetchTickets(setTickets: React.Dispatch<React.SetStateAction<i_Ticket[]>>, userEmail: string): Promise<void>
 }
 
 export default function TicketTableDashboard({notificationIsActive,setTickets, setCreateNewTicketIsActive, 
-                                              createNewTicketActive, tickets, ticketPriorities, ticketCategories,userInfo}: i_TicketTableDashboard)
+                                              createNewTicketActive, tickets, ticketPriorities, ticketCategories,userInfo, fetchTickets}: i_TicketTableDashboard)
 {
     const [showDetailedTicket, setShowDetailedTicket] = useState(false);
     const [infoDetailedTicket, setInfoDetailedTicket] = useState<i_Ticket>()
@@ -86,6 +87,8 @@ export default function TicketTableDashboard({notificationIsActive,setTickets, s
                             setInfoDetailedTicket={setInfoDetailedTicket}
                             setShowDetailedTicket={setShowDetailedTicket}
                             showDetailedTicket={showDetailedTicket}
+                            fetchTickets={fetchTickets}
+                            setTickets={setTickets}
                         />
                     ))
                 }
@@ -103,6 +106,8 @@ export default function TicketTableDashboard({notificationIsActive,setTickets, s
                             setInfoDetailedTicket={setInfoDetailedTicket}
                             setShowDetailedTicket={setShowDetailedTicket}
                             showDetailedTicket={showDetailedTicket}
+                            fetchTickets={fetchTickets}
+                            setTickets={setTickets}
                         />
                     ))
                 }
@@ -120,6 +125,8 @@ export default function TicketTableDashboard({notificationIsActive,setTickets, s
                             setShowDetailedTicket={setShowDetailedTicket}
                             setInfoDetailedTicket={setInfoDetailedTicket}
                             showDetailedTicket={showDetailedTicket}
+                            fetchTickets={fetchTickets}
+                            setTickets={setTickets}
                         />
                     ))
                 }       
@@ -137,6 +144,8 @@ export default function TicketTableDashboard({notificationIsActive,setTickets, s
                             setInfoDetailedTicket={setInfoDetailedTicket}
                             setShowDetailedTicket={setShowDetailedTicket}
                             showDetailedTicket={showDetailedTicket}
+                            fetchTickets={fetchTickets}
+                            setTickets={setTickets}
                         />
                     ))
                 }   

@@ -5,11 +5,13 @@ interface interface_ticket_table_body
     ticketInfo : i_Ticket
     setShowDetailedTicket: React.Dispatch<React.SetStateAction<boolean>>
     setInfoDetailedTicket: React.Dispatch<React.SetStateAction<i_Ticket | undefined>>
-    showDetailedTicket: boolean
+    showDetailedTicket: boolean;
+    fetchTickets(setTickets: React.Dispatch<React.SetStateAction<i_Ticket[]>>, userEmail: string): Promise<void>
+    setTickets :  React.Dispatch<React.SetStateAction<i_Ticket[]>>,
 }
 
 export function Ticket_Table_Body({ ticketInfo, 
-                                    setShowDetailedTicket, setInfoDetailedTicket, showDetailedTicket}: interface_ticket_table_body) {
+                                    setShowDetailedTicket, setInfoDetailedTicket, showDetailedTicket, fetchTickets, setTickets}: interface_ticket_table_body) {
 
   async function advanceTicket(ticketId: number)
   {
@@ -23,10 +25,6 @@ export function Ticket_Table_Body({ ticketInfo,
                 "Content-Type": "application/json"
             }
         });
-
-        if (response.ok) {
-            window.location.reload(); 
-        }
  
     }
     catch (error)
@@ -97,9 +95,10 @@ export function Ticket_Table_Body({ ticketInfo,
             color: "white", fontSize: "18px", lineHeight: 1,
           }}
           onClick={(e) => {
-            e.stopPropagation();
-            e.preventDefault(); 
-            advanceTicket(ticketInfo.Id);
+            e.stopPropagation(); 
+           advanceTicket(ticketInfo.Id);
+  
+            fetchTickets(setTickets, ticketInfo.ticketAgent!.usuarEmail);
           }}
           >+</button>
         </div>
