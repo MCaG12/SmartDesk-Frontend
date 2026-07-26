@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import type { i_Ticket } from "../interfaces/i_ticket";
 import type { i_TicketCategory } from "../interfaces/i_ticketCategory";
 import type { i_TicketPriority } from "../interfaces/i_ticketPriority";
@@ -7,8 +7,13 @@ import { Create_New_Ticket_Menu } from "./createNewTicketMenu";
 import { Notification_Menu } from "./notificationsMenu";
 import { Ticket_Table_Body } from "./ticketTableBody";
 import DetailedTicketInfo from "./detailedTicketInfo";
+import type { i_ticketComment } from "../interfaces/i_ticketComment";
 
-
+interface i_fetchLatestNotifications
+{
+    i_userId: number;
+    setLatestNotifications: React.Dispatch<React.SetStateAction<i_ticketComment[] | undefined>>;
+}
 
 interface i_TicketTableDashboard
 {
@@ -28,6 +33,37 @@ export default function TicketTableDashboard({notificationIsActive,setTickets, s
 {
     const [showDetailedTicket, setShowDetailedTicket] = useState(false);
     const [infoDetailedTicket, setInfoDetailedTicket] = useState<i_Ticket>()
+
+    async function fetchLatestNotifications({i_userId, setLatestNotifications}: i_fetchLatestNotifications)
+    {
+        let a_NotificationsFound: i_ticketComment[];
+
+        const url = `http://localhost:3000/Ticket/fetch-latest-ticket-comments/`;
+
+        try 
+        {
+            const response = await fetch(url, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                "AgentId": i_userId
+            })
+        }); 
+        a_NotificationsFound = await response.json() as i_ticketComment[];
+        setLatestNotifications(a_NotificationsFound);
+        } 
+        catch (error) 
+        {
+            console.error("Error " + error);    
+        }
+
+    }
+
+    const [latestNotifications, setLatestNotifications] = useState<i_ticketComment[]>()
+
+    useEffect(() => {
+    fetchLatestNotifications({ i_userId: userInfo.Id, setLatestNotifications });
+    }, [userInfo.Id]);
 
     return(
     <>
@@ -52,8 +88,10 @@ export default function TicketTableDashboard({notificationIsActive,setTickets, s
             }
 
             {
-                notificationIsActive &&
-                    <Notification_Menu />
+                (notificationIsActive && latestNotifications) &&
+                    <Notification_Menu 
+                        a_notifications={latestNotifications}
+                    />
             }
             
             {
