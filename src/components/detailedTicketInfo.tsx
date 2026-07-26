@@ -29,15 +29,15 @@ export default function DetailedTicketInfo({ticketInfo, setShowDetailedTicket}: 
                 </div>
                 <div className="detailed-ticket-field">
                 <label>Categoria</label>
-                <span>{ticketInfo.ticketCategory.name}</span>
+                <span>{ticketInfo.ticketCategory.tickcatDescription}</span>
                 <label>Email Solicitante</label>
-                <span>{ticketInfo.ticketSolicitant.email}</span>
+                <span>{ticketInfo.ticketSolicitant.usuarEmail}</span>
                 </div>
                 <div className="detailed-ticket-field">
                 <label>Prioridade</label>
-                <span>{ticketInfo.ticketPriority.name}</span>
+                <span>{ticketInfo.ticketPriority.typepriDescription}</span>
                 <label>Email Atendente</label>
-                <span>{ticketInfo.ticketAgent?.email}</span>
+                <span>{ticketInfo.ticketAgent?.usuarEmail}</span>
                 </div>
             </div>
 
