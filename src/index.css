@@ -640,6 +640,38 @@
   opacity: 0.85;
 }
 
+.detailed-ticket-comment-section
+{
+  width: 100%;
+  max-width: 700px;
+  background-color: #ffffff;
+  border-radius: 12px;
+  display: flex;
+  flex-direction: column;
+  border: 1px solid #eaeaea;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+  overflow: hidden;
+  flex-shrink: 0; 
+}
+
+.ticket-comment-item {
+  padding: 12px 16px;
+  border-bottom: 1px solid #eaeaea;
+}
+
+.ticket-comment-item:last-child {
+  border-bottom: none;
+}
+
+.ticket-comment-text {
+  margin: 0;
+  font-size: 14px;
+  line-height: 1.5;
+  color: #333;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
 .table-header {
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
   font-size: 20px;
