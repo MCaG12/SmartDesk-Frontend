@@ -687,3 +687,27 @@
   color: #1a1a1a;
   letter-spacing: 0em;
 }
+
+.ticket-new-comment-button 
+{
+  background-color: #1e2a5e;
+  color: #ffffff;
+  width: 60%;
+  height: 48px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  align-self: center;
+  margin-top: 8%;
+  border: none;
+  border-radius: 8px;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.2s ease, transform 0.1s ease;
+}
+
+.ticket-new-comment-button:hover
+{
+  background-color: #152047;
+}
