@@ -9,6 +9,7 @@ interface i_DetailedTicketInfo
 {
     ticketInfo: i_Ticket,
     setShowDetailedTicket: React.Dispatch<React.SetStateAction<i_ticketComment[] | undefined>>;
+    userInfo_id : number
 }
 
 interface i_fetchTicketComments
@@ -44,7 +45,7 @@ async function FetchTicketComments({TicketId, setTicketComments}: i_fetchTicketC
 }
 
 
-export default function DetailedTicketInfo({ticketInfo, setShowDetailedTicket}: i_DetailedTicketInfo)
+export default function DetailedTicketInfo({ticketInfo, setShowDetailedTicket, userInfo_id}: i_DetailedTicketInfo)
 {
     const [ticketComments, setTicketComments] = useState<i_ticketComment[]>()
     const [showCreateNewTicketMenu, setShowCreateNewTicketMenu] = useState(false);
@@ -57,7 +58,7 @@ export default function DetailedTicketInfo({ticketInfo, setShowDetailedTicket}: 
     <div className="detailed-ticket-overlay">
         <div className="detailed-ticket-modal">
             {showCreateNewTicketMenu && (
-                <CreateNewTicketMenu setShowNewTicketCommentMenu={setShowCreateNewTicketMenu} />
+                <CreateNewTicketMenu ticketId={ticketInfo.Id} setShowNewTicketCommentMenu={setShowCreateNewTicketMenu} userId={userInfo_id} />
             )}
 
             <div className="detailed-ticket-header">

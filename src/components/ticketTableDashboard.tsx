@@ -84,6 +84,7 @@ export default function TicketTableDashboard({notificationIsActive,setTickets, s
                     <DetailedTicketInfo 
                         ticketInfo={infoDetailedTicket}
                         setShowDetailedTicket={setShowDetailedTicket}
+                        userInfo_id={userInfo.Id}
                     />
             }
 

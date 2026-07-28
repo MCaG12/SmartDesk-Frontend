@@ -2,10 +2,14 @@ import { useState } from "react";
  
 interface i_NewTicketCommentMenu
 {
+    ticketId : number;
     setShowNewTicketCommentMenu: React.Dispatch<React.SetStateAction<boolean>>;
+    userId : number;
+
+
 }
 
-export default function CreateNewTicketMenu({setShowNewTicketCommentMenu} : i_NewTicketCommentMenu) 
+export default function CreateNewTicketMenu({ticketId, setShowNewTicketCommentMenu, userId} : i_NewTicketCommentMenu) 
 {
   const [comment, setComment] = useState("");
   const maxLength = 500;
@@ -18,6 +22,8 @@ export default function CreateNewTicketMenu({setShowNewTicketCommentMenu} : i_Ne
   function handleSubmit()
   {
     console.log("the message typed was " + comment)
+    console.log("user code " + userId);
+    console.log("ticket id " + ticketId) 
     //setShowNewTicketCommentMenu(false);
   } 
  
@@ -60,7 +66,7 @@ export default function CreateNewTicketMenu({setShowNewTicketCommentMenu} : i_Ne
               ...styles.btnSubmit,
               ...(comment.trim() === "" ? styles.btnDisabled : {}),
             }}
-            onClick={() => {console.log("the message typed was " + comment)}}
+            onClick={handleSubmit}
             disabled={comment.trim() === ""}
           >
             Comentar
