@@ -2,14 +2,14 @@ import { useState } from "react";
  
 interface i_NewTicketCommentMenu
 {
-    ticketId : number;
-    setShowNewTicketCommentMenu: React.Dispatch<React.SetStateAction<boolean>>;
-    userId : number;
-
-
+  ticketId : number;
+  setShowNewTicketCommentMenu: React.Dispatch<React.SetStateAction<boolean>>;
+  userId : number;
+  setShowTicketCommentCreatedMenu: React.Dispatch<React.SetStateAction<boolean>>;
+  setNewTicketText: React.Dispatch<React.SetStateAction<string>>;
 }
 
-export default function CreateNewTicketMenu({ticketId, setShowNewTicketCommentMenu, userId} : i_NewTicketCommentMenu) 
+export default function CreateNewTicketMenu({ticketId, setShowNewTicketCommentMenu, userId, setShowTicketCommentCreatedMenu, setNewTicketText} : i_NewTicketCommentMenu) 
 {
   const [comment, setComment] = useState("");
   const maxLength = 500;
@@ -19,12 +19,29 @@ export default function CreateNewTicketMenu({ticketId, setShowNewTicketCommentMe
     setShowNewTicketCommentMenu(false);
   }
 
-  function handleSubmit()
+  async function handleSubmit()
   {
-    console.log("the message typed was " + comment)
-    console.log("user code " + userId);
-    console.log("ticket id " + ticketId) 
-    //setShowNewTicketCommentMenu(false);
+      const url = `http://localhost:3000/TicketComment/`;
+
+      try 
+      {
+        await fetch(url, {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({
+              "tickcomUser": userId,
+              "tickcomTicket": ticketId,
+              "tickcomComment": comment
+          })
+        }); 
+        setNewTicketText(comment);
+        setShowNewTicketCommentMenu(false);
+        setShowTicketCommentCreatedMenu(true);
+      } 
+      catch (error) 
+      {
+          console.error("Error " + error);    
+      }
   } 
  
   return (

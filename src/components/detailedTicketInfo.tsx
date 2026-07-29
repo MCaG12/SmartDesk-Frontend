@@ -1,7 +1,9 @@
 import { useEffect, useState } from "react";
 import type { i_Ticket } from "../interfaces/i_ticket";
 import type { i_ticketComment } from "../interfaces/i_ticketComment";
-import CreateNewTicketMenu from "./CreateTIcketCommentMenu";
+import CreateNewTicketMenu from "./CreateTicketCommentMenu";
+import NewTicketCommentMenu from "./newTicketCommentMenu";
+import FetchTicketComments from "../util-functions/FetchTicketComments";
 
 
 
@@ -10,45 +12,18 @@ interface i_DetailedTicketInfo
     ticketInfo: i_Ticket,
     setShowDetailedTicket: React.Dispatch<React.SetStateAction<i_ticketComment[] | undefined>>;
     userInfo_id : number
-}
-
-interface i_fetchTicketComments
-{
-    TicketId : number
-    setTicketComments:React.Dispatch<React.SetStateAction<i_ticketComment[] | undefined>>
+    
 }
 
 
-async function FetchTicketComments({TicketId, setTicketComments}: i_fetchTicketComments)
-{
-    const url = "http://localhost:3000/TicketComment/fetch-ticket-comments/";
-
-    try
-    {
-        const response = await fetch(url, {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json"
-            },
-            body: JSON.stringify({
-                "ticketId": TicketId
-            })
-        });
-        const data = await response.json() as i_ticketComment[];
-        setTicketComments(data);
-    }
-    catch (error)
-    {
-        console.error("Error:", error);
-       
-    }
-}
 
 
 export default function DetailedTicketInfo({ticketInfo, setShowDetailedTicket, userInfo_id}: i_DetailedTicketInfo)
 {
     const [ticketComments, setTicketComments] = useState<i_ticketComment[]>()
     const [showCreateNewTicketMenu, setShowCreateNewTicketMenu] = useState(false);
+    const [showNewTicketCommentMenu, setShowNewTicketCommentMenu] = useState(false);
+    const [newTicketText, setNewTicketText] = useState('');
 
     useEffect(() => {
         FetchTicketComments({ TicketId: ticketInfo.Id, setTicketComments });
@@ -58,7 +33,23 @@ export default function DetailedTicketInfo({ticketInfo, setShowDetailedTicket, u
     <div className="detailed-ticket-overlay">
         <div className="detailed-ticket-modal">
             {showCreateNewTicketMenu && (
-                <CreateNewTicketMenu ticketId={ticketInfo.Id} setShowNewTicketCommentMenu={setShowCreateNewTicketMenu} userId={userInfo_id} />
+                <CreateNewTicketMenu 
+                ticketId={ticketInfo.Id} 
+                setShowNewTicketCommentMenu={setShowCreateNewTicketMenu} 
+                userId={userInfo_id} 
+                setShowTicketCommentCreatedMenu={setShowNewTicketCommentMenu}
+                setNewTicketText={setNewTicketText}
+                />
+            )}
+
+            {showNewTicketCommentMenu && (
+                <NewTicketCommentMenu 
+                    CommentText={newTicketText}
+                    TicketCode={ticketInfo.Id}
+                    setTicketComments={setTicketComments}
+                    setShowNewTicketCommentMenu={setShowNewTicketCommentMenu}
+                
+                />
             )}
 
             <div className="detailed-ticket-header">
