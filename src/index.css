@@ -252,6 +252,11 @@
   text-align: center;
 }
 
+.search-input-wrapper:hover
+{
+  cursor: pointer;
+}
+
 .search-input {
   background: transparent;
   border: none;

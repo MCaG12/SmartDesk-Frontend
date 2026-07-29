@@ -8,6 +8,7 @@ import { Notification_Menu } from "./notificationsMenu";
 import { Ticket_Table_Body } from "./ticketTableBody";
 import DetailedTicketInfo from "./detailedTicketInfo";
 import type { i_ticketComment } from "../interfaces/i_ticketComment";
+import { TicketSearchMenu } from "./TicketSearchMenu";
 
 interface i_fetchLatestNotifications
 {
@@ -17,19 +18,20 @@ interface i_fetchLatestNotifications
 
 interface i_TicketTableDashboard
 {
-    notificationIsActive : boolean,
-    setTickets :  React.Dispatch<React.SetStateAction<i_Ticket[]>>,
-    setCreateNewTicketIsActive: React.Dispatch<React.SetStateAction<boolean>>,
-    createNewTicketActive: boolean,
+    notificationIsActive : boolean;
+    setTickets :  React.Dispatch<React.SetStateAction<i_Ticket[]>>;
+    setCreateNewTicketIsActive: React.Dispatch<React.SetStateAction<boolean>>;
+    createNewTicketActive: boolean;
     tickets: i_Ticket[];
     ticketPriorities: i_TicketPriority[];
     ticketCategories: i_TicketCategory[];
     userInfo: i_UserLoginInfoResponse;
-    fetchTickets(setTickets: React.Dispatch<React.SetStateAction<i_Ticket[]>>, userEmail: string): Promise<void>
+    fetchTickets(setTickets: React.Dispatch<React.SetStateAction<i_Ticket[]>>, userEmail: string): Promise<void>;
+    ticketSearchActive: boolean
 }
 
 export default function TicketTableDashboard({notificationIsActive,setTickets, setCreateNewTicketIsActive, 
-                                              createNewTicketActive, tickets, ticketPriorities, ticketCategories,userInfo, fetchTickets}: i_TicketTableDashboard)
+                                              createNewTicketActive, tickets, ticketPriorities, ticketCategories,userInfo, fetchTickets, ticketSearchActive}: i_TicketTableDashboard)
 {
     const [showDetailedTicket, setShowDetailedTicket] = useState(false);
     const [infoDetailedTicket, setInfoDetailedTicket] = useState<i_Ticket>()
@@ -78,6 +80,10 @@ export default function TicketTableDashboard({notificationIsActive,setTickets, s
                 padding: "1%",
                 boxSizing: "border-box"
                 }}>
+
+            {ticketSearchActive &&
+                <TicketSearchMenu/>
+            }
 
             {
                 (showDetailedTicket && infoDetailedTicket) &&

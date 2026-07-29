@@ -94,6 +94,7 @@ export default function DashScreenScreen() {
     const [dashBoardState, setDashBoardState] = useState(0)
     const [notificationIsActive, setNotificationIsActive] = useState(false)
     const [createNewTicketActive, setCreateNewTicketIsActive] = useState(false)
+    const [ticketSearchActive, setTicketSearchActive] = useState(false)
     const [tickets, setTickets] = useState<i_Ticket[]>([]);
     const [ticketPriorities, setTicketPriorities] = useState<i_TicketPriority[]>([]);
     const [ticketCategories, setTicketCategories] = useState<i_TicketCategory[]>([]);
@@ -155,6 +156,7 @@ export default function DashScreenScreen() {
                         tickets={tickets} 
                         ticketPriorities={ticketPriorities}
                         ticketCategories={ticketCategories}
+                        ticketSearchActive={ticketSearchActive}
                         userInfo={userFound}
                         fetchTickets={fetchTickets}
 
@@ -185,7 +187,11 @@ export default function DashScreenScreen() {
                     <button className="btn-novo-chamado" style={{width:"25%"}} onClick={(() => {setCreateNewTicketIsActive(!createNewTicketActive)})}> Novo Chamado</button>
                 </div>
                 <div style={{display: "flex", flexDirection:"row", justifyContent: "space-evenly", height: "100%", width:"60%"}}>
-                    <div className="search-input-wrapper">Procurar Ticket</div>
+                    {dashBoardState == 1 && 
+                        <div className="search-input-wrapper" onClick={() => {setTicketSearchActive(!ticketSearchActive)}}>
+                            Procurar Ticket
+                        </div>
+                    }
 
                     <div className="icon-btn" onClick={() => {setNotificationIsActive(!notificationIsActive)}}>
                         <img src={NotificationImage} alt="NotificationBell" 
