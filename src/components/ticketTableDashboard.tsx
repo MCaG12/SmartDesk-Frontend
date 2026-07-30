@@ -82,7 +82,9 @@ export default function TicketTableDashboard({notificationIsActive,setTickets, s
                 }}>
 
             {ticketSearchActive &&
-                <TicketSearchMenu/>
+                <TicketSearchMenu
+                    tickets={tickets}
+                />
             }
 
             {
