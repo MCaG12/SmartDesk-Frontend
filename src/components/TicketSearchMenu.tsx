@@ -3,28 +3,28 @@ import type { i_ticketComment } from "../interfaces/i_ticketComment";
 import type { i_Ticket } from "../interfaces/i_ticket";
 
 const statusOptions = [
-    { label: "Novos Chamados", bgColor: "#ffa2a2", buttonCode: 0 },
-    { label: "Em Andamento", bgColor: "#766cff", buttonCode: 1 },
-    { label: "Pendente", bgColor: "#ffd665", buttonCode: 2 },
-    { label: "Concluído", bgColor: "#66e9a1", buttonCode: 3 }
+    { label: "Novos Chamados", bgColor: "#ffa2a2", buttonCode: 1 },
+    { label: "Em Andamento", bgColor: "#766cff", buttonCode: 2},
+    { label: "Pendente", bgColor: "#ffd665", buttonCode: 4 },
+    { label: "Concluído", bgColor: "#66e9a1", buttonCode: 5 }
 ];
 
 const categoryOptions = [
-    { label: "Hardware", buttonCode: 0 },
-    { label: "Software", buttonCode: 1 },
-    { label: "Rede", buttonCode: 2 },
-    { label: "Acesso Permissão", buttonCode: 3 },
-    { label: "Email", buttonCode: 4 },
-    { label: "Erro no Sistema", buttonCode: 5 },
-    { label: "Impressora", buttonCode: 6 },
-    { label: "Outras", buttonCode: 7 },
+    { label: "Hardware", buttonCode: 1 },
+    { label: "Software", buttonCode: 2 },
+    { label: "Rede", buttonCode: 3 },
+    { label: "Acesso Permissão", buttonCode: 4 },
+    { label: "Email", buttonCode: 5 },
+    { label: "Erro no Sistema", buttonCode: 6 },
+    { label: "Impressora", buttonCode: 7 },
+    { label: "Outras", buttonCode: 8 },
 ];
 
 const priorityOptions = [
-    {label: "Baixa Prioridade", buttonCode: 0},
-    {label: "Média Prioridade", buttonCode: 1},
-    {label: "Alta Prioridade", buttonCode: 2},
-    {label: "Critica Prioridade", buttonCode: 3}
+    {label: "Baixa Prioridade", buttonCode: 1},
+    {label: "Média Prioridade", buttonCode: 2},
+    {label: "Alta Prioridade", buttonCode: 3},
+    {label: "Critica Prioridade", buttonCode: 4}
 ]
 
 interface i_TicketMenu
@@ -33,9 +33,43 @@ interface i_TicketMenu
 }
 
 export function TicketSearchMenu({tickets}:i_TicketMenu) {
+
+
+    const [displayedItems, setDisplayedItems] = useState(tickets);
+
+
     const [ticketState, setTicketState] = useState(-1);
     const [priorityCode, setPriorityCode] = useState(-1);
     const [categoryCode, setCategoryCode] = useState(-1);
+
+    function HandleStatusClick(statusCode: number) {
+    setTicketState((prev) => (prev == statusCode ? -1 : statusCode));
+    }
+
+    function handleCategoryClick(categoryCode: number) {
+        setCategoryCode((prev) => (prev == categoryCode ? -1 : categoryCode));
+    }
+
+    function handlePriorityClick(priorityCode: number) {
+        setPriorityCode((prev) => (prev == priorityCode ? -1 : priorityCode));
+    }
+
+    displayedItems.filter((item) => {
+        if(ticketState != -1 && item.ticketStatus.Id != ticketState)
+            {
+               return false;
+            }
+        if(priorityCode != -1 && item.ticketPriority.Id != priorityCode)
+            {
+                return false;
+            }
+        if(categoryCode != -1 && item.ticketCategory.Id != categoryCode)
+            {
+                return false;
+            }
+        
+        return true;
+    })
 
     return (
         <div className="NotificationsTab" style={styles.Container}>
@@ -46,12 +80,11 @@ export function TicketSearchMenu({tickets}:i_TicketMenu) {
             <div style={styles.OptionRow}>
                 {statusOptions.map((button) => (
                     <button
-                        key={button.buttonCode}
-                        onClick={() => setTicketState(button.buttonCode)}
+                        onClick={() => HandleStatusClick(button.buttonCode)}
                         style={{
                             ...styles.StatusCard,
                             backgroundColor: button.bgColor,
-                            outline: ticketState === button.buttonCode ? "3px solid #333" : "none"
+                            outline: ticketState === button.buttonCode ? "3px solid #333": "none"
                         }}
                     >
                         {button.label}
@@ -63,8 +96,7 @@ export function TicketSearchMenu({tickets}:i_TicketMenu) {
             <div style={styles.OptionRow}>
                 {categoryOptions.map((button) => (
                     <button
-                        key={button.buttonCode}
-                        onClick={() => setCategoryCode(button.buttonCode)}
+                        onClick={() => handleCategoryClick(button.buttonCode)}
                         style={{
                             ...styles.CategoryCard,
                             outline: categoryCode === button.buttonCode ? "3px solid #4272b6" : "1px solid #e0e0e0"
@@ -80,11 +112,10 @@ export function TicketSearchMenu({tickets}:i_TicketMenu) {
             <div style={styles.OptionRow}>
                 {priorityOptions.map((button) => (
                     <button
-                        key={button.buttonCode}
-                        onClick={() => setCategoryCode(button.buttonCode)}
+                        onClick={() => handlePriorityClick(button.buttonCode)}
                         style={{
                             ...styles.CategoryCard,
-                            outline: categoryCode === button.buttonCode ? "3px solid #4272b6" : "1px solid #e0e0e0"
+                            outline: priorityCode === button.buttonCode ? "3px solid #4272b6" : "1px solid #e0e0e0"
                         }}
                     >
                         {button.label}
@@ -93,19 +124,34 @@ export function TicketSearchMenu({tickets}:i_TicketMenu) {
             </div>
             <p style={styles.SubHeaderFont}>Tickets Encontrados</p>
             <div style={styles.TicketGrid}>
-            {tickets.map((ticket) => {
-                return <>
-                    <div style={styles.TicketCard} key={ticket.Id}>
-                        <div style={styles.TicketCardTop}>
-                            <span style={styles.TicketId}>#{ticket.Id}</span>
+                {displayedItems.filter((item) => {
+                    if(ticketState != -1 && item.ticketStatus.Id != ticketState)
+                        {
+                        return false;
+                        }
+                    if(priorityCode != -1 && item.ticketPriority.Id != priorityCode)
+                        {
+                            return false;
+                        }
+                    if(categoryCode != -1 && item.ticketCategory.Id != categoryCode)
+                        {
+                            return false;
+                        }
+                    
+                    return true;
+                }).map((ticket) => {
+                    return <>
+                        <div style={styles.TicketCard} key={ticket.Id}>
+                            <div style={styles.TicketCardTop}>
+                                <span style={styles.TicketId}>#{ticket.Id}</span>
+                            </div>
+                            <h3 style={styles.TicketTitle}>{ticket.ticketTitle}</h3>
+                            <div style={styles.TicketMeta}>
+                                <span>{ticket.ticketCategory.tickcatDescription}</span>
+                            </div>
                         </div>
-                        <h3 style={styles.TicketTitle}>{ticket.ticketTitle}</h3>
-                        <div style={styles.TicketMeta}>
-                            <span>{ticket.ticketCategory.tickcatDescription}</span>
-                        </div>
-                    </div>
-                </>
-            })}
+                    </>
+                })}
             </div>
         </div>
     );
