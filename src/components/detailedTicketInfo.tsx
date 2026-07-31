@@ -5,8 +5,6 @@ import CreateNewTicketMenu from "./CreateTicketCommentMenu";
 import NewTicketCommentMenu from "./newTicketCommentMenu";
 import FetchTicketComments from "../util-functions/FetchTicketComments";
 
-
-
 interface i_DetailedTicketInfo
 {
     ticketInfo: i_Ticket,
@@ -14,9 +12,6 @@ interface i_DetailedTicketInfo
     userInfo_id : number
     
 }
-
-
-
 
 export default function DetailedTicketInfo({ticketInfo, setShowDetailedTicket, userInfo_id}: i_DetailedTicketInfo)
 {

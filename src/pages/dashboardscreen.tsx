@@ -89,6 +89,10 @@ async function fetchTicketCategories(setTicketCategories:React.Dispatch<React.Se
 }
 
 export default function DashScreenScreen() {
+    const DashBoardState = 0;
+    const TicketTableState = 1;
+    const UserInfoState = 2;
+
     const location = useLocation();
     const { userFound } = location.state;
     const [dashBoardState, setDashBoardState] = useState(0)
@@ -132,7 +136,7 @@ export default function DashScreenScreen() {
     {
         switch(dashBoardState)
         {
-            case 0:
+            case DashBoardState:
             {
                 return <GreetingDashboard
                     notificationIsActive={notificationIsActive}
@@ -146,7 +150,7 @@ export default function DashScreenScreen() {
                     userInfo={userFound}
                 />
             }
-            case 1:
+            case TicketTableState:
                 {
                     return <TicketTableDashboard
                         notificationIsActive={notificationIsActive}
@@ -162,7 +166,7 @@ export default function DashScreenScreen() {
 
                     />
                 }
-            case 2:
+            case UserInfoState:
             {
                 return <UserDashBoard 
                     Name={userFound.usuarNome}
@@ -187,7 +191,7 @@ export default function DashScreenScreen() {
                     <button className="btn-novo-chamado" style={{width:"25%"}} onClick={(() => {setCreateNewTicketIsActive(!createNewTicketActive)})}> Novo Chamado</button>
                 </div>
                 <div style={{display: "flex", flexDirection:"row", justifyContent: "space-evenly", height: "100%", width:"60%"}}>
-                    {dashBoardState == 1 && 
+                    {dashBoardState == TicketTableState && 
                         <div className="search-input-wrapper" onClick={() => {setTicketSearchActive(!ticketSearchActive)}}>
                             Procurar Ticket
                         </div>
@@ -199,7 +203,7 @@ export default function DashScreenScreen() {
                                       marginBottom: "2%", borderRadius: "50%"  }}/>
                     </div>
 
-                    <div className="icon-btn" onClick={() => setDashBoardState(2)}>
+                    <div className="icon-btn" onClick={() => setDashBoardState(UserInfoState)}>
                        <img src={UserLogoImage} alt="UserLogoOutline" 
                         style={{ width: "80%", height: "80%", objectFit: "cover", alignSelf: "center",
                                 marginBottom: "2%", borderRadius: "50%"  }}/>
@@ -212,22 +216,22 @@ export default function DashScreenScreen() {
                 <div className="sidebar">
                     <button
                     className="tab-btn"
-                    onClick={() => setDashBoardState(0)}
-                    style={{ backgroundColor: dashBoardState === 0 ? "#1b54a3" : "#538fe4" }}
+                    onClick={() => setDashBoardState(DashBoardState)}
+                    style={{ backgroundColor: dashBoardState === DashBoardState ? "#1b54a3" : "#538fe4" }}
                     >
                     DashBoard
                     </button>
                     <button
                     className="tab-btn"
-                    onClick={() => setDashBoardState(1)}
-                    style={{ backgroundColor: dashBoardState === 1? "#1b54a3" : "#538fe4" }}
+                    onClick={() => setDashBoardState(TicketTableState)}
+                    style={{ backgroundColor: dashBoardState === TicketTableState? "#1b54a3" : "#538fe4" }}
                     >
                     Chamados
                     </button>
                         <button
                     className="tab-btn"
-                    onClick={() => setDashBoardState(2)}
-                    style={{ backgroundColor: dashBoardState === 2 ? "#1b54a3" : "#538fe4" }}
+                    onClick={() => setDashBoardState(UserInfoState)}
+                    style={{ backgroundColor: dashBoardState === UserInfoState ? "#1b54a3" : "#538fe4" }}
                     >
                     Usuário
                     </button>
