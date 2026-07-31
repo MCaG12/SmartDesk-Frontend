@@ -1,30 +1,49 @@
 import { useState } from "react";
-import type { i_ticketComment } from "../interfaces/i_ticketComment";
+
 import type { i_Ticket } from "../interfaces/i_ticket";
 
+const NewTicketCode = 1;
+const TicketInProgressCode = 2;
+const PendingTicketCode = 4;
+const ConcludedTicketCode = 5;
+
+const HardwareCategoryCode =  1;
+const SoftwareCategoryCode = 2;
+const NetworkCode          = 3;
+const AcessPermissionCode  = 4;
+const EmailCode            = 5;
+const SystemErrorCode      = 6;
+const PrinterErrorCode     = 7;
+const AnotherErrorCode     = 8;
+
+const LowPriorityCode = 1;
+const MediumPriorityCode = 2;
+const HighPriorityCode = 3;
+const CriticalPriority = 4;
+
 const statusOptions = [
-    { label: "Novos Chamados", bgColor: "#ffa2a2", buttonCode: 1 },
-    { label: "Em Andamento", bgColor: "#766cff", buttonCode: 2},
-    { label: "Pendente", bgColor: "#ffd665", buttonCode: 4 },
-    { label: "Concluído", bgColor: "#66e9a1", buttonCode: 5 }
+    { label: "Novos Chamados", bgColor: "#ffa2a2", buttonCode: NewTicketCode },
+    { label: "Em Andamento", bgColor: "#766cff", buttonCode: TicketInProgressCode},
+    { label: "Pendente", bgColor: "#ffd665", buttonCode: PendingTicketCode },
+    { label: "Concluído", bgColor: "#66e9a1", buttonCode: ConcludedTicketCode }
 ];
 
 const categoryOptions = [
-    { label: "Hardware", buttonCode: 1 },
-    { label: "Software", buttonCode: 2 },
-    { label: "Rede", buttonCode: 3 },
-    { label: "Acesso Permissão", buttonCode: 4 },
-    { label: "Email", buttonCode: 5 },
-    { label: "Erro no Sistema", buttonCode: 6 },
-    { label: "Impressora", buttonCode: 7 },
-    { label: "Outras", buttonCode: 8 },
+    { label: "Hardware", buttonCode: HardwareCategoryCode },
+    { label: "Software", buttonCode: SoftwareCategoryCode },
+    { label: "Rede", buttonCode: NetworkCode },
+    { label: "Acesso Permissão", buttonCode: AcessPermissionCode },
+    { label: "Email", buttonCode: EmailCode },
+    { label: "Erro no Sistema", buttonCode: SystemErrorCode },
+    { label: "Impressora", buttonCode: PrinterErrorCode },
+    { label: "Outras", buttonCode: AnotherErrorCode },
 ];
 
 const priorityOptions = [
-    {label: "Baixa Prioridade", buttonCode: 1},
-    {label: "Média Prioridade", buttonCode: 2},
-    {label: "Alta Prioridade", buttonCode: 3},
-    {label: "Critica Prioridade", buttonCode: 4}
+    {label: "Baixa Prioridade", buttonCode: LowPriorityCode},
+    {label: "Média Prioridade", buttonCode: MediumPriorityCode},
+    {label: "Alta Prioridade", buttonCode: HighPriorityCode},
+    {label: "Critica Prioridade", buttonCode: CriticalPriority}
 ]
 
 interface i_TicketMenu
@@ -35,8 +54,9 @@ interface i_TicketMenu
 export function TicketSearchMenu({tickets}:i_TicketMenu) {
 
 
-    const [displayedItems, setDisplayedItems] = useState(tickets);
+    const [displayedItems, setDisplayedItems] = useState<i_Ticket[]>([]);
 
+    setDisplayedItems(tickets);
 
     const [ticketState, setTicketState] = useState(-1);
     const [priorityCode, setPriorityCode] = useState(-1);
@@ -290,4 +310,4 @@ const styles = {
         textAlign: "center",
         padding: "40px 0"
     }
-};
+} as const satisfies Record<string, React.CSSProperties>;

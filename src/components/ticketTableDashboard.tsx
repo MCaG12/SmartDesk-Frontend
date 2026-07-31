@@ -58,7 +58,7 @@ export default function TicketTableDashboard({notificationIsActive,setTickets, s
             }
 
             {
-                (showDetailedTicket && infoDetailedTicket) &&
+                (showDetailedTicket && infoDetailedTicket ) &&
                     <DetailedTicketInfo 
                         ticketInfo={infoDetailedTicket}
                         setShowDetailedTicket={setShowDetailedTicket}

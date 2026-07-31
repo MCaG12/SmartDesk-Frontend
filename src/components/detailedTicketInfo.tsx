@@ -8,7 +8,7 @@ import FetchTicketComments from "../util-functions/FetchTicketComments";
 interface i_DetailedTicketInfo
 {
     ticketInfo: i_Ticket,
-    setShowDetailedTicket: React.Dispatch<React.SetStateAction<i_ticketComment[] | undefined>>;
+    setShowDetailedTicket: React.Dispatch<boolean>;
     userInfo_id : number
     
 }

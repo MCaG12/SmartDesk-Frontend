@@ -8,7 +8,6 @@ import type { i_TicketCategory } from "../interfaces/i_ticketCategory";
 import type { i_TicketPriority } from "../interfaces/i_ticketPriority";
 import type { i_UserLoginInfoResponse } from "../interfaces/i_UserResponse";
 import { Create_New_Ticket_Menu } from "./createNewTicketMenu";
-import { LasTicketsCall } from "./lastTicketsTableItem";
 import { Notification_Menu } from "./notificationsMenu";
 import type { i_dashBoardLatestTicket } from "../interfaces/i_dashBoardTicketFound";
 import type { i_ticketComment } from "../interfaces/i_ticketComment";

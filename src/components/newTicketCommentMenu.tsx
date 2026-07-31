@@ -125,4 +125,4 @@ const styles = {
     letterSpacing: '0.3px',
     cursor: 'pointer',
   },
-};
+} as const satisfies Record<string, React.CSSProperties>;;

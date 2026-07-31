@@ -200,4 +200,4 @@ const styles = {
     background: "#b9bfd0",
     cursor: "not-allowed",
   },
-};
+} as const satisfies Record<string, React.CSSProperties>;;
