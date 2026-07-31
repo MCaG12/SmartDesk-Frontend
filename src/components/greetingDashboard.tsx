@@ -14,12 +14,6 @@ import type { i_dashBoardLatestTicket } from "../interfaces/i_dashBoardTicketFou
 import type { i_ticketComment } from "../interfaces/i_ticketComment";
 import fetchLatestNotifications from "../util-functions/fetchLatestTicketsComments";
 
-interface i_fetchLatestTickets 
-{
-    i_userId: number;
-    setLatestTickets: React.Dispatch<React.SetStateAction<i_dashBoardLatestTicket[] | undefined>>;
-}
-
 interface i_category
 {
     categoryTitle: string;
@@ -53,36 +47,12 @@ export default function GreetingDashboard({notificationIsActive, ticketPrioritie
     { categoryTitle: "Outros", categoryColor: "#95A5A6" },
 ];
 
-    async function fetchLatestTickets({i_userId, setLatestTickets}: i_fetchLatestTickets)
-    {
-        let a_TicketsFound: i_dashBoardLatestTicket[];
-
-        const url = `http://localhost:3000/Ticket/fetch-latest-tickets/`;
-
-        try 
-        {
-            const response = await fetch(url, {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({
-                "UserId": i_userId
-            })
-        }); 
-        a_TicketsFound = await response.json() as i_dashBoardLatestTicket[];
-        setLatestTickets(a_TicketsFound);
-        } 
-        catch (error) 
-        {
-            console.error("Error " + error);    
-        }
-
-    }
     const [LatestTickets, setLatestTickets] = useState<i_dashBoardLatestTicket[]>()
 
     const [latestNotifications, setLatestNotifications] = useState<i_ticketComment[]>()
     
     useEffect(() => {
-    fetchLatestTickets({ i_userId: userInfo.Id, setLatestTickets });
+    setLatestTickets({ i_userId: userInfo.Id, setLatestTickets });
     fetchLatestNotifications({ i_userId: userInfo.Id, setLatestNotifications });
     }, [userInfo.Id]);
 

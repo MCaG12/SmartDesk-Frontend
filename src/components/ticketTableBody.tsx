@@ -13,24 +13,8 @@ interface interface_ticket_table_body
 export function Ticket_Table_Body({ ticketInfo, 
                                     setShowDetailedTicket, setInfoDetailedTicket, showDetailedTicket, fetchTickets, setTickets}: interface_ticket_table_body) {
 
-  async function advanceTicket(ticketId: number)
-  {
-    const url = `http://localhost:3000/Ticket/advanceTicket/${ticketId}`;
-
-    try
-    {
-        const response = await fetch(url, {
-            method: "GET",
-            headers: {
-                "Content-Type": "application/json"
-            }
-        });
- 
-    }
-    catch (error)
-    {
-        console.error("Error:", error);
-    }
+  function advanceTicket(Id: number) {
+    throw new Error("Function not implemented.");
   }
 
   return (

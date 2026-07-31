@@ -7,7 +7,6 @@ interface i_Notification_menu
 
 export function Notification_Menu({a_notifications} : i_Notification_menu)
 {
-    console.log(a_notifications)
     return (
          <div className="NotificationsTab">
             <h1 className="HeaderFont" style={{color: "#4272b6"}}>Notificações</h1>  
