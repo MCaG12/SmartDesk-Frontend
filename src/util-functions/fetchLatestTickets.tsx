@@ -6,7 +6,7 @@ interface i_fetchLatestTickets
     setLatestTickets: React.Dispatch<React.SetStateAction<i_dashBoardLatestTicket[] | undefined>>;
 }
 
-async function fetchLatestTickets({i_userId, setLatestTickets}: i_fetchLatestTickets)
+export default async function fetchLatestTickets({i_userId, setLatestTickets}: i_fetchLatestTickets)
     {
         let a_TicketsFound: i_dashBoardLatestTicket[];
 

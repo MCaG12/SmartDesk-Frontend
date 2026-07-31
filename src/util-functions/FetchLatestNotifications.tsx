@@ -6,7 +6,7 @@ interface i_fetchLatestNotifications
     setLatestNotifications: React.Dispatch<React.SetStateAction<i_ticketComment[] | undefined>>;
 }
 
-async function fetchLatestNotifications({i_userId, setLatestNotifications}: i_fetchLatestNotifications)
+export default  async function fetchLatestNotifications({i_userId, setLatestNotifications}: i_fetchLatestNotifications)
     {
         let a_NotificationsFound: i_ticketComment[];
 

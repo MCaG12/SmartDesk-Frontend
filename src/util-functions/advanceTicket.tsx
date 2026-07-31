@@ -1,4 +1,4 @@
-async function advanceTicket(ticketId: number)
+export default async function advanceTicket(ticketId: number)
   {
     const url = `http://localhost:3000/Ticket/advanceTicket/${ticketId}`;
 

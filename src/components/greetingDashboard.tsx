@@ -13,6 +13,7 @@ import { Notification_Menu } from "./notificationsMenu";
 import type { i_dashBoardLatestTicket } from "../interfaces/i_dashBoardTicketFound";
 import type { i_ticketComment } from "../interfaces/i_ticketComment";
 import fetchLatestNotifications from "../util-functions/fetchLatestTicketsComments";
+import fetchLatestTickets from "../util-functions/fetchLatestTickets";
 
 interface i_category
 {
@@ -52,7 +53,7 @@ export default function GreetingDashboard({notificationIsActive, ticketPrioritie
     const [latestNotifications, setLatestNotifications] = useState<i_ticketComment[]>()
     
     useEffect(() => {
-    setLatestTickets({ i_userId: userInfo.Id, setLatestTickets });
+    fetchLatestTickets({ i_userId: userInfo.Id, setLatestTickets });
     fetchLatestNotifications({ i_userId: userInfo.Id, setLatestNotifications });
     }, [userInfo.Id]);
 

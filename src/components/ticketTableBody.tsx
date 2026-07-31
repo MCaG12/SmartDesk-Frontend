@@ -1,4 +1,5 @@
 import type { i_Ticket } from "../interfaces/i_ticket";
+import advanceTicket from "../util-functions/advanceTicket";
 
 interface interface_ticket_table_body
 {
@@ -12,10 +13,6 @@ interface interface_ticket_table_body
 
 export function Ticket_Table_Body({ ticketInfo, 
                                     setShowDetailedTicket, setInfoDetailedTicket, showDetailedTicket, fetchTickets, setTickets}: interface_ticket_table_body) {
-
-  function advanceTicket(Id: number) {
-    throw new Error("Function not implemented.");
-  }
 
   return (
     <>
