@@ -200,6 +200,14 @@
   
 }
 
+.table-item, .table-header {
+    text-align: center;
+    padding: 8px;
+    color : #333333;
+    font-weight: 500;
+    
+}
+
 /** DASHBOARD HEADER ITEMS*/
 
 .btn-novo-chamado {
@@ -242,6 +250,11 @@
   width:10%;
   height: 60%;
   text-align: center;
+}
+
+.search-input-wrapper:hover
+{
+  cursor: pointer;
 }
 
 .search-input {
@@ -324,25 +337,51 @@
   color: #6b7280;
 }
 
-.notificationContainer
-{
-  width: 100%;
-  height:80%;
-  background-color: #dfdfdf;
-  display: flex;
-  flex-direction: column;
-  justify-content: space-evenly;
-  align-items: center;
+.notificationContainer {
+    width: 100%;
+    height: 80%;
+    background-color: #dfdfdf;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    align-items: center;
+    overflow-y: auto; /* was: hidden */
+    padding: 16px 0;
+    box-sizing: border-box;
 }
 
-.notificationBody
-{
-  Width: 90%;
-  height: 40%;
-  background-color: white;
-  border-radius: 30px;
-  display: flex;
-  flex-direction: column;
+.notificationBody {
+    width: 100%;
+    max-width: 700px;
+    background-color: #ffffff;
+    border-radius: 12px;
+    display: flex;
+    flex-direction: column;
+    border: 1px solid #eaeaea;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+    overflow: hidden;
+    flex-shrink: 0; /* prevents cards from squishing in a flex column */
+}
+
+.notificationHeader {
+    padding: 16px 24px;
+    border-bottom: 1px solid #f0f0f0;
+    display: grid;
+    grid-template-columns: 140px 1fr; /* fixed label column, comment takes the rest */
+    gap: 16px;
+    align-items: center;
+}
+
+.notificationHeader:last-child {
+    border-bottom: none;
+}
+
+.notificationTitle {
+    font-size: 16px;
+    font-weight: 500;
+    color: #1a1a1a;
+    margin: 0;
+    text-align: left;
 }
 
 .NewTicketTab
@@ -606,6 +645,38 @@
   opacity: 0.85;
 }
 
+.detailed-ticket-comment-section
+{
+  width: 100%;
+  max-width: 700px;
+  background-color: #ffffff;
+  border-radius: 12px;
+  display: flex;
+  flex-direction: column;
+  border: 1px solid #eaeaea;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+  overflow: hidden;
+  flex-shrink: 0; 
+}
+
+.ticket-comment-item {
+  padding: 12px 16px;
+  border-bottom: 1px solid #eaeaea;
+}
+
+.ticket-comment-item:last-child {
+  border-bottom: none;
+}
+
+.ticket-comment-text {
+  margin: 0;
+  font-size: 14px;
+  line-height: 1.5;
+  color: #333;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
 .table-header {
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
   font-size: 20px;
@@ -620,4 +691,28 @@
   font-weight: 400;
   color: #1a1a1a;
   letter-spacing: 0em;
+}
+
+.ticket-new-comment-button 
+{
+  background-color: #1e2a5e;
+  color: #ffffff;
+  width: 60%;
+  height: 48px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  align-self: center;
+  margin-top: 8%;
+  border: none;
+  border-radius: 8px;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.2s ease, transform 0.1s ease;
+}
+
+.ticket-new-comment-button:hover
+{
+  background-color: #152047;
 }

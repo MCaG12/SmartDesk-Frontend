@@ -59,6 +59,10 @@ async function UpdateUserPassword(insertedEmail:string , insertedPassword:string
 
 export default function UserDashBoard({Name, Email, Type, Role, Department}: DashBoardUserInfo)
 {
+    const UserConfigurations = 0;
+    const UserInformations = 1;
+    const UserCredentials = 2;
+
     const [userDashBoardState, setUserDashBoardState] = useState(0)
     const [userEmail, setUserEmail] = useState("");
     const [userPassword, setUserPassword] = useState("");
@@ -69,7 +73,7 @@ export default function UserDashBoard({Name, Email, Type, Role, Department}: Das
     {
         switch(userDashBoardState)
         {
-            case 0:
+            case UserConfigurations:
             {
                 return (
                 <>
@@ -91,7 +95,7 @@ export default function UserDashBoard({Name, Email, Type, Role, Department}: Das
             );
                 
             }
-            case 1:
+            case UserInformations:
             {
                 return (
                     <>
@@ -99,7 +103,7 @@ export default function UserDashBoard({Name, Email, Type, Role, Department}: Das
                             <h1 className="DashBoard-Title">Informações Pessoais</h1>
                             <button
                             className="tab-btn"
-                            onClick={() => {setUserDashBoardState(0)}}
+                            onClick={() => {setUserDashBoardState(UserConfigurations)}}
                             style={{ width: "10%", marginRight:"25%" }}
                             >Voltar</button>
                         </div>
@@ -162,7 +166,7 @@ export default function UserDashBoard({Name, Email, Type, Role, Department}: Das
                 )
             }
         
-            case 2:
+            case UserCredentials:
             {
                 return (
                 <>
@@ -171,7 +175,7 @@ export default function UserDashBoard({Name, Email, Type, Role, Department}: Das
                         <h1 className="DashBoard-Title">Segurança</h1>
                         <button
                         className="tab-btn"
-                        onClick={() => {setUserDashBoardState(0)}}
+                        onClick={() => {setUserDashBoardState(UserConfigurations)}}
                         style={{ width: "10%", marginRight:"25%" }}
                         >Voltar</button>
                     </div>

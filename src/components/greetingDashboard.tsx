@@ -1,3 +1,4 @@
+import { useEffect, useState } from "react";
 import DashBoardNewTicketsImage from "../images/DashBoardNewTicketsImage.png"
 import DashBoardTicketAWaitingForConfirmationImage from "../images/DashBoardTicketAWaitingForConfirmationImage.png"
 import DashBoardTicketsCompletedImage from "../images/DashBoardTicketsCompletedImage.png"
@@ -7,8 +8,11 @@ import type { i_TicketCategory } from "../interfaces/i_ticketCategory";
 import type { i_TicketPriority } from "../interfaces/i_ticketPriority";
 import type { i_UserLoginInfoResponse } from "../interfaces/i_UserResponse";
 import { Create_New_Ticket_Menu } from "./createNewTicketMenu";
-import { LasTicketsCall } from "./lastTicketsTableItem";
 import { Notification_Menu } from "./notificationsMenu";
+import type { i_dashBoardLatestTicket } from "../interfaces/i_dashBoardTicketFound";
+import type { i_ticketComment } from "../interfaces/i_ticketComment";
+import fetchLatestNotifications from "../util-functions/fetchLatestTicketsComments";
+import fetchLatestTickets from "../util-functions/fetchLatestTickets";
 
 interface i_category
 {
@@ -42,6 +46,16 @@ export default function GreetingDashboard({notificationIsActive, ticketPrioritie
     { categoryTitle: "Impressora", categoryColor: "#1ABC9C" },
     { categoryTitle: "Outros", categoryColor: "#95A5A6" },
 ];
+
+    const [LatestTickets, setLatestTickets] = useState<i_dashBoardLatestTicket[]>()
+
+    const [latestNotifications, setLatestNotifications] = useState<i_ticketComment[]>()
+    
+    useEffect(() => {
+    fetchLatestTickets({ i_userId: userInfo.Id, setLatestTickets });
+    fetchLatestNotifications({ i_userId: userInfo.Id, setLatestNotifications });
+    }, [userInfo.Id]);
+
     return(
     <>
         <div style={{
@@ -100,8 +114,10 @@ export default function GreetingDashboard({notificationIsActive, ticketPrioritie
                 </div>
 
                 {
-                    notificationIsActive &&
-                        <Notification_Menu />
+                    (notificationIsActive && latestNotifications) &&
+                        <Notification_Menu
+                            a_notifications={latestNotifications}
+                         />
                 }
 
                 {
@@ -162,19 +178,32 @@ export default function GreetingDashboard({notificationIsActive, ticketPrioritie
                 </div>
 
                 {/* Recent tickets */}
-                <h3 className="DashBoardScreen-ItemFont">Ultimos Chamados</h3>
+                <h3 className="DashBoardScreen-ItemFont">Últimos Chamados</h3>
                 <div className="table-container">
-                    <div style={{display:"flex", flexDirection: "row", justifyContent:"space-evenly"}}>
-                        <p className="table-header">ID</p>
-                        <p className="table-header">Categoria</p>
-                        <p className="table-header">Status</p>
-                        <p className="table-header">Responsável</p>
-                        <p className="table-header">Data de Abertura</p>
-                    </div>
-                    <hr></hr>
-                    {tickets
-                        .filter((ticket) => ticket.ticketStatus.tickstaDescription == "NOVO TICKET")
-                        .map((ticket) => LasTicketsCall(ticket))}
+                    <table style={{width: "100%"}}>
+                        <thead>
+                            <tr>
+                                <th className="table-header">Código</th>
+                                <th className="table-header">Categoria</th>
+                                <th className="table-header">Data de Abertura</th>
+                                <th className="table-header">Data de Fechamento</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {LatestTickets?.map((ticket) => (
+                                <tr key={ticket.Id}>
+                                    <td className="table-item">{ticket.Id}</td>
+                                    <td className="table-item">{ticket.ticketTitle}</td>
+                                    <td className="table-item">{ticket.ticketDateOpen.split("T")[0]}</td>
+                                    {ticket.ticketDateClose ? (
+                                        <td className="table-item">{ticket.ticketDateClose.split("T")[0]}</td>
+                                    ) : (
+                                        <td className="table-item">-</td>
+                                    )}
+                                </tr>
+                            ))}
+                        </tbody>
+                    </table>
                 </div>
 
         </div>

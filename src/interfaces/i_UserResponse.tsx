@@ -8,8 +8,7 @@ export interface i_UserLoginInfoResponse
     Id: number;
     usuarNome:string; 
     usuarEmail:string;
-    usuarSenha: string;
     usuarCargo: i_userCargo; 
     usuarDepartamento: i_usuarDepartamento; 
-    usuarTipo: i_tipoUser; 
+    usuarTipoUsuario: i_tipoUser; 
 }

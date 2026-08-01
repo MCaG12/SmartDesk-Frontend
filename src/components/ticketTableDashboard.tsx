@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import type { i_Ticket } from "../interfaces/i_ticket";
 import type { i_TicketCategory } from "../interfaces/i_ticketCategory";
 import type { i_TicketPriority } from "../interfaces/i_ticketPriority";
@@ -7,27 +7,35 @@ import { Create_New_Ticket_Menu } from "./createNewTicketMenu";
 import { Notification_Menu } from "./notificationsMenu";
 import { Ticket_Table_Body } from "./ticketTableBody";
 import DetailedTicketInfo from "./detailedTicketInfo";
-
-
+import type { i_ticketComment } from "../interfaces/i_ticketComment";
+import { TicketSearchMenu } from "./TicketSearchMenu";
+import fetchLatestNotifications from "../util-functions/fetchLatestTicketsComments";
 
 interface i_TicketTableDashboard
 {
-    notificationIsActive : boolean,
-    setTickets :  React.Dispatch<React.SetStateAction<i_Ticket[]>>,
-    setCreateNewTicketIsActive: React.Dispatch<React.SetStateAction<boolean>>,
-    createNewTicketActive: boolean,
+    notificationIsActive : boolean;
+    setTickets :  React.Dispatch<React.SetStateAction<i_Ticket[]>>;
+    setCreateNewTicketIsActive: React.Dispatch<React.SetStateAction<boolean>>;
+    createNewTicketActive: boolean;
     tickets: i_Ticket[];
     ticketPriorities: i_TicketPriority[];
     ticketCategories: i_TicketCategory[];
     userInfo: i_UserLoginInfoResponse;
-    fetchTickets(setTickets: React.Dispatch<React.SetStateAction<i_Ticket[]>>, userEmail: string): Promise<void>
+    fetchTickets(setTickets: React.Dispatch<React.SetStateAction<i_Ticket[]>>, userEmail: string): Promise<void>;
+    ticketSearchActive: boolean
 }
 
 export default function TicketTableDashboard({notificationIsActive,setTickets, setCreateNewTicketIsActive, 
-                                              createNewTicketActive, tickets, ticketPriorities, ticketCategories,userInfo, fetchTickets}: i_TicketTableDashboard)
+                                              createNewTicketActive, tickets, ticketPriorities, ticketCategories,userInfo, fetchTickets, ticketSearchActive}: i_TicketTableDashboard)
 {
     const [showDetailedTicket, setShowDetailedTicket] = useState(false);
     const [infoDetailedTicket, setInfoDetailedTicket] = useState<i_Ticket>()
+
+    const [latestNotifications, setLatestNotifications] = useState<i_ticketComment[]>()
+
+    useEffect(() => {
+    fetchLatestNotifications({ i_userId: userInfo.Id, setLatestNotifications });
+    }, [userInfo.Id]);
 
     return(
     <>
@@ -43,17 +51,26 @@ export default function TicketTableDashboard({notificationIsActive,setTickets, s
                 boxSizing: "border-box"
                 }}>
 
+            {ticketSearchActive &&
+                <TicketSearchMenu
+                    tickets={tickets}
+                />
+            }
+
             {
-                (showDetailedTicket && infoDetailedTicket) &&
+                (showDetailedTicket && infoDetailedTicket ) &&
                     <DetailedTicketInfo 
                         ticketInfo={infoDetailedTicket}
                         setShowDetailedTicket={setShowDetailedTicket}
+                        userInfo_id={userInfo.Id}
                     />
             }
 
             {
-                notificationIsActive &&
-                    <Notification_Menu />
+                (notificationIsActive && latestNotifications) &&
+                    <Notification_Menu 
+                        a_notifications={latestNotifications}
+                    />
             }
             
             {

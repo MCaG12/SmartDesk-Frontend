@@ -1,7 +1,11 @@
+import type { i_ticketComment } from "../interfaces/i_ticketComment";
 
+interface i_Notification_menu 
+{
+    a_notifications : i_ticketComment[];
+}
 
-export function Notification_Menu
-    ()
+export function Notification_Menu({a_notifications} : i_Notification_menu)
 {
     return (
          <div className="NotificationsTab">
@@ -9,15 +13,17 @@ export function Notification_Menu
             <hr></hr>
             <div className="notificationContainer">
                 <div className="notificationBody">
-                    <div style={{width:"100%", height:"20%", backgroundColor:"#4a7fcb", borderRadius: "30px 30px 0 0"}}>
-                        <h1 className="greetTitle" style={{textAlign:"center"}}> Titulo Ticket</h1>
+                    <div className="notificationHeader">
+                        <p className="notificationTitle">Número Chamado</p>
+                        <p className="notificationTitle">Comentários</p>
                     </div>
+                    {a_notifications.map((notification) => (
+                        <div className="notificationHeader" key={notification.Id} style={{justifyContent:"center"}}>
+                            <p className="notificationTitle">{notification.Id}</p>
+                            <p className="notificationTitle">{notification.tickcomComment}</p>
+                        </div>
+                    ))}
                 </div>
-                <div className="notificationBody">
-                    <div style={{width:"100%", height:"20%", backgroundColor:"#4a7fcb", borderRadius: "30px 30px 0 0"}}>
-                        <h1 className="greetTitle" style={{textAlign:"center"}}> Titulo Ticket</h1>
-                    </div>
-                </div>  
             </div>
         </div>
     )}

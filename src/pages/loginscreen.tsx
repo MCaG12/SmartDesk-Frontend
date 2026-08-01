@@ -21,27 +21,24 @@ async function FetchUserInfo({
         return;
     }
 
-    const url = "http://localhost:3000/Usuario/GetAll";
+    const url = "http://localhost:3000/Usuario/Login";
 
     try
     {
         const response = await fetch(url, {
-            method: "GET",
-            headers: {
-                "Content-Type": "application/json"
-            }
-        });
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({
+              "Email": userEmail,
+              "Password": userPassword
+          })
+        }); 
 
-        const users =
-            await response.json() as i_UserLoginInfoResponse[];
+        const responseBody = await response.json();
+        
+        const userFound = responseBody.message;
 
-        console.log(users);
-
-        const userFound = users.find(user =>
-            user.usuarSenha === userPassword &&
-            user.usuarEmail === userEmail
-        );
-
+        
         if (!userFound)
         {
             setShowError(true);

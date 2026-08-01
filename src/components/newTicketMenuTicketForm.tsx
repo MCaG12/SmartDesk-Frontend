@@ -9,7 +9,7 @@ export function NewTicketForm({ ticketCategories, ticketPriorities, setTicketTit
                                 setTicketCategory, setTicketPriority, 
                                 setTicketProblemDescription, setPageStatus, setCreateNewTicketIsActive
                             }: i_NewTicketForm) {
-    const [pickedPriority , setPickedPriority] = useState(0);
+    const [ , setPickedPriority] = useState(0);
     const pickedPriorityRef = useRef(0);
     return (
         <>
