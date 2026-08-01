@@ -21,19 +21,6 @@ interface i_Create_New_Ticket_Menu
     userInfo:i_UserLoginInfoResponse;
 }
 
-interface NewTicket
-{
-    ticketTitle: string,
-    ticketCategory: i_TicketCategory,
-    ticketPriority: i_TicketPriority,
-    ticketProblemDescription: string,
-    ticketSolicitant: i_TicketSolicitant,
-    problemSolved: boolean,
-    setProblemSolved: React.Dispatch<React.SetStateAction<boolean>>,
-    setAiSuggestion: React.Dispatch<React.SetStateAction<string>>;
-    setLoadingAi: React.Dispatch<React.SetStateAction<boolean>>;
-}
-
 interface SaveTicket
 {
     ticketTitle: string,
@@ -205,15 +192,14 @@ async function save_new_ticket({ticketTitle, ticketCategory, ticketPriority, tic
 }
 
 export function Create_New_Ticket_Menu
-    ({setCreateNewTicketIsActive, createNewTicketActive, setTickets, ticketPriorities, ticketCategories, userInfo}:i_Create_New_Ticket_Menu)
+    ({setCreateNewTicketIsActive, ticketPriorities, ticketCategories, userInfo}:i_Create_New_Ticket_Menu)
 {
     const [ticketTitle, setTicketTitle] = useState("");
     const [ticketCategory, setTicketCategory] = useState<i_TicketCategory>();
     const [ticketPriority, setTicketPriority]= useState<i_TicketPriority>();
     const [ticketProblemDescription, setTicketProblemDescription] = useState("");
     const [aiSuggestion, setAiSuggestion] = useState("");
-    const [loadingAi, setLoadingAi] = useState(false);
-    const [problemSolved, setProblemSolved] = useState(false);
+    const [, setLoadingAi] = useState(false);
     const ticketSolicitant: i_TicketSolicitant = {Id: userInfo.Id, usuarNome: userInfo.usuarNome, usuarEmail: userInfo.usuarEmail};
     const [pageStatus, setPageStatus] = useState(0);
     const [aiTicketPrioritySuggestion, setAiTicketPrioritySuggestion] = useState<i_TicketPriority>();

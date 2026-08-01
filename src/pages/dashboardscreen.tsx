@@ -128,10 +128,6 @@ export default function DashScreenScreen() {
     fetchData();
     }, []);
 
-    useEffect(() => {
-        console.log(userFound);
-    }, []);   
-
     function drawDashBoard(dashBoardState : number)
     {
         switch(dashBoardState)
@@ -168,6 +164,8 @@ export default function DashScreenScreen() {
                 }
             case UserInfoState:
             {
+                console.log("acessing the USerDashBoard")
+                console.log(userFound)
                 return <UserDashBoard 
                     Name={userFound.usuarNome}
                     Email={userFound.usuarEmail}
