@@ -56,8 +56,6 @@ export function TicketSearchMenu({tickets}:i_TicketMenu) {
 
     const [displayedItems, setDisplayedItems] = useState<i_Ticket[]>([]);
 
-    setDisplayedItems(tickets);
-
     const [ticketState, setTicketState] = useState(-1);
     const [priorityCode, setPriorityCode] = useState(-1);
     const [categoryCode, setCategoryCode] = useState(-1);
@@ -144,7 +142,7 @@ export function TicketSearchMenu({tickets}:i_TicketMenu) {
             </div>
             <p style={styles.SubHeaderFont}>Tickets Encontrados</p>
             <div style={styles.TicketGrid}>
-                {displayedItems.filter((item) => {
+                {tickets.filter((item) => {
                     if(ticketState != -1 && item.ticketStatus.Id != ticketState)
                         {
                         return false;

@@ -11,6 +11,7 @@ import type { i_TicketCategory } from "../interfaces/i_ticketCategory";
 import { useLocation } from "react-router-dom";
 import type { i_TicketPriority } from "../interfaces/i_ticketPriority";
 import type { i_Ticket } from "../interfaces/i_ticket";
+import ManagerDashBoard from "../components/ManagerDashBoard/ManagerDashBoard";
 
 
 
@@ -92,6 +93,7 @@ export default function DashScreenScreen() {
     const DashBoardState = 0;
     const TicketTableState = 1;
     const UserInfoState = 2;
+    const ManagerPanel = 3; 
 
     const location = useLocation();
     const { userFound } = location.state;
@@ -164,14 +166,19 @@ export default function DashScreenScreen() {
                 }
             case UserInfoState:
             {
-                console.log("acessing the USerDashBoard")
-                console.log(userFound)
                 return <UserDashBoard 
                     Name={userFound.usuarNome}
                     Email={userFound.usuarEmail}
                     Type={userFound.usuarTipoUsuario.tipusuDescricao}
                     Role={userFound.usuarCargo.carNome}
                     Department={userFound.usuarDepartamento.depNomeDepartamento}
+                />
+            }
+
+            case ManagerPanel: 
+            {
+                return <ManagerDashBoard
+                
                 />
             }
         }
@@ -226,12 +233,20 @@ export default function DashScreenScreen() {
                     >
                     Chamados
                     </button>
-                        <button
+                    <button
                     className="tab-btn"
                     onClick={() => setDashBoardState(UserInfoState)}
                     style={{ backgroundColor: dashBoardState === UserInfoState ? "#1b54a3" : "#538fe4" }}
                     >
                     Usuário
+                    </button>
+
+                    <button
+                    className="tab-btn"
+                    onClick={() => setDashBoardState(ManagerPanel)}
+                    style={{ backgroundColor: dashBoardState === ManagerPanel ? "#1b54a3" : "#538fe4" }}
+                    >
+                    Gerenciamento
                     </button>
                 </div>
                 { drawDashBoard(dashBoardState) }
