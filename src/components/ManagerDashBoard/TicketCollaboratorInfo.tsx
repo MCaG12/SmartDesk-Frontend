@@ -196,9 +196,7 @@ export default function TicketMonthsDashBoard()
         {
            (displayDetailedTicket && selectedTicket) && <DetailedTicketInfo 
                                         ticketInfo={selectedTicket} 
-                                        setShowDetailedTicket={setDisplayDetailedTicket}
-                                        userInfo_id={1}
-                                        />
+                                        setShowDetailedTicket={setDisplayDetailedTicket}/>
                                     
         }
         <div style={styles.TitleBar}>
@@ -256,7 +254,7 @@ export default function TicketMonthsDashBoard()
                     <div key={ticket.Id} style={{...styles.KanbanColumn, backgroundColor: hoveredTicket == ticket.Id ? "#eeeeee" : "#ffffff", 
                                                                          cursor: "pointer" }} 
                         onMouseEnter={() => setHoveredTicket(ticket.Id)}
-                        onMouseLeave={() => setHoveredTicket(-1)} 
+                        onMouseLeave={() => setHoveredTicket(c_i_unpickedTicket)} 
                         onClick={() => {setDisplayDetailedTicket(true); setSelectedTicket(ticket);}}>
                         <div style={styles.KanbanColumnHeader}>
                             <span

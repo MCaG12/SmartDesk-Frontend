@@ -9,7 +9,7 @@ interface i_DetailedTicketInfo
 {
     ticketInfo: i_Ticket,
     setShowDetailedTicket: React.Dispatch<boolean>;
-    userInfo_id : number
+    userInfo_id? : number
     
 }
 
@@ -27,7 +27,7 @@ export default function DetailedTicketInfo({ticketInfo, setShowDetailedTicket, u
     return(
     <div className="detailed-ticket-overlay">
         <div className="detailed-ticket-modal">
-            {showCreateNewTicketMenu && (
+            {(showCreateNewTicketMenu && userInfo_id) && (
                 <CreateNewTicketMenu 
                 ticketId={ticketInfo.Id} 
                 setShowNewTicketCommentMenu={setShowCreateNewTicketMenu} 
@@ -92,10 +92,13 @@ export default function DetailedTicketInfo({ticketInfo, setShowDetailedTicket, u
                         })
                     }
                 </div>
-
-                <button className="ticket-new-comment-button "  onClick={() => setShowCreateNewTicketMenu(!showCreateNewTicketMenu)}>
-                    Novo Comentário
-                </button>
+                {
+                    (userInfo_id) &&
+                    <button className="ticket-new-comment-button "  onClick={() => setShowCreateNewTicketMenu(!showCreateNewTicketMenu)}>
+                        Novo Comentário
+                    </button>
+                }
+                
         </div>
     </div>
     </div>
