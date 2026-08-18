@@ -14,7 +14,6 @@ async function UpdateUserPassword(insertedEmail:string , insertedPassword:string
 {
     try 
         {
-
             if(insertedEmail.trim() == "" || insertedPassword.trim() == "" || insertedNewPassword.trim() == "" || userCheckNewPassword.trim() == "")
                 {
                     return;
@@ -26,8 +25,6 @@ async function UpdateUserPassword(insertedEmail:string , insertedPassword:string
                 }
             
             const url = "http://localhost:3000/Usuario/UpdatePassword";
-
-            console.log(insertedEmail,insertedPassword,insertedNewPassword)
     
             const response = await fetch(url, {
             method: 'POST', 

@@ -155,7 +155,7 @@ export default function GreetingDashboard({notificationIsActive, ticketPrioritie
                             <div style={{width: "100%", height: "100%", display: "flex", backgroundColor: "white", flexDirection: "row", overflowX: "scroll", alignItems: "center", justifyContent: "space-evenly"}}>
                                 {categories.map((category) => {
                                     const categoryTickets = tickets.filter((ticket) => ticket.ticketCategory.tickcatDescription == category.categoryTitle && ticket.ticketAgent?.usuarEmail == userInfo.usuarEmail);
-                                    console.log(categoryTickets)
+                        
                                     if(categoryTickets.length > 0)
                                         {
                                             return (

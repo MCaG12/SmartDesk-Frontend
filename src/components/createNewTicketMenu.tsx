@@ -32,7 +32,7 @@ interface SaveTicket
 
 async function getPrioritySuggestion({ticketCategoryDescription, ticketProblemDescription, ticketTitle, setAiTicketPrioritySuggestion, setLoadingAi}:i_GetPrioritySuggestion ) {
   if (!ticketCategoryDescription  || !ticketProblemDescription) {console.log("Failed"); return;}
-  console.log(ticketTitle, ticketCategoryDescription, ticketProblemDescription)
+
   setLoadingAi(true);
   try {
     const response = await fetch(
@@ -114,7 +114,6 @@ async function getTroubleshootingSuggestion({ticketCategoryDescription, ticketPr
       }
     );
     const data = await response.json();
-    console.log(data);
     const text = data.candidates[0].content.parts[0].text ?? "";
     setAiSuggestion(text);
   } catch (err) {
