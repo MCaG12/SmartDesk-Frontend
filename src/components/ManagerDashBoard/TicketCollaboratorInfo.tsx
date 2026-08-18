@@ -33,19 +33,23 @@ const statusOptions = [
     { label: "FINALIZADO", bgColor: "#66e9a1", buttonCode: ConcludedTicketCode }
 ];
 
+const c_i_unpickedDep = 0;
+const c_i_unpickedRole = 0;
+const c_i_unpickedTicket = -1;
+
 export default function TicketMonthsDashBoard()
 {
     const [departments, setDepartment] = useState<i_department[]>([]);
-    const [pickedDepartmentCode, setPickedDepartmentCode] = useState<number>(0);
+    const [pickedDepartmentCode, setPickedDepartmentCode] = useState<number>(c_i_unpickedDep);
     const [roles, setRoles] = useState<i_role[]>([]);
-    const [pickedRole, setPickedRole] = useState<number>(0)
+    const [pickedRole, setPickedRole] = useState<number>(c_i_unpickedRole)
     const [foundUsers, setFoundUsers] = useState<i_user[]>([])
     const [pickedUser, setPickedUser] = useState<string>()
     const [foundTickets, setFoundTickets] = useState<i_Ticket[]>([])
     const [selectedTicket, setSelectedTicket] = useState<i_Ticket>()
-    const [displayDetailedTicket,setDisplayDetailedTicket] = useState<boolean>(false);;
+    const [displayDetailedTicket,setDisplayDetailedTicket] = useState<boolean>(false);
 
-    const [hoveredTicket, setHoveredTicket] = useState<number>(-1);
+    const [hoveredTicket, setHoveredTicket] = useState<number>(c_i_unpickedTicket);
 
     function setSelectedRole(pn_roleCode : number)
     {
