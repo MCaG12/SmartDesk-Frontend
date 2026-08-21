@@ -63,7 +63,7 @@ export function NewTicketForm({ ticketCategories, ticketPriorities, setTicketTit
             </div>
             <div style={{display:"flex", flexDirection:"row", height: "10%", justifyContent:"space-evenly"}}>
                 <button className="tab-btn" style={{width:"40%"}} onClick={() => {const priority = pickedPriorityRef.current; 
-                                                                                    console.log("picked priority ->", priority);
+                                                                                  
                                                                                     setPageStatus(resolvePageStatus(priority));}}>
                     Criar Chamado
                 </button>

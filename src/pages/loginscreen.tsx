@@ -93,6 +93,7 @@ export default function LoginScreen() {
                         className={showError ? "input-error" :"input"}
                         placeholder="Digite a sua senha"
                         value={userPassword}
+                        type={'password'}
                         onChange={(e) => setUserPassword(e.target.value)}
                         />
                     {showError && <h4 className="subtleFont" style={{color: "#e53935 " }}> O e-mail ou senha inseridos são invalidos!</h4>}
