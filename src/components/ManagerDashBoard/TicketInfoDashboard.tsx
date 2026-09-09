@@ -1,9 +1,17 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import type { i_Ticket } from "../../interfaces/i_ticket";
 
 interface i_category
 {
-    categoryTitle: string;
-    categoryColor : string;
+    category: Number;
+    count : string;
+};
+
+interface i_categoryTitleInfo
+{
+   categoryCode: Number;
+   categoryTitle : string; 
+   categoryColor : string; 
 }
 
 
@@ -12,57 +20,16 @@ const TicketInProgressCode = 2;
 const PendingTicketCode = 4;
 const ConcludedTicketCode = 5;
 
-const sectorAgents = [
-    {
-        sectorTitle: "Suporte Técnico",
-        sectorColor: "#3b82f6",
-        agents: [
-            { name: "João Silva", ticketCount: 24 },
-            { name: "Mariana Costa", ticketCount: 19 },
-            { name: "Pedro Almeida", ticketCount: 15 },
-        ],
-    },
-    {
-        sectorTitle: "Financeiro",
-        sectorColor: "#10b981",
-        agents: [
-            { name: "Ana Beatriz", ticketCount: 18 },
-            { name: "Carlos Eduardo", ticketCount: 14 },
-            { name: "Fernanda Lima", ticketCount: 9 },
-        ],
-    },
-    {
-        sectorTitle: "Comercial",
-        sectorColor: "#f59e0b",
-        agents: [
-            { name: "Rafael Souza", ticketCount: 21 },
-            { name: "Juliana Rocha", ticketCount: 16 },
-            { name: "Bruno Martins", ticketCount: 11 },
-        ],
-    },
-    {
-        sectorTitle: "RH",
-        sectorColor: "#8b5cf6",
-        agents: [
-            { name: "Camila Ferreira", ticketCount: 12 },
-            { name: "Lucas Oliveira", ticketCount: 8 },
-            { name: "Beatriz Santos", ticketCount: 5 },
-        ],
-    },
-];
-
-
-
-const categories :i_category[] = [
-    { categoryTitle: "Hardware", categoryColor: "#E74C3C" },
-    { categoryTitle: "Software", categoryColor: "#3498DB" },
-    { categoryTitle: "Rede", categoryColor: "#2ECC71" },
-    { categoryTitle: "Acesso / Permissão", categoryColor: "#9B59B6" },
-    { categoryTitle: "Email", categoryColor: "#F39C12" },
-    { categoryTitle: "Erro no Sistema", categoryColor: "#E67E22" },
-    { categoryTitle: "Impressora", categoryColor: "#1ABC9C" },
-    { categoryTitle: "Outros", categoryColor: "#95A5A6" },
-];
+const categoriesInfo :i_categoryTitleInfo[] = [
+  { "categoryTitle": "Hardware", "categoryCode": 1, "categoryColor": "#E74C3C" },
+  { "categoryTitle": "Software", "categoryCode": 2, "categoryColor": "#3498DB" },
+  { "categoryTitle": "Rede", "categoryCode": 3, "categoryColor": "#2ECC71" },
+  { "categoryTitle": "Acesso / Permissão", "categoryCode": 4, "categoryColor": "#9B59B6" },
+  { "categoryTitle": "Email", "categoryCode": 5, "categoryColor": "#F39C12" },
+  { "categoryTitle": "Erro no Sistema", "categoryCode": 6, "categoryColor": "#E67E22" },
+  { "categoryTitle": "Impressora", "categoryCode": 7, "categoryColor": "#1ABC9C" },
+  { "categoryTitle": "Outros", "categoryCode": 8, "categoryColor": "#95A5A6" }
+]
 
 const statusOptions = [
     { label: "Novos Chamados", bgColor: "#ffa2a2", buttonCode: NewTicketCode },
@@ -74,31 +41,57 @@ const statusOptions = [
 export default function TicketInfoDashboard()
 {
     const [currentTicketSector, setCurrentTicketSector] = useState(0);
-    function getSectorAgents(sectorTitle : string) {
-        return sectorAgents.find((sector) => sector.sectorTitle === sectorTitle);
+    const [foundOpenTickets, setFoundOpenTickets] = useState<i_category[]>([]);
+
+    const [displayDetailedTicket,setDisplayDetailedTicket] = useState<boolean>(false);
+ 
+    const [selectedCategory, setSelectedCategory] = useState(0);
+
+    async function GetDepartmentTickets()
+    {
+        const categoryTicketsUrl = "http://localhost:3000/Ticket/fetch-open-ticket-counts";
+
+        const openTicketsResponse = await fetch(categoryTicketsUrl, {
+            method: "GET",
+            headers: {
+                "Content-Type": "application/json"
+            }
+        });
+
+        const data = await openTicketsResponse.json() as i_category[]; 
+        setFoundOpenTickets(data);
     }
-    
-    const selectedSector = getSectorAgents("Suporte Técnico");
+
+    useEffect(() => {
+        GetDepartmentTickets();
+        console.log(foundOpenTickets)
+    }, []);
+
 
     return <div style={styles.DashBoardBody}>
         <div style={styles.TitleBar}>
-            <p style={styles.TitleFont}>Chamados Dashboard </p>
+            <p style={styles.TitleFont}>Dashboard - Geral </p>
         </div>
         <div style={styles.Container}>
             <p style={styles.SectionTitle}>Tickets Abertos por Setor</p>
 
             <div style={styles.TicketsPerSectorGraph}>
-                {categories.map((category) => (
-                    <div key={category.categoryTitle} style={styles.BarColumn}>
-                        <div
-                            style={{
-                                ...styles.TicketsPerSectorBar,
-                                backgroundColor: category.categoryColor,
-                            }}
-                        />
-                        <span style={styles.BarLabel}>{category.categoryTitle}: 10</span>
+                {foundOpenTickets.map((category) => {
+                const categoryTitle =
+                    categoriesInfo.find((item) => item.categoryCode === category.category)?.categoryTitle
+
+                return (
+                    <div key={category.categoryCode} style={styles.BarColumn}>
+                    <div
+                        style={{
+                        ...styles.TicketsPerSectorBar,
+                        backgroundColor: categoriesInfo.find((item) => item.categoryCode === category.category)?.categoryColor,
+                        }}
+                    />
+                    <span style={styles.BarLabel}>{categoryTitle} : {category.count} chamado(s) aberto(s) </span>
                     </div>
-                ))}
+                );
+                })}
             </div>
         </div>
 
@@ -108,9 +101,11 @@ export default function TicketInfoDashboard()
             <p style={styles.SectionTitle}>Status de Tickets por Setor</p>
 
             <div style={styles.SectorButtonBar}>
-                {categories.map((category) => (
-                    <div key={category.categoryTitle} style={{...styles.CategoryCard, display:"flex",flexDirection:"row"}}>
-                      
+                {categoriesInfo.map((category) => (
+                    <div key={category.categoryCode} style={{...styles.CategoryCard, display:"flex",flexDirection:"row"}}
+                    onMouseEnter={() => setHoveredCategory(ticket.Id)}
+                    onMouseLeave={() => setHoveredCategory(c_i_unpickedTicket)} 
+                    onClick={() => {setDisplayDetailedTicket(true); setSelectedTicket(ticket);}}>
                         <span
                             style={{
                                 ...styles.CategoryDot,
@@ -152,38 +147,38 @@ export default function TicketInfoDashboard()
         </div>
 
         <div style={styles.Container}>
-            <p style={styles.SectionTitle}>Principais Agentes — {selectedSector.sectorTitle}</p>
+            <p style={styles.SectionTitle}>Principais Agentes — {}</p>
 
             <div style={styles.AgentPanel}>
                 <div style={styles.AgentPanelHeader}>
                     <span
                         style={{
-                            ...styles.StatusDot,
-                            backgroundColor: selectedSector.sectorColor,
+                            ...styles.StatusDot
                         }}
                     />
                     <span style={styles.AgentPanelHeaderText}>
-                        {selectedSector.agents.length} agentes ativos
+                 
                     </span>
                 </div>
 
                 <div style={styles.AgentList}>
-                    {selectedSector.agents.map((agent, index) => (
-                        <div key={agent.name} style={styles.AgentRow}>
-                            <span style={styles.AgentRank}>{index + 1}º</span>
-                            <span style={styles.AgentName}>{agent.name}</span>
-                            <div style={styles.AgentBarTrack}>
-                                <div
-                                    style={{
-                                        ...styles.AgentBarFill,
-                                        width: `${(agent.ticketCount / selectedSector.agents[0].ticketCount) * 100}%`,
-                                        backgroundColor: selectedSector.sectorColor,
-                                    }}
-                                />
-                            </div>
-                            <span style={styles.AgentCount}>{agent.ticketCount}</span>
-                        </div>
-                    ))}
+                    {//selectedSector.agents.map((agent, index) => (
+                       // <div key={agent.name} style={styles.AgentRow}>
+                     //       <span style={styles.AgentRank}>{index + 1}º</span>
+                      //      <span style={styles.AgentName}>{agent.name}</span>
+                      //      <div style={styles.AgentBarTrack}>
+                     //          <div
+                      //              style={{
+                      //                  ...styles.AgentBarFill,
+                      //                  width: `${(agent.ticketCount / selectedSector.agents[0].ticketCount) * 100}%`,
+                      //                  backgroundColor: selectedSector.sectorColor,
+                      //              }}
+                      //          />
+                      //      </div>
+                      //      <span style={styles.AgentCount}>{agent.ticketCount}</span>
+                     //   </div>
+                    //))}
+                    }
                 </div>
             </div>
         </div>
