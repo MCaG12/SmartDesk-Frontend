@@ -1,10 +1,12 @@
 import { useState } from "react";
 
-interface i_department
+interface i_FetchTicketsInTime 
 {
-    departmentCode: number;
-    departmentName : string;
+    openingDate: Date;
+    closingDate: Date|undefined;
+    selectedCategory: Number;
 }
+
 
 interface i_sector_status {
     label: string;
@@ -21,6 +23,37 @@ const sectorData: i_sector_status[] = [
 
 export default function TicketMonthsDashBoard() {
     const maxValue = Math.max(...sectorData.map(d => d.value));
+    const [openingDate, setOpeningDate] = useState<Date>()
+    const [closingDate, setClosingDate] = useState<Date>()
+    const [selectedCategory, setSelectedCategory] = useState<number>(0)
+
+    async function FetchTicketsInTime({ openingDate, closingDate, selectedCategory }: i_FetchTicketsInTime) {
+        const url = `http://localhost:3000/Ticket/fetch-tickets-in-period/`;
+        try {
+            const response = await fetch(url, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    InitialDate: openingDate,
+                    FinalDate: closingDate ?? "",
+                    TicketCategory: selectedCategory
+                })
+            });
+
+            if (!response.ok) {
+                throw new Error(`Request failed with status ${response.status}`);
+            }
+
+            const data = await response.json();
+            console.log(data);
+        } catch (error) {
+            console.error(error);
+            throw error; // or return null, depending on how the caller should handle failure
+        }
+    }
+
     return (
         <div style={styles.DashBoardBody}>
             <div style={styles.TitleBar}>
@@ -33,18 +66,42 @@ export default function TicketMonthsDashBoard() {
                 <div style={styles.DateRow}>
                     <div style={styles.DateCard}>
                         <p style={styles.InputLabel}>Data Inicio:</p>
-                        <input style={styles.InputField} placeholder="Insira uma data de inicio" />
+                        <input 
+                            type="date" 
+                            style={styles.InputField} 
+                            placeholder="Insira uma data de inicio" 
+                            onChange={((e) => {setOpeningDate(e.target.value)})}
+                        />
                     </div>
                     <div style={styles.DateCard}>
                         <p style={styles.InputLabel}>Data Final:</p>
-                        <input style={styles.InputField} placeholder="Insira uma data final - Opcional" />
+                        <input 
+                            type="date" 
+                            style={styles.InputField} 
+                            placeholder="Insira uma data final - Opcional" 
+                            onChange={((e) => {setClosingDate(e.target.value)})}
+                        />
                     </div>
 
                 </div>
                 <div style={styles.DateRow}>
                     <div style={styles.DateCard}>
                         <p style={styles.InputLabel}>Departamento</p>
-                        <input style={styles.InputField} placeholder="Escolha um departamento" />
+                        <input 
+                            type="number" 
+                            style={styles.InputField} 
+                            placeholder="Escolha um departamento" 
+                            onChange={((e) => {setSelectedCategory(Number(e.target.value))})}
+                        />
+                    </div>
+                </div>
+
+                <div style={{"display":"flex", width:"100%", "justifyContent": "center"}}>
+                    <div 
+                        style={styles.Button}
+                        onClick={() => {FetchTicketsInTime({openingDate, closingDate, selectedCategory})}}
+                    >
+                        Procurar Tickets
                     </div>
                 </div>
 
@@ -339,6 +396,40 @@ const styles = {
         transform: "translate(14px, -50%)",
         whiteSpace: "nowrap",
         margin: 0,
+    },
+
+    Button: {
+        width:"40%",
+        display: "inline-flex",
+        alignItems: "center",
+        justifyContent: "center",
+        border: "1px solid #e0e0e0",
+        borderRadius: "10px",
+        padding: "8px 16px",
+        fontFamily: "Inter",
+        fontWeight: "600",
+        fontSize: "14px",
+        color: "#4386d8",
+        backgroundColor: "#fff",
+        cursor: "pointer",
+        outline: "none",
+        outlineOffset: "2px",
+        transition: "background-color 0.15s ease, border-color 0.15s ease, transform 0.1s ease",
+    },
+    ButtonHover: {
+        backgroundColor: "#f5f8fd",
+        borderColor: "#4386d8",
+    },
+    ButtonActive: {
+        transform: "scale(0.98)",
+    },
+    ButtonPrimary: {
+        backgroundColor: "#4386d8",
+        borderColor: "#4386d8",
+        color: "#fff",
+    },
+    ButtonPrimaryHover: {
+        backgroundColor: "#3574c2",
     },
 
 } as const satisfies Record<string, React.CSSProperties>;
