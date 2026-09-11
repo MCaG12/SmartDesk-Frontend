@@ -1,4 +1,9 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import type { i_Ticket } from "../../interfaces/i_ticket";
+
+type MonthGraphInfo = Map<Number, i_Ticket[]>
+type YearGraphInfo = Map<Number, MonthGraphInfo>
+
 
 interface i_FetchTicketsInTime 
 {
@@ -6,7 +11,6 @@ interface i_FetchTicketsInTime
     closingDate: Date|undefined;
     selectedCategory: Number;
 }
-
 
 interface i_sector_status {
     label: string;
@@ -21,11 +25,64 @@ const sectorData: i_sector_status[] = [
     { label: "RH", value: 15, color: "#d16a6a" },
 ];
 
+const formatDate = (d: Date | string | null): string => {
+    if (!d) return "—";
+    if (typeof d === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(d)) {
+        const [year, month, day] = d.split('-').map(Number);
+        return `${String(day).padStart(2, '0')}/${String(month).padStart(2, '0')}/${year}`;
+    }
+    const date = new Date(d);
+    return `${String(date.getDate()).padStart(2, '0')}/${String(date.getMonth() + 1).padStart(2, '0')}/${date.getFullYear()}`;
+};
+
 export default function TicketMonthsDashBoard() {
     const maxValue = Math.max(...sectorData.map(d => d.value));
-    const [openingDate, setOpeningDate] = useState<Date>()
+    const [openingDate, setOpeningDate] = useState<Date>("")
     const [closingDate, setClosingDate] = useState<Date>()
     const [selectedCategory, setSelectedCategory] = useState<number>(0)
+    const [TicketsFound, setTicketsFound] = useState<i_Ticket[]>([]);
+    const [GraphInfo, setGraphInfo] = useState<YearGraphInfo>();
+    const [displayGraph, setDisplayGraph] = useState<boolean>(false);
+
+    function TurnTicketInfoToGraphData(TicketsFound: i_Ticket[])
+    {
+        let currentTicketData : YearGraphInfo = new Map();
+
+        for (let ticket of TicketsFound)
+        {
+         
+            let ticketDate : Date = new Date(ticket.ticketDateOpen);
+            let ticketYear = ticketDate.getFullYear();
+            let ticketMonth = ticketDate.getMonth();    
+
+            if ( !currentTicketData.has(ticketYear) )
+            {
+                const ticketMap: MonthGraphInfo = new Map();
+                const ticketArray : i_Ticket[] = [ticket]
+                ticketMap.set(ticketMonth, ticketArray);
+
+                currentTicketData.set(ticketYear, ticketMap);
+            }
+            else
+            {
+                let ticketsFoundAtCurrentYear : MonthGraphInfo = currentTicketData.get(ticketYear);
+
+                if( !ticketsFoundAtCurrentYear.get(ticketMonth) )
+                {
+                    let createTicketsFoundInMonth : MonthGraphInfo = new Map();
+                    createTicketsFoundInMonth.set(ticketMonth, [ticket]);
+                    currentTicketData.set(ticketYear, createTicketsFoundInMonth);
+                }
+                else
+                {
+                    let ticketsFoundInMonth : i_Ticket[] = ticketsFoundAtCurrentYear.get(ticketMonth);
+                    ticketsFoundInMonth.push(ticket);
+                }
+
+            }
+        }
+        setGraphInfo(currentTicketData);
+    }
 
     async function FetchTicketsInTime({ openingDate, closingDate, selectedCategory }: i_FetchTicketsInTime) {
         const url = `http://localhost:3000/Ticket/fetch-tickets-in-period/`;
@@ -42,17 +99,34 @@ export default function TicketMonthsDashBoard() {
                 })
             });
 
+        
+
             if (!response.ok) {
                 throw new Error(`Request failed with status ${response.status}`);
             }
 
             const data = await response.json();
-            console.log(data);
+            console.log(data)
+            setTicketsFound(data);
         } catch (error) {
             console.error(error);
-            throw error; // or return null, depending on how the caller should handle failure
+            throw error; 
         }
     }
+
+    useEffect(() => {
+        TurnTicketInfoToGraphData(TicketsFound)
+        if(TicketsFound.length > 0)
+            {
+                setDisplayGraph(true);
+            }
+        else
+            {
+               setDisplayGraph(false); 
+            }
+
+    }, [TicketsFound])
+
 
     return (
         <div style={styles.DashBoardBody}>
@@ -101,51 +175,54 @@ export default function TicketMonthsDashBoard() {
                         style={styles.Button}
                         onClick={() => {FetchTicketsInTime({openingDate, closingDate, selectedCategory})}}
                     >
-                        Procurar Tickets
+                        Procurar Tickets No Período
                     </div>
                 </div>
 
                 <div>
-                    <p style={{ ...styles.SectionTitle, textAlign: "center" }}>Status de Tickets por Setor</p>
+                    <p style={{ ...styles.SectionTitle, textAlign: "center" }}>Tickets Encontrados no periodo {formatDate(openingDate)} - {formatDate(closingDate)}</p>
                     <div style={styles.separationBar} />
                 </div>
 
 
                 {/*** Graphs */}
-                <div style={styles.GraphSection}>
-                    <div style={styles.GraphStatsColumn}>
-                        <p style={styles.BarLabel}>Maior Valor: {}</p>
-                        <p style={styles.BarLabel}>Menor Valor: {}</p>
-                    </div>
+                { displayGraph &&
+                    <div style={styles.GraphSection}>
+                        <div style={styles.GraphStatsColumn}>
+                            <p style={styles.BarLabel}>Maior Valor: {}</p>
+                            <p style={styles.BarLabel}>Menor Valor: {}</p>
+                        </div>
 
-                    <div style={styles.GraphWrapper}>
-                        <div style={styles.TicketsPerSectorGraph}>
-                            {sectorData.map((sector) => {
-                                const topPercent = 100 - (sector.value / maxValue) * 100;
-                                return (
-                                    <div key={sector.label} style={styles.DotColumn}>
-                                        <div style={styles.DotTrack}>
-                                            <div
-                                                style={{
-                                                    ...styles.Dot,
-                                                    top: `${topPercent}%`,
-                                                }}
-                                            />
-                                            <p
-                                                style={{
-                                                    ...styles.DotValue,
-                                                    top: `${topPercent}%`,
-                                                }}
-                                            >
-                                                {sector.value}
-                                            </p>
+                        <div style={styles.GraphWrapper}>
+                            <div style={styles.TicketsPerSectorGraph}>
+                                {sectorData.map((sector) => {
+                                    const topPercent = 100 - (sector.value / maxValue) * 100;
+                                    return (
+                                        <div key={sector.label} style={styles.DotColumn}>
+                                            <div style={styles.DotTrack}>
+                                                <div
+                                                    style={{
+                                                        ...styles.Dot,
+                                                        top: `${topPercent}%`,
+                                                    }}
+                                                />
+                                                <p
+                                                    style={{
+                                                        ...styles.DotValue,
+                                                        top: `${topPercent}%`,
+                                                    }}
+                                                >
+                                                    {sector.value}
+                                                </p>
+                                            </div>
                                         </div>
-                                    </div>
-                                );
-                            })}
+                                    );
+                                })}
+                            </div>
                         </div>
                     </div>
-                </div>
+                }
+                
               
             </div>
         </div>
