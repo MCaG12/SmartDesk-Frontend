@@ -1,5 +1,4 @@
 import { useState } from "react";
-import type { i_Ticket } from "../../interfaces/i_ticket";
 import TicketInfoDashboard from "./TicketInfoDashboard";
 import TicketCollaboratorInfo from "./TicketCollaboratorInfo";
 import TicketMonthsDashboard from "./TicketMonthsDashboard";
@@ -8,31 +7,6 @@ export default function ManagerDashBoard()
 {
     // 0 - initial all tickets display, 1 - collaborator info, 2 - tickets in months
     const [currentGraphState, setCurrentGraphState] = useState(0);
-
-
-    const [currentTickets, setCurrentTickets] = useState<i_Ticket[]>();
-
-    async function FetchAllTickets(setCurrentTickets: React.Dispatch<React.SetStateAction<i_Ticket[] | undefined>>)
-    {
-       const url = "http://localhost:3000/Ticket/GetAll";
-        try
-        {
-            const response = await fetch(url, {
-                method: "GET",
-                headers: {
-                    "Content-Type": "application/json"
-                }
-            });
-
-            const data = await response.json() as i_Ticket[]; 
-            setCurrentTickets(data);
-        }
-        catch (error)
-        {
-            console.error("Error:", error);
-        
-        } 
-    }
 
     function drawCurrentDashboard(currentGraph : number)
     {

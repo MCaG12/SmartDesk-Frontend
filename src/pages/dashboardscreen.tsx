@@ -1,4 +1,3 @@
-import TickItLogo from "../images/TickItLogo.png";
 import NotificationImage from "../images/NotificationImage.jpg"
 import UserLogoImage from "../images/UserImage.png"
 

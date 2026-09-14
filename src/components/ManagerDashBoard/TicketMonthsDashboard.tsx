@@ -12,20 +12,8 @@ interface i_FetchTicketsInTime
     selectedCategory: Number;
 }
 
-const sectorData: i_sector_status[] = [
-    { label: "Suporte", value: 42, color: "#4386d8" },
-    { label: "Financeiro", value: 28, color: "#63a375" },
-    { label: "TI", value: 65, color: "#e0a94c" },
-    { label: "RH", value: 15, color: "#d16a6a" },
-];
 
-interface i_sector_status {
-    label: string;
-    value: number;
-    color: string;
-}
-
-const formatDate = (d: Date | string | null): string => {
+const formatDate = (d: Date | string | null | undefined): string => {
     if (!d) return "—";
     if (typeof d === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(d)) {
         const [year, month, day] = d.split('-').map(Number);
@@ -36,14 +24,50 @@ const formatDate = (d: Date | string | null): string => {
 };
 
 export default function TicketMonthsDashBoard() {
-    const [maxValue , setMaxValue] = useState(0);
-    const [openingDate, setOpeningDate] = useState<Date>("")
+    const [maxMonthTicketValue , setMaxMonthTicketValue] = useState(0);
+    const [minMonthTicketValue , setMinMonthTicketValue] = useState(0);
+    const [openingDate, setOpeningDate] = useState<Date>()
     const [closingDate, setClosingDate] = useState<Date>()
     const [selectedCategory, setSelectedCategory] = useState<number>(0)
+
     const [TicketsFound, setTicketsFound] = useState<i_Ticket[]>([]);
+
     const [GraphInfo, setGraphInfo] = useState<YearGraphInfo>();
+
+    const [yearTickets, setYearTickets] = useState<MonthGraphInfo>();
+
     const [displayGraph, setDisplayGraph] = useState<boolean>(false);
+
     const [selectedYear, setSelectedYear] = useState<number>(0);
+
+    function updateMaxMinValues()
+    {
+       const ticketsMonthFound : number[] = [];
+
+       console.log(GraphInfo)
+
+       const ticketsInYearSelected : MonthGraphInfo | undefined =  GraphInfo?.get(selectedYear)
+
+       if (!ticketsInYearSelected) {
+            return;
+        }
+
+        setYearTickets(ticketsInYearSelected);
+
+       for(const MonthTickets of ticketsInYearSelected.values())
+        {
+            ticketsMonthFound.push(MonthTickets.length);
+        }
+
+       setMinMonthTicketValue(Math.min(...ticketsMonthFound));
+       setMaxMonthTicketValue(Math.max(...ticketsMonthFound));
+
+       console.log("min is " + Math.min(...ticketsMonthFound));
+       console.log("min is " + Math.max(...ticketsMonthFound));
+
+
+    }
+
     function TurnTicketInfoToGraphData(TicketsFound: i_Ticket[])
     {
         let currentTicketData : YearGraphInfo = new Map();
@@ -66,32 +90,29 @@ export default function TicketMonthsDashBoard() {
             }
             else
             {
-                let ticketsFoundAtCurrentYear : MonthGraphInfo = currentTicketData.get(ticketYear);
+                let ticketsFoundAtCurrentYear : MonthGraphInfo | undefined = currentTicketData.get(ticketYear);
 
-                if( !ticketsFoundAtCurrentYear.get(ticketMonth) )
+                if (!ticketsFoundAtCurrentYear) { return; }
+
+                if (!ticketsFoundAtCurrentYear.get(ticketMonth))
                 {
-                    let createTicketsFoundInMonth : MonthGraphInfo = new Map();
-                    createTicketsFoundInMonth.set(ticketMonth, [ticket]);
-                    if(currentBiggestMonth == 0)
-                        {
-                            currentBiggestMonth = 1;
-                        }
-                    currentTicketData.set(ticketYear, createTicketsFoundInMonth);
+                    ticketsFoundAtCurrentYear.set(ticketMonth, [ticket]);
                 }
                 else
                 {
-                    let ticketsFoundInMonth : i_Ticket[] = ticketsFoundAtCurrentYear.get(ticketMonth);
-                    if(ticketsFoundInMonth.length > currentBiggestMonth)
-                        {
-                            currentBiggestMonth = ticketsFoundInMonth.length;
-                        }
+                    let ticketsFoundInMonth : i_Ticket[] | undefined = ticketsFoundAtCurrentYear.get(ticketMonth);
+
+                    if (!ticketsFoundInMonth) { return; }
+
+                    if (ticketsFoundInMonth.length > currentBiggestMonth)
+                    {
+                        currentBiggestMonth = ticketsFoundInMonth.length;
+                    }
                     ticketsFoundInMonth.push(ticket);
                 }
-
             }
         }
         setGraphInfo(currentTicketData);
-        setMaxValue(currentBiggestMonth);
     }
 
     async function FetchTicketsInTime({ openingDate, closingDate, selectedCategory }: i_FetchTicketsInTime) {
@@ -116,7 +137,6 @@ export default function TicketMonthsDashBoard() {
             }
 
             const data = await response.json();
-            console.log(data)
             setTicketsFound(data);
         } catch (error) {
             console.error(error);
@@ -125,6 +145,7 @@ export default function TicketMonthsDashBoard() {
     }
 
     useEffect(() => {
+        console.log("TurnTicketInfoToGraphData called")
         TurnTicketInfoToGraphData(TicketsFound)
         if(TicketsFound.length > 0)
             {
@@ -154,7 +175,7 @@ export default function TicketMonthsDashBoard() {
                             type="date" 
                             style={styles.InputField} 
                             placeholder="Insira uma data de inicio" 
-                            onChange={((e) => {setOpeningDate(e.target.value)})}
+                            onChange={((e) => {setOpeningDate(new Date(e.target.value))})}
                         />
                     </div>
                     <div style={styles.DateCard}>
@@ -163,7 +184,7 @@ export default function TicketMonthsDashBoard() {
                             type="date" 
                             style={styles.InputField} 
                             placeholder="Insira uma data final - Opcional" 
-                            onChange={((e) => {setClosingDate(e.target.value)})}
+                            onChange={((e) => {setClosingDate(new Date(e.target.value))})}
                         />
                     </div>
 
@@ -183,7 +204,7 @@ export default function TicketMonthsDashBoard() {
                 <div style={{"display":"flex", width:"100%", "justifyContent": "center"}}>
                     <div 
                         style={styles.Button}
-                        onClick={() => {FetchTicketsInTime({openingDate, closingDate, selectedCategory})}}
+                        onClick={() => {if(openingDate) FetchTicketsInTime({openingDate, closingDate, selectedCategory})}}
                     >
                         Procurar Tickets No Período
                     </div>
@@ -198,25 +219,83 @@ export default function TicketMonthsDashBoard() {
                 {/*** Graphs */}
                 { (displayGraph && GraphInfo) &&
                     <>
+
                     <select value={selectedYear} onChange={(e) => setSelectedYear(Number(e.target.value))}>
                         {[...GraphInfo.keys()].map((option) => (
-                            <option key={option} value={option}>
+                            <option key={Number(option)} value={Number(option)} onClick={() => updateMaxMinValues()}>
                             {String(option)}
                             </option>
                         ))}
                     </select>
                     <div style={styles.GraphSection}>
                         <div style={styles.GraphStatsColumn}>
-                            <p style={styles.BarLabel}>Maior Valor: {maxValue}</p>
-                            <p style={styles.BarLabel}>Menor Valor: {}</p>
+                            <p style={styles.BarLabel}>Maior Valor: {maxMonthTicketValue}</p>
+                            <p style={styles.BarLabel}>Menor Valor: {minMonthTicketValue}</p>
                         </div>
 
                         <div style={styles.GraphWrapper}>
                             <div style={styles.TicketsPerSectorGraph}>
-                                {sectorData.map((sector) => {
-                                    const topPercent = 100 - (sector.value / maxValue) * 100;
+
+                                {yearTickets &&
+                                    Array.from({ length: 12 }, (_, month) => {
+                                        const tickets = yearTickets.get(month) ?? [];
+                                        if(!yearTickets.get(month))
+                                            {
+                                                return (
+                                                    <div key={month} style={styles.DotColumn}>
+                                                        <div style={styles.DotTrack}>
+                                                            <p
+                                                                style={{
+                                                                    ...styles.DotValue,
+                                                                    top: `100%`,
+                                                                }}
+                                                            >
+                                                                {new Date(2000, month, 1).toLocaleString('default', { month: 'long' })}
+                                                            </p>
+                                                        </div>
+                                                    </div>
+                                                )
+                                            }
+                                        else
+                                            {
+                                                return (
+                                                    <div key={month} style={styles.DotColumn}>
+                                                        <div style={styles.DotTrack}>
+                                                            <div
+                                                                style={{
+                                                                    ...styles.Dot,
+                                                                    top: `${100 - (tickets.length / maxMonthTicketValue) * 100}%`,
+                                                                }}
+                                                            />
+                                                            <p
+                                                                style={{
+                                                                    ...styles.DotValue,
+                                                                    top: `${100 - (tickets.length / maxMonthTicketValue) * 100}%`,
+                                                                }}
+                                                            >
+                                                                {tickets.length}
+                                                            </p>
+                                                            <p
+                                                                style={{
+                                                                    ...styles.DotValue,
+                                                                    top: `100%`,
+                                                                }}
+                                                            >
+                                                                {new Date(2000, month, 1).toLocaleString('default', { month: 'long' })}
+                                                            </p>
+
+                                                        </div>
+                                                    </div>
+                                                )
+                                            }
+                                    })
+                                }
+
+                                {/* {TicketsFound.map((Ticket) => {
+                                    const topPercent = 100 - (sector.value / maxMonthTicketValue) * 100;
+
                                     return (
-                                        <div key={sector.label} style={styles.DotColumn}>
+                                        w<div key={sector.label} style={styles.DotColumn}>
                                             <div style={styles.DotTrack}>
                                                 <div
                                                     style={{
@@ -235,7 +314,8 @@ export default function TicketMonthsDashBoard() {
                                             </div>
                                         </div>
                                     );
-                                })}
+                                })} */}
+                                
                             </div>
                         </div>
                     </div>

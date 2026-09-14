@@ -54,7 +54,7 @@ interface i_TicketMenu
 export function TicketSearchMenu({tickets}:i_TicketMenu) {
 
 
-    const [displayedItems, setDisplayedItems] = useState<i_Ticket[]>([]);
+    const [displayedItems] = useState<i_Ticket[]>([]);
 
     const [ticketState, setTicketState] = useState(-1);
     const [priorityCode, setPriorityCode] = useState(-1);

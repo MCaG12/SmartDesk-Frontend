@@ -1,5 +1,4 @@
 import { useEffect, useState } from "react";
-import type { i_Ticket } from "../../interfaces/i_ticket";
 
 interface i_category
 {
@@ -40,12 +39,15 @@ const statusOptions = [
 
 export default function TicketInfoDashboard()
 {
-    const [currentTicketSector, setCurrentTicketSector] = useState(0);
+    //const c_i_unpickedTicket = -1
+    //const [currentTicketSector, setCurrentTicketSector] = useState(0);
     const [foundOpenTickets, setFoundOpenTickets] = useState<i_category[]>([]);
 
-    const [displayDetailedTicket,setDisplayDetailedTicket] = useState<boolean>(false);
+    //const [hoveredCategory, setHoveredCategory] = useState(0);
+
+    //const [displayDetailedTicket,setDisplayDetailedTicket] = useState<boolean>(false);
  
-    const [selectedCategory, setSelectedCategory] = useState(0);
+    //const [selectedCategory, setSelectedCategory] = useState(0);
 
     async function GetDepartmentTickets()
     {
@@ -81,7 +83,7 @@ export default function TicketInfoDashboard()
                     categoriesInfo.find((item) => item.categoryCode === category.category)?.categoryTitle
 
                 return (
-                    <div key={category.categoryCode} style={styles.BarColumn}>
+                    <div key={Number(category.category)} style={styles.BarColumn}>
                     <div
                         style={{
                         ...styles.TicketsPerSectorBar,
@@ -102,10 +104,11 @@ export default function TicketInfoDashboard()
 
             <div style={styles.SectorButtonBar}>
                 {categoriesInfo.map((category) => (
-                    <div key={category.categoryCode} style={{...styles.CategoryCard, display:"flex",flexDirection:"row"}}
-                    onMouseEnter={() => setHoveredCategory(ticket.Id)}
-                    onMouseLeave={() => setHoveredCategory(c_i_unpickedTicket)} 
-                    onClick={() => {setDisplayDetailedTicket(true); setSelectedTicket(ticket);}}>
+                    <div key={Number(category.categoryCode)} style={{...styles.CategoryCard, display:"flex",flexDirection:"row"}}
+                    //onMouseEnter={() => setHoveredCategory(Number(category.categoryCode))}
+                    //onMouseLeave={() => setHoveredCategory(Number(c_i_unpickedTicket))} 
+                    //onClick={() => {setDisplayDetailedTicket(true); setSelectedTicket(ticket);}}
+                    >
                         <span
                             style={{
                                 ...styles.CategoryDot,

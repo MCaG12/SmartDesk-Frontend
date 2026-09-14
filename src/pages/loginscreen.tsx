@@ -1,7 +1,6 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import GreetImage from "../images/GreetImage.png";
 import type { i_UserLoginInfo } from "../interfaces/i_User";
-import type { i_UserLoginInfoResponse } from "../interfaces/i_UserResponse";
 import { useNavigate } from "react-router-dom";
 
 
