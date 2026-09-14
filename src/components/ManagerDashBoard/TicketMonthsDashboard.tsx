@@ -12,18 +12,18 @@ interface i_FetchTicketsInTime
     selectedCategory: Number;
 }
 
-interface i_sector_status {
-    label: string;
-    value: number;
-    color: string;
-}
-
 const sectorData: i_sector_status[] = [
     { label: "Suporte", value: 42, color: "#4386d8" },
     { label: "Financeiro", value: 28, color: "#63a375" },
     { label: "TI", value: 65, color: "#e0a94c" },
     { label: "RH", value: 15, color: "#d16a6a" },
 ];
+
+interface i_sector_status {
+    label: string;
+    value: number;
+    color: string;
+}
 
 const formatDate = (d: Date | string | null): string => {
     if (!d) return "—";
@@ -36,17 +36,18 @@ const formatDate = (d: Date | string | null): string => {
 };
 
 export default function TicketMonthsDashBoard() {
-    const maxValue = Math.max(...sectorData.map(d => d.value));
+    const [maxValue , setMaxValue] = useState(0);
     const [openingDate, setOpeningDate] = useState<Date>("")
     const [closingDate, setClosingDate] = useState<Date>()
     const [selectedCategory, setSelectedCategory] = useState<number>(0)
     const [TicketsFound, setTicketsFound] = useState<i_Ticket[]>([]);
     const [GraphInfo, setGraphInfo] = useState<YearGraphInfo>();
     const [displayGraph, setDisplayGraph] = useState<boolean>(false);
-
+    const [selectedYear, setSelectedYear] = useState<number>(0);
     function TurnTicketInfoToGraphData(TicketsFound: i_Ticket[])
     {
         let currentTicketData : YearGraphInfo = new Map();
+        let currentBiggestMonth : number = 1; 
 
         for (let ticket of TicketsFound)
         {
@@ -71,17 +72,26 @@ export default function TicketMonthsDashBoard() {
                 {
                     let createTicketsFoundInMonth : MonthGraphInfo = new Map();
                     createTicketsFoundInMonth.set(ticketMonth, [ticket]);
+                    if(currentBiggestMonth == 0)
+                        {
+                            currentBiggestMonth = 1;
+                        }
                     currentTicketData.set(ticketYear, createTicketsFoundInMonth);
                 }
                 else
                 {
                     let ticketsFoundInMonth : i_Ticket[] = ticketsFoundAtCurrentYear.get(ticketMonth);
+                    if(ticketsFoundInMonth.length > currentBiggestMonth)
+                        {
+                            currentBiggestMonth = ticketsFoundInMonth.length;
+                        }
                     ticketsFoundInMonth.push(ticket);
                 }
 
             }
         }
         setGraphInfo(currentTicketData);
+        setMaxValue(currentBiggestMonth);
     }
 
     async function FetchTicketsInTime({ openingDate, closingDate, selectedCategory }: i_FetchTicketsInTime) {
@@ -186,10 +196,18 @@ export default function TicketMonthsDashBoard() {
 
 
                 {/*** Graphs */}
-                { displayGraph &&
+                { (displayGraph && GraphInfo) &&
+                    <>
+                    <select value={selectedYear} onChange={(e) => setSelectedYear(Number(e.target.value))}>
+                        {[...GraphInfo.keys()].map((option) => (
+                            <option key={option} value={option}>
+                            {String(option)}
+                            </option>
+                        ))}
+                    </select>
                     <div style={styles.GraphSection}>
                         <div style={styles.GraphStatsColumn}>
-                            <p style={styles.BarLabel}>Maior Valor: {}</p>
+                            <p style={styles.BarLabel}>Maior Valor: {maxValue}</p>
                             <p style={styles.BarLabel}>Menor Valor: {}</p>
                         </div>
 
@@ -221,6 +239,7 @@ export default function TicketMonthsDashBoard() {
                             </div>
                         </div>
                     </div>
+                    </>
                 }
                 
               
