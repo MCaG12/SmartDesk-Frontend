@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import type { i_Ticket } from "../../interfaces/i_ticket";
 
 interface i_category
 {
@@ -13,6 +14,7 @@ interface i_categoryTitleInfo
    categoryColor : string; 
 }
 
+const c_i_unpickedTicket = -1
 
 const NewTicketCode = 1;
 const TicketInProgressCode = 2;
@@ -39,9 +41,13 @@ const statusOptions = [
 
 export default function TicketInfoDashboard()
 {
-    //const c_i_unpickedTicket = -1
-    //const [currentTicketSector, setCurrentTicketSector] = useState(0);
+    
+    const [currentTicketSector, setCurrentTicketSector] = useState(0);
     const [foundOpenTickets, setFoundOpenTickets] = useState<i_category[]>([]);
+
+    const [foundSectorTickets, setFoundSectorTickets] = useState<i_Ticket[]>([]);
+
+    const [currentSectorTicketStates, setCurrentSectorTicketStates] = useState<Map<Number,Number>>();
 
     //const [hoveredCategory, setHoveredCategory] = useState(0);
 
@@ -51,6 +57,7 @@ export default function TicketInfoDashboard()
 
     async function GetDepartmentTickets()
     {
+
         const categoryTicketsUrl = "http://localhost:3000/Ticket/fetch-open-ticket-counts";
 
         const openTicketsResponse = await fetch(categoryTicketsUrl, {
@@ -64,10 +71,45 @@ export default function TicketInfoDashboard()
         setFoundOpenTickets(data);
     }
 
+    async function FetchCurrentSectorTickets(pn_currentTicketSector: number)
+    {
+        const TicketsPerCategoryUrl = "http://localhost:3000/Ticket/fetch-tickets-by-category";
+
+        try 
+        {
+            const FoundTicketsResponse = await fetch(TicketsPerCategoryUrl, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ "CategoryId": pn_currentTicketSector })
+            }); 
+            
+            const a_ticketsFound = await FoundTicketsResponse.json() as i_Ticket[];
+            console.log(a_ticketsFound)
+            setFoundSectorTickets(a_ticketsFound);
+        } 
+        catch (error) 
+        {
+            console.error("Error " + error);    
+        }
+    }
+
     useEffect(() => {
         GetDepartmentTickets();
         console.log(foundOpenTickets)
     }, []);
+
+    useEffect(() => {
+        let TicketStatesInCategory : Map<Number, Number> = new Map();
+        
+        for (const ticket of foundSectorTickets) {
+            const catId = ticket.ticketStatus.Id;
+            const current = TicketStatesInCategory.get(catId) ?? 0;
+            TicketStatesInCategory.set(catId, Number(current) + 1);
+        }
+
+        setCurrentSectorTicketStates(TicketStatesInCategory);
+        console.log(TicketStatesInCategory)
+    }, [foundSectorTickets]);
 
 
     return <div style={styles.DashBoardBody}>
@@ -104,10 +146,16 @@ export default function TicketInfoDashboard()
 
             <div style={styles.SectorButtonBar}>
                 {categoriesInfo.map((category) => (
-                    <div key={Number(category.categoryCode)} style={{...styles.CategoryCard, display:"flex",flexDirection:"row"}}
+                    <div key={Number(category.categoryCode)} 
+                         style={{...styles.CategoryCard, display:"flex",flexDirection:"row", 
+                                    filter: category.categoryCode == currentTicketSector ? "brightness(75%)" : "brightness(100%)" }}
                     //onMouseEnter={() => setHoveredCategory(Number(category.categoryCode))}
                     //onMouseLeave={() => setHoveredCategory(Number(c_i_unpickedTicket))} 
-                    //onClick={() => {setDisplayDetailedTicket(true); setSelectedTicket(ticket);}}
+                    onClick={() => {
+                        const newSector = Number(category.categoryCode);
+                        setCurrentTicketSector(newSector);
+                        FetchCurrentSectorTickets(newSector);
+                    }}
                     >
                         <span
                             style={{
@@ -121,27 +169,27 @@ export default function TicketInfoDashboard()
             </div>
             
             <div style={styles.KanbanBoard}>
-                {statusOptions.map((status) => (
-                    <div key={status.buttonCode} style={styles.KanbanColumn}>
+                {currentSectorTicketStates && Array.from(currentSectorTicketStates.entries()).map(([key, status]) => (
+                    <div key={Number(key)} style={styles.KanbanColumn}>
                         <div style={styles.KanbanColumnHeader}>
                             <span
                                 style={{
                                     ...styles.StatusDot,
-                                    backgroundColor: status.bgColor,
+                                    backgroundColor: statusOptions.find((state) => state.buttonCode === key)?.bgColor,
                                 }}
                             />
-                            <span style={styles.KanbanColumnTitle}>{status.label}</span>
+                            <span style={styles.KanbanColumnTitle}>{statusOptions.find((state) => state.buttonCode === key)?.label}</span>
                         </div>
 
                         <div style={styles.KanbanCountBadge}>
-                            <span style={styles.KanbanCountNumber}>10</span>
-                            <span style={styles.KanbanCountUnit}>tickets</span>
+                            <span style={styles.KanbanCountNumber}>{String(status)}</span>
+                            <span style={styles.KanbanCountUnit}>Ticket(s)</span>
                         </div>
 
                         <div
                             style={{
                                 ...styles.KanbanAccentBar,
-                                backgroundColor: status.bgColor,
+                                backgroundColor: statusOptions.find((state) => state.buttonCode === key)?.bgColor,
                             }}
                         />
                     </div>
@@ -351,6 +399,7 @@ const styles = {
         border: "1px solid #eef1f8",
         borderRadius: "12px",
         padding: "14px 12px",
+        maxWidth: "400px"
     },
 
     KanbanColumnHeader: {
