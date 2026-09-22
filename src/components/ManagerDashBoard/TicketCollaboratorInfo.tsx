@@ -170,6 +170,25 @@ export default function TicketMonthsDashBoard()
         }
     }
 
+    function SelectDepartmentHelper(pi_departmentId:number)
+    {
+        setSelectedDepartment(pi_departmentId);
+        setPickedRole(c_i_unpickedRole);
+        setPickedUser("");
+    }
+
+    function SelectRoleHelper(pi_roleId:number)
+    {
+        setPickedRole(pi_roleId);
+        setPickedUser("");
+    }
+
+    function SelectUserHelper(ps_user)
+    {
+        setPickedUser(ps_user);
+    }
+
+
     useEffect(() => {
         fetchRolesByDepartment(pickedDepartmentCode)
 
@@ -193,100 +212,121 @@ export default function TicketMonthsDashBoard()
 
 
     return <div style={styles.DashBoardBody}>
-        {
-           (displayDetailedTicket && selectedTicket) && <DetailedTicketInfo 
-                                        ticketInfo={selectedTicket} 
-                                        setShowDetailedTicket={setDisplayDetailedTicket}/>
-                                    
-        }
-        <div style={styles.TitleBar}>
-            <p style={styles.TitleFont}> Status Colaboradores </p>
-        </div>
-        {/***Departments Graph */}
-        <div style={styles.Container}>
-            <p style={styles.SectionTitle}>Departamento</p>
-                {departments.map((department) => (
-                    <div key={department.Id} 
-                        style={{...styles.CategoryCard, backgroundColor: pickedDepartmentCode === department.Id ? "#4386d8" : "#eef4fc" }}
-                        onClick={() => {setSelectedDepartment(department.Id)}}>
-                        <p style={styles.BarLabel}>{department.depNomeDepartamento}</p>
-                    </div>
-                ))}
-        </div>
+    {
+       (displayDetailedTicket && selectedTicket) && <DetailedTicketInfo 
+                                    ticketInfo={selectedTicket} 
+                                    setShowDetailedTicket={setDisplayDetailedTicket}/>
+                                
+    }
+    <div style={styles.TitleBar}>
+        <p style={styles.TitleFont}> Status Colaboradores </p>
+    </div>
 
-        {/***Areas in department */}
+    {/***Departments Graph */}
+    <div style={styles.Container}>
+        <p style={styles.SectionTitle}>Departamento</p>
+        {departments.length > 0 ? (
+            departments.map((department) => (
+                <div key={department.Id} 
+                    style={{...styles.CategoryCard, backgroundColor: pickedDepartmentCode === department.Id ? "#4386d8" : "#eef4fc" }}
+                    onClick={() => {SelectDepartmentHelper(department.Id)}}>
+                    <p style={styles.BarLabel}>{department.depNomeDepartamento}</p>
+                </div>
+            ))
+        ) : (
+            <p style={styles.EmptyStateText}>Nenhum departamento encontrado.</p>
+        )}
+    </div>
+
+    {/***Areas in department - only shows after a department is picked */}
+    {pickedDepartmentCode != c_i_unpickedDep && (
         <div style={styles.Container}>
             <p style={styles.SectionTitle}>Cargos por Setor</p>
+            {roles.length > 0 ? (
                 <div style={{display:"flex", flexDirection: "row", justifyContent:"space-evenly", width:"100%"}}>
                     {roles.map((role) => (
                         <div
                             key={role.Id}
                             style={{...styles.roleButton, backgroundColor: pickedRole === role.Id ? "#4386d8" : "#eef4fc"}}
-                            onClick={() => {setSelectedRole(role.Id)}}
+                            onClick={() => {SelectRoleHelper(role.Id)}}
                             >
                             <p style={styles.roleButtonText}>{role.carNome}</p>
                         </div>
                     ))}
                 </div>
+            ) : (
+                <p style={styles.EmptyStateText}>Nenhum cargo encontrado para este departamento.</p>
+            )}
         </div>
+    )}
 
-        {/** Colaboradores Encotrados */}
+    {/** Colaboradores Encontrados - only shows after a role is picked */}
+    {pickedDepartmentCode != c_i_unpickedDep && pickedRole != c_i_unpickedRole && (
         <div style={styles.Container}>
             <p style={styles.SectionTitle}>Usuários encontrados </p>
+            {foundUsers.length > 0 ? (
                 <div style={{display:"flex", flexDirection: "row", justifyContent:"space-evenly", width:"100%"}}>
                     {foundUsers.map((user) => (
                         <div
                             key={user.Id}
                             style={{...styles.roleButton, backgroundColor: pickedUser === user.usuarEmail ? "#4386d8" : "#eef4fc"}}
-                            onClick={() => {setSelecteduser(user.usuarEmail)}}
+                            onClick={() => {SelectUserHelper(user.usuarEmail)}}
                             >
                             <p style={styles.roleButtonText}>{user.usuarNome}</p>
-                        </div>))    
-                    }
+                        </div>
+                    ))}
                 </div>
+            ) : (
+                <p style={styles.EmptyStateText}>Nenhum usuário encontrado para este cargo.</p>
+            )}
         </div>
+    )}
 
-        {/** Tickets Encontrados */}
+    {/** Tickets Encontrados - only shows after a user is picked */}
+    {pickedDepartmentCode != c_i_unpickedDep && pickedRole != c_i_unpickedRole && pickedUser != "" && (
         <div style={styles.Container}>
             <p style={styles.SectionTitle}>Tickets Associados ao Usuário</p>  
-            <div style={styles.KanbanBoard}>
-                {foundTickets.map((ticket) => (
-                    <div key={ticket.Id} style={{...styles.KanbanColumn, backgroundColor: hoveredTicket == ticket.Id ? "#eeeeee" : "#ffffff", 
-                                                                         cursor: "pointer" }} 
-                        onMouseEnter={() => setHoveredTicket(ticket.Id)}
-                        onMouseLeave={() => setHoveredTicket(c_i_unpickedTicket)} 
-                        onClick={() => {setDisplayDetailedTicket(true); setSelectedTicket(ticket);}}>
-                        <div style={styles.KanbanColumnHeader}>
-                            <span
-                                style={{
-                                    ...styles.StatusDot,
-                                    backgroundColor: statusOptions.find(
-                                    (status) => status.label === ticket.ticketStatus.tickstaDescription
-                                    )?.bgColor
-                                }}
-                            />
-                            <span style={styles.KanbanCountNumber}> N° Chamado: {ticket.Id}</span>
-                            <div style={styles.KanbanCountBadge}>
-                                <span style={styles.KanbanCountUnit}>{ticket.ticketTitle}</span>
-                            </div>
-
-                            <div
-                                style={{
-                                    ...styles.KanbanAccentBar,
-                                    backgroundColor: statusOptions.find(
+            {foundTickets.length > 0 ? (
+                <div style={styles.KanbanBoard}>
+                    {foundTickets.map((ticket) => (
+                        <div key={ticket.Id} style={{...styles.KanbanColumn, backgroundColor: hoveredTicket == ticket.Id ? "#eeeeee" : "#ffffff", 
+                                                                             cursor: "pointer" }} 
+                            onMouseEnter={() => setHoveredTicket(ticket.Id)}
+                            onMouseLeave={() => setHoveredTicket(c_i_unpickedTicket)} 
+                            onClick={() => {setDisplayDetailedTicket(true); setSelectedTicket(ticket);}}>
+                            <div style={styles.KanbanColumnHeader}>
+                                <span
+                                    style={{
+                                        ...styles.StatusDot,
+                                        backgroundColor: statusOptions.find(
                                         (status) => status.label === ticket.ticketStatus.tickstaDescription
                                         )?.bgColor
-                                }}
-                            />
+                                    }}
+                                />
+                                <span style={styles.KanbanCountNumber}> N° Chamado: {ticket.Id}</span>
+                                <div style={styles.KanbanCountBadge}>
+                                    <span style={styles.KanbanCountUnit}>{ticket.ticketTitle}</span>
+                                </div>
+
+                                <div
+                                    style={{
+                                        ...styles.KanbanAccentBar,
+                                        backgroundColor: statusOptions.find(
+                                            (status) => status.label === ticket.ticketStatus.tickstaDescription
+                                            )?.bgColor
+                                    }}
+                                />
+                            </div>
                         </div>
+                    ))}
+                </div>
+            ) : (
+                <p style={styles.EmptyStateText}>Nenhum ticket encontrado para este usuário.</p>
+            )}
+        </div>
+    )}
 
-                    </div>
-                ))}
-            </div>
-
-        </div>               
-
-    </div>
+</div>
            
 
 
