@@ -11,6 +11,7 @@ import { useLocation } from "react-router-dom";
 import type { i_TicketPriority } from "../interfaces/i_ticketPriority";
 import type { i_Ticket } from "../interfaces/i_ticket";
 import ManagerDashBoard from "../components/ManagerDashBoard/ManagerDashBoard";
+import HomeSupportDashboard from "../components/CommonUserHomeInterface";
 
 
 
@@ -93,6 +94,7 @@ export default function DashScreenScreen() {
     const TicketTableState = 1;
     const UserInfoState = 2;
     const ManagerPanel = 3; 
+    const UserPanel = 4;
 
     const location = useLocation();
     const { userFound } = location.state;
@@ -180,6 +182,11 @@ export default function DashScreenScreen() {
                 
                 />
             }
+
+            case UserPanel:
+            {
+                return <HomeSupportDashboard />
+            }
         }
     }
 
@@ -246,6 +253,14 @@ export default function DashScreenScreen() {
                     style={{ backgroundColor: dashBoardState === ManagerPanel ? "#1b54a3" : "#538fe4" }}
                     >
                     Gerenciamento
+                    </button>
+
+                    <button
+                    className="tab-btn"
+                    onClick={() => setDashBoardState(UserPanel)}
+                    style={{ backgroundColor: dashBoardState === UserPanel ? "#1b54a3" : "#538fe4" }}
+                    >
+                    Home
                     </button>
                 </div>
                 { drawDashBoard(dashBoardState) }

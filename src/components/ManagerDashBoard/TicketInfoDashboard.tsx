@@ -14,8 +14,6 @@ interface i_categoryTitleInfo
    categoryColor : string; 
 }
 
-const c_i_unpickedTicket = -1
-
 const NewTicketCode = 1;
 const TicketInProgressCode = 2;
 const PendingTicketCode = 4;
@@ -48,12 +46,6 @@ export default function TicketInfoDashboard()
     const [foundSectorTickets, setFoundSectorTickets] = useState<i_Ticket[]>([]);
 
     const [currentSectorTicketStates, setCurrentSectorTicketStates] = useState<Map<Number,Number>>();
-
-    //const [hoveredCategory, setHoveredCategory] = useState(0);
-
-    //const [displayDetailedTicket,setDisplayDetailedTicket] = useState<boolean>(false);
- 
-    //const [selectedCategory, setSelectedCategory] = useState(0);
 
     async function GetDepartmentTickets()
     {
@@ -95,7 +87,6 @@ export default function TicketInfoDashboard()
 
     useEffect(() => {
         GetDepartmentTickets();
-        console.log(foundOpenTickets)
     }, []);
 
     useEffect(() => {
@@ -149,8 +140,6 @@ export default function TicketInfoDashboard()
                     <div key={Number(category.categoryCode)} 
                          style={{...styles.CategoryCard, display:"flex",flexDirection:"row", 
                                     filter: category.categoryCode == currentTicketSector ? "brightness(75%)" : "brightness(100%)" }}
-                    //onMouseEnter={() => setHoveredCategory(Number(category.categoryCode))}
-                    //onMouseLeave={() => setHoveredCategory(Number(c_i_unpickedTicket))} 
                     onClick={() => {
                         const newSector = Number(category.categoryCode);
                         setCurrentTicketSector(newSector);
@@ -194,43 +183,6 @@ export default function TicketInfoDashboard()
                         />
                     </div>
                 ))}
-            </div>
-        </div>
-
-        <div style={styles.Container}>
-            <p style={styles.SectionTitle}>Principais Agentes — {}</p>
-
-            <div style={styles.AgentPanel}>
-                <div style={styles.AgentPanelHeader}>
-                    <span
-                        style={{
-                            ...styles.StatusDot
-                        }}
-                    />
-                    <span style={styles.AgentPanelHeaderText}>
-                 
-                    </span>
-                </div>
-
-                <div style={styles.AgentList}>
-                    {//selectedSector.agents.map((agent, index) => (
-                       // <div key={agent.name} style={styles.AgentRow}>
-                     //       <span style={styles.AgentRank}>{index + 1}º</span>
-                      //      <span style={styles.AgentName}>{agent.name}</span>
-                      //      <div style={styles.AgentBarTrack}>
-                     //          <div
-                      //              style={{
-                      //                  ...styles.AgentBarFill,
-                      //                  width: `${(agent.ticketCount / selectedSector.agents[0].ticketCount) * 100}%`,
-                      //                  backgroundColor: selectedSector.sectorColor,
-                      //              }}
-                      //          />
-                      //      </div>
-                      //      <span style={styles.AgentCount}>{agent.ticketCount}</span>
-                     //   </div>
-                    //))}
-                    }
-                </div>
             </div>
         </div>
 
