@@ -11,7 +11,7 @@ import { useLocation } from "react-router-dom";
 import type { i_TicketPriority } from "../interfaces/i_ticketPriority";
 import type { i_Ticket } from "../interfaces/i_ticket";
 import ManagerDashBoard from "../components/ManagerDashBoard/ManagerDashBoard";
-import HomeSupportDashboard from "../components/CommonUserHomeInterface";
+import HomeSupportDashboard from "../components/commonUserHome/CommonUserHomeInterface";
 
 
 

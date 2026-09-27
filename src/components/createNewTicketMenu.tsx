@@ -5,11 +5,11 @@ import type { i_UserLoginInfoResponse } from "../interfaces/i_UserResponse";
 import type { i_TicketPriority } from "../interfaces/i_ticketPriority";
 import type { i_TicketSolicitant } from "../interfaces/i_ticketSolicitant";
 import type { i_ticketAgentResponse } from "../interfaces/i_ticketAgentResponse";
-import type { i_GetTroubleshootingSuggestion } from "../interfaces/i_TroubleShootingInterface";
 import { NewTicketForm } from "./newTicketMenuTicketForm";
 import { AiSuggestionBox } from "./createNewTicketAiSuggestion";
 import { NewTicketAiLoading } from "./createNewTicketAiLoading";
-import type { i_GetPrioritySuggestion } from "../interfaces/i_GetPrioritySuggestion";
+import getPrioritySuggestion from "./aiPipelines/aiGetPrioritySuggestion";
+import getTroubleshootingSuggestion from "./aiPipelines/aiGetTroubleshootingSuggestion";
 
 interface i_Create_New_Ticket_Menu
 {
@@ -28,100 +28,6 @@ interface SaveTicket
     ticketPriority: i_TicketPriority,
     ticketProblemDescription: string,
     ticketSolicitant: i_TicketSolicitant;
-}
-
-async function getPrioritySuggestion({ticketCategoryDescription, ticketProblemDescription, ticketTitle, setAiTicketPrioritySuggestion, setLoadingAi}:i_GetPrioritySuggestion ) {
-  if (!ticketCategoryDescription  || !ticketProblemDescription) {console.log("Failed"); return;}
-
-  setLoadingAi(true);
-  try {
-    const response = await fetch(
-      `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${import.meta.env.VITE_GEMINI_API_KEY}`,
-      {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          contents: [{
-            parts: [{
-              text: `You are an IT helpdesk assistant. A user has opened a support ticket with the following details:
-              
-              Title: ${ticketTitle}
-              Category: ${ticketCategoryDescription}
-              Description: ${ticketProblemDescription}
-              Choose the priority based on the following list of options
-                id: 1 - BAIXA PRIORIDADE
-                id: 2 - MEDIA PRIORIDADE
-                id: 3 - ALTA PRIORIDADE
-                id: 4 - CRITICA PRIORIDADE
-            
-              Respond with ONLY valid JSON, no markdown, no explanation:
-              {
-                    "Id": id of priority selected,
-                    "typepriDescription": "priority text"
-                }
-              `
-            }]
-          }]
-        })
-      }
-    );
-    const data = await response.json();
-    console.log("the suggested priority is -> ", data);
-    const raw = data.candidates[0].content.parts[0].text ?? "";
-    const clean = raw.replace(/```json|```/g, "").trim();
-
-    try {
-        const parsed : i_TicketPriority = JSON.parse(clean);
-        if (parsed.Id && [1, 2, 3, 4].includes(parsed.Id)) {
-            setAiTicketPrioritySuggestion(parsed);
-        } else {
-            console.error("Unexpected priority response:", parsed);
-        }
-    } catch {
-        console.error("Failed to parse priority JSON:", raw);
-    }
-  } catch (err) {
-    console.error(err);
-  } finally {
-    setLoadingAi(false);
-  }
-}
-
-
-async function getTroubleshootingSuggestion({ticketCategoryDescription, ticketPriorityDescription, ticketProblemDescription, ticketTitle, setAiSuggestion, setLoadingAi}:i_GetTroubleshootingSuggestion ) {
-  if (!ticketCategoryDescription || !ticketPriorityDescription || !ticketProblemDescription) return;
-  console.log(ticketTitle, ticketCategoryDescription, ticketPriorityDescription, ticketProblemDescription)
-  setLoadingAi(true);
-  try {
-    const response = await fetch(
-      `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${import.meta.env.VITE_GEMINI_API_KEY}`,
-      {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          contents: [{
-            parts: [{
-              text: `You are an IT helpdesk assistant. A user has opened a support ticket with the following details:
-              
-              Title: ${ticketTitle}
-              Category: ${ticketCategoryDescription}
-              Priority: ${ticketPriorityDescription}
-              Description: ${ticketProblemDescription}
-              Provide 3 to 5 basic troubleshooting steps the user can try before an agent responds. Be concise and practical. answer in portuguese `
-            }]
-          }]
-        })
-      }
-    );
-    const data = await response.json();
-    const text = data.candidates[0].content.parts[0].text ?? "";
-    setAiSuggestion(text);
-  } catch (err) {
-    console.error(err);
-    setAiSuggestion("Não foi possível carregar sugestões.");
-  } finally {
-    setLoadingAi(false);
-  }
 }
 
 async function save_new_ticket({ticketTitle, ticketCategory, ticketPriority, ticketProblemDescription,

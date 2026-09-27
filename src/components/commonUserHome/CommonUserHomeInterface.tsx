@@ -1,5 +1,10 @@
 
 import React, { useState, useRef, useEffect } from "react";
+import aiUserContact from "../aiPipelines/aiUserContact";
+import getPrioritySuggestion from "../aiPipelines/aiGetPrioritySuggestion";
+import type { i_TicketPriority } from "../../interfaces/i_ticketPriority";
+import getTroubleshootingSuggestion from "../aiPipelines/aiGetTroubleshootingSuggestion";
+import type { i_TicketCategory } from "../../interfaces/i_ticketCategory";
  
 const COLUMNS = [
   { key: "NOVO TICKET", label: "Novos Chamados", color: "#ffa2a2" },
@@ -7,11 +12,54 @@ const COLUMNS = [
   { key: "AGUARDANDO RESPOSTA", label: "Ag. Terceiros", color: "#ffd665" },
   { key: "FINALIZADO", label: "Concluídos", color: "#66e9a1" },
 ];
+
+interface i_AiTriageResult {
+  Error: boolean;
+  ErrorMessage: string;
+  category?: i_TicketCategory;
+  ticketProblemDescription?: string;
+  ticketTitle?: string;
+}
+
+interface i_userAiResponse 
+{
+  error: boolean;
+  errorMessage: string;
+  categoryId: number;
+  categoryDescription: string;
+  ticketProblemDescription: string;
+  ticketTitle: string;
+}
  
 function formatTime(date) {
   return date.toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit" });
 }
- 
+
+function SolvedFeedback({  }) {
+
+  return (
+    <div style={styles.wrap}>
+      <span style={styles.label}>Seu problema foi resolvido?</span>
+
+      <button
+        style={{
+          ...styles.btnSolvedActive
+        }}
+      >
+        ✅ Sim
+      </button>
+
+      <button
+        style={{
+          ...styles.btnNotSolvedActive,
+        }}
+      >
+        ❌ Não
+      </button>
+    </div>
+  );
+}
+
 function TicketCard({ ticket, color, onOpenTicket }) {
   const [hovered, setHovered] = useState(false);
  
@@ -68,20 +116,7 @@ function TypingIndicator() {
     </div>
   );
 }
- 
-function QuickReplyButton({ label, onClick }) {
-  const [hovered, setHovered] = useState(false);
-  return (
-    <button
-      style={{ ...styles.quickreplyBtn, ...(hovered ? styles.quickreplyBtnHover : {}) }}
-      onMouseEnter={() => setHovered(true)}
-      onMouseLeave={() => setHovered(false)}
-      onClick={onClick}
-    >
-      {label}
-    </button>
-  );
-}
+
  
 export default function HomeSupportDashboard({
 }) {
@@ -95,30 +130,65 @@ export default function HomeSupportDashboard({
   const [draft, setDraft] = useState("");
   const [inputFocused, setInputFocused] = useState(false);
   const [sendHovered, setSendHovered] = useState(false);
-  const messagesEndRef = useRef(null);
+  const [aiTicketPrioritySuggestion, setAiTicketPrioritySuggestion] = useState<i_TicketPriority>();
+  const [loadingAi,setLoadingAi] = useState<boolean>(false);
+  const [aiSuggestion, setAiSuggestion] = useState("");
+  const [askProblemSolved, setAskProblemSolved] = useState(false);
  
   const sendDisabled = !draft.trim();
 
-   async function handleSend(text) {
+   async function handleSend(text: string) {
         const trimmed = (text ?? draft).trim();
         if (!trimmed) return;
     
         setMessages((prev) => [...prev, { sender: "user", text: trimmed, time: new Date() }]);
         setDraft("");
     
-        try {
-        const reply =  "Entendi. Já registrei os detalhes e um responsável vai te dar retorno em breve. Quer que eu abra um chamado com essa descrição?";
-    
-        setMessages((prev) => [...prev, { sender: "bot", text: reply, time: new Date() }]);
-        } catch (err) {
-        setMessages((prev) => [
-            ...prev,
+        try 
+        {
+          console.log(draft)
+          const reply : i_AiTriageResult | undefined = await aiUserContact({ userMessage: text, setLoadingAi: setLoadingAi });
+          if(!reply?.Error)
             {
-            sender: "bot",
-            text: "Não consegui enviar sua mensagem agora. Pode tentar de novo em instantes?",
-            time: new Date(),
-            },
-        ]);
+              //fetch response info 
+              const replyTicketName = String(reply?.ticketTitle);
+              const replyProblemDescription = String(reply?.ticketProblemDescription);
+              const replyCategory = String(reply?.category?.tickcatDescription);
+
+              //kickstart the usual ai pipeline
+              await getPrioritySuggestion({
+                ticketCategoryDescription: replyCategory,
+                ticketProblemDescription: replyProblemDescription,
+                ticketTitle: replyTicketName,
+                setAiTicketPrioritySuggestion: setAiTicketPrioritySuggestion,
+                setLoadingAi: setLoadingAi
+              });
+
+              await getTroubleshootingSuggestion({
+                ticketCategoryDescription: replyCategory,
+                ticketPriorityDescription: String(aiTicketPrioritySuggestion?.typepriDescription),
+                ticketProblemDescription: replyProblemDescription,
+                ticketTitle: replyTicketName,
+                setAiSuggestion: setAiSuggestion,
+                setLoadingAi: setLoadingAi
+            }).then(() => setAskProblemSolved(true));
+            setMessages((prev) => [...prev, { sender: "bot", text: aiSuggestion, time: new Date() }]);
+          }
+          else
+          {
+            setMessages((prev) => [...prev, { sender: "bot", text: reply.ErrorMessage, time: new Date() }]);
+          }
+        } 
+        catch (err) 
+        {
+          setMessages((prev) => [
+              ...prev,
+              {
+              sender: "bot",
+              text: "Não consegui enviar sua mensagem agora. Pode tentar de novo em instantes?",
+              time: new Date(),
+              },
+          ]);
         } 
   }
 
@@ -135,10 +205,12 @@ export default function HomeSupportDashboard({
           </div>
  
           <div style={styles.chatMessages}>
+            
             {messages.map((message, index) => (
               <ChatBubble key={index} message={message} />
             ))}
-
+            {loadingAi && TypingIndicator()}
+            {askProblemSolved && SolvedFeedback({})}
           </div>
  
           <div style={styles.chatInputbar}>
@@ -177,7 +249,7 @@ export default function HomeSupportDashboard({
 
       <div style={styles.boardWrap}>
         <div style={styles.greeting}>
-          <p style={styles.greetingName}>Olá</p>
+          <p style={styles.greetingName}>Meus Chamados</p>
           <p style={styles.greetingSub}>Aqui está o andamento dos seus chamados</p>
         </div>
  
@@ -551,5 +623,59 @@ const styles = {
   chatSendBtnDisabled: {
     backgroundColor: "#c7cbdb",
     cursor: "not-allowed",
+  },
+
+  wrap: {
+    display: "flex",
+    gap: 10,
+    padding: "12px 16px",
+    alignItems: "center",
+  },
+  label: {
+    fontSize: 13,
+    fontWeight: 600,
+    color: "#24243a",
+    marginRight: 4,
+  },
+  btnBase: {
+    display: "flex",
+    alignItems: "center",
+    gap: 6,
+    border: "1px solid #d7ddec",
+    backgroundColor: "#ffffff",
+    color: "#1e2a5e",
+    fontSize: 12,
+    fontWeight: 600,
+    padding: "7px 14px",
+    borderRadius: 999,
+    cursor: "pointer",
+  },
+  btnSolvedActive: {
+    display: "flex",
+    alignItems: "center",
+    gap: 6,
+    border: "1px solid ",
+    backgroundColor: "#e5f7ee",
+    borderColor: "#66e9a1",
+    color: "#1c8a52",
+    fontSize: 12,
+    fontWeight: 600,
+    padding: "7px 14px",
+    borderRadius: 999,
+    cursor: "pointer",
+  },
+  btnNotSolvedActive: {
+    display: "flex",
+    alignItems: "center",
+    gap: 6,
+    border: "1px solid ",
+    backgroundColor: "#fdeceb",
+    borderColor: "#f0a3a0",
+    color: "#c0392b",
+    fontSize: 12,
+    fontWeight: 600,
+    padding: "7px 14px",
+    borderRadius: 999,
+    cursor: "pointer",
   },
 } as const satisfies Record<string, React.CSSProperties>;
