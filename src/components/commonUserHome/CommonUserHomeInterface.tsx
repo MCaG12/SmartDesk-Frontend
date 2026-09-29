@@ -5,12 +5,14 @@ import getPrioritySuggestion from "../aiPipelines/aiGetPrioritySuggestion";
 import type { i_TicketPriority } from "../../interfaces/i_ticketPriority";
 import getTroubleshootingSuggestion from "../aiPipelines/aiGetTroubleshootingSuggestion";
 import type { i_TicketCategory } from "../../interfaces/i_ticketCategory";
+import type { i_Ticket } from "../../interfaces/i_ticket";
+import DetailedTicketInfo from "../detailedTicketInfo";
  
 const COLUMNS = [
-  { key: "NOVO TICKET", label: "Novos Chamados", color: "#ffa2a2" },
-  { key: "EM ANDAMENTO", label: "Em Andamento", color: "#766cff" },
-  { key: "AGUARDANDO RESPOSTA", label: "Ag. Terceiros", color: "#ffd665" },
-  { key: "FINALIZADO", label: "Concluídos", color: "#66e9a1" },
+  { key: "NOVO TICKET", label: "Novos Chamados", color: "#ffa2a2", id: 1 },
+  { key: "EM ANDAMENTO", label: "Em Andamento", color: "#766cff", id: 2 },
+  { key: "AGUARDANDO RESPOSTA", label: "Ag. Terceiros", color: "#ffd665", id: 4 },
+  { key: "FINALIZADO", label: "Concluídos", color: "#66e9a1", id: 5 },
 ];
 
 interface i_AiTriageResult {
@@ -60,7 +62,7 @@ function SolvedFeedback({  }) {
   );
 }
 
-function TicketCard({ ticket, color, onOpenTicket }) {
+function TicketCard({ ticket, color,  setInfoDetailedTicket, showDetailedTicket  }) {
   const [hovered, setHovered] = useState(false);
  
   return (
@@ -68,7 +70,7 @@ function TicketCard({ ticket, color, onOpenTicket }) {
       style={{ ...styles.ticketCard, ...(hovered ? styles.ticketCardHover : {}) }}
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}
-      onClick={() => onOpenTicket && onOpenTicket(ticket)}
+      onClick={() => {showDetailedTicket(true); setInfoDetailedTicket(ticket); }}
     >
       <div style={styles.ticketTopRow}>
         <span style={{ ...styles.ticketDot, backgroundColor: color }} />
@@ -134,6 +136,9 @@ export default function HomeSupportDashboard({
   const [loadingAi,setLoadingAi] = useState<boolean>(false);
   const [aiSuggestion, setAiSuggestion] = useState("");
   const [askProblemSolved, setAskProblemSolved] = useState(false);
+  const [userTickets, setUserTickets] = useState<i_Ticket[]>([]);
+  const [showDetailedTicket,setShowDetailedTicket] = useState<boolean>(false);
+  const [infoDetailedTicket, setInfoDetailedTicket] = useState<i_Ticket>();
  
   const sendDisabled = !draft.trim();
 
@@ -191,6 +196,40 @@ export default function HomeSupportDashboard({
           ]);
         } 
   }
+
+  async function FetchUserTickets(setUserTickets :React.Dispatch<React.SetStateAction<i_Ticket[]>>)
+  {
+    const url = 'http://localhost:3000/Ticket/fetch-tickets-by-solicitant';
+    const userId = 3;
+    try 
+    {
+      const response = await fetch(url, {
+        method: 'POST', 
+        headers: {
+            'Content-Type': 'application/json' 
+        },
+        body: 
+          JSON.stringify({   
+              "solicitantId": userId
+          })
+        }) 
+      const ticketFound =  await response.json() as i_Ticket[]; 
+      setUserTickets(ticketFound);
+    } 
+    catch (error) 
+    {
+      console.error("Error:", error);
+    }
+  }
+
+  useEffect(() => 
+  {
+    const fetchUserTicketsData = async () => {
+        await FetchUserTickets(setUserTickets);
+        
+    };
+    fetchUserTicketsData();
+  }, [])
 
  
   return (
@@ -252,13 +291,24 @@ export default function HomeSupportDashboard({
           <p style={styles.greetingName}>Meus Chamados</p>
           <p style={styles.greetingSub}>Aqui está o andamento dos seus chamados</p>
         </div>
+
+        {
+          (showDetailedTicket && infoDetailedTicket ) &&
+              <DetailedTicketInfo 
+                  ticketInfo={infoDetailedTicket}
+                  setShowDetailedTicket={setShowDetailedTicket}
+                  userInfo_id={3}
+              />
+        }
  
         <div style={styles.board}>
           {COLUMNS.map((column) => {
             /* const columnTickets = tickets.filter(
               (ticket) => ticket.ticketStatus?.tickstaDescription === column.key
             ); */
- 
+            const columnTickets = userTickets.filter(
+              (ticket) => ticket.ticketStatus.Id === column.id
+            );
             return (
               <div style={styles.column} key={column.key}>
                 <div style={{ ...styles.columnHeader, backgroundColor: column.color }}>
@@ -267,18 +317,19 @@ export default function HomeSupportDashboard({
                 </div>
  
                 <div style={styles.columnBody}>
-                  {/* columnTickets.length > 0 ? (
+                  { userTickets.length > 0 ? (
                     columnTickets.map((ticket) => (
                       <TicketCard
                         key={ticket.Id}
                         ticket={ticket}
                         color={column.color}
-                        onOpenTicket={onOpenTicket}
+                        setInfoDetailedTicket={setInfoDetailedTicket}
+                        showDetailedTicket={setShowDetailedTicket}    
                       />
                     ))
                   ) : (
                     <div style={styles.emptyColumn}>Nenhum chamado por aqui</div>
-                  ) */}
+                  ) }
                 </div>
               </div>
             );
@@ -326,6 +377,7 @@ const styles = {
   boardWrap: {
     flex: "1 1 62%",
     minWidth: 0,
+    height:"100vh",
     display: "flex",
     flexDirection: "column",
   },
@@ -333,8 +385,10 @@ const styles = {
     display: "flex",
     gap: 16,
     width: "100%",
+    height: "45vh",
     alignItems: "flex-start",
     flexWrap: "wrap",
+    overflowY:"scroll",
   },
   column: {
     display: "flex",
