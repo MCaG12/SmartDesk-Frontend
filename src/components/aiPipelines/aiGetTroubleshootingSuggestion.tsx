@@ -1,7 +1,10 @@
 import type { i_GetTroubleshootingSuggestion } from "../../interfaces/i_TroubleShootingInterface";
 
 export default async function getTroubleshootingSuggestion({ticketCategoryDescription, ticketPriorityDescription, ticketProblemDescription, ticketTitle, setAiSuggestion, setLoadingAi}:i_GetTroubleshootingSuggestion ) {
-  if (!ticketCategoryDescription || !ticketPriorityDescription || !ticketProblemDescription) return;
+  if (!ticketCategoryDescription || !ticketPriorityDescription || !ticketProblemDescription) {
+    console.log("didnt get enought info -> " + ticketCategoryDescription, ticketPriorityDescription, ticketProblemDescription);
+    return;
+  }
   console.log(ticketTitle, ticketCategoryDescription, ticketPriorityDescription, ticketProblemDescription)
   setLoadingAi(true);
   try {
@@ -27,6 +30,8 @@ export default async function getTroubleshootingSuggestion({ticketCategoryDescri
     );
     const data = await response.json();
     const text = data.candidates[0].content.parts[0].text ?? "";
+    console.log("updated ai Suggestion -> " + text);
+    
     setAiSuggestion(text);
   } catch (err) {
     console.error(err);

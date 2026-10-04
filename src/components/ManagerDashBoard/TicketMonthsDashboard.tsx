@@ -191,13 +191,25 @@ export default function TicketMonthsDashBoard() {
                 </div>
                 <div style={styles.DateRow}>
                     <div style={styles.DateCard}>
-                        <p style={styles.InputLabel}>Departamento</p>
-                        <input 
-                            type="number" 
-                            style={styles.InputField} 
-                            placeholder="Escolha um departamento" 
+                        <p style={styles.InputLabel}>Categoria: </p>
+                        <select 
+                            id="languages" 
+                            name="language" 
                             onChange={((e) => {setSelectedCategory(Number(e.target.value))})}
-                        />
+                            style={styles.SelectField}>
+             
+                            <option value="" disabled selected>Escolha uma Categoria</option>
+                            <option value="1">Hardware</option>
+                            <option value="2">Software</option>
+                            <option value="3">Rede</option>
+                            <option value="4">Acesso Permissao</option>
+                            <option value="5">Email</option>
+                            <option value="6">Erro no Sistema</option>
+                            <option value="7">Impressora</option>
+                            <option value="8">Outros</option>
+                        </select>
+                        
+          
                     </div>
                 </div>
 
@@ -220,7 +232,7 @@ export default function TicketMonthsDashBoard() {
                 { (displayGraph && GraphInfo) &&
                     <>
 
-                    <select value={selectedYear} onChange={(e) => setSelectedYear(Number(e.target.value))}>
+                    <select value={selectedYear} onChange={(e) => setSelectedYear(Number(e.target.value))} style={{...styles.SelectField, alignSelf:"center"}}>
                         {[...GraphInfo.keys()].map((option) => (
                             <option key={Number(option)} value={Number(option)} onClick={() => updateMaxMinValues()}>
                             {String(option)}
@@ -607,5 +619,25 @@ const styles = {
     ButtonPrimaryHover: {
         backgroundColor: "#3574c2",
     },
+    SelectField: {
+    width: "50%",
+    boxSizing: "border-box",
+    border: "1px solid #e0e0e0",
+    borderRadius: "10px",
+    padding: "10px 40px 10px 12px",
+    fontFamily: "Inter",
+    fontWeight: "600",
+    fontSize: "14px",
+    color: "#4a4a4a",
+    backgroundColor: "#fff",
+    cursor: "pointer",
+    outline: "none",
+    outlineOffset: "2px",
+    appearance: "none",
+    WebkitAppearance: "none",
+    MozAppearance: "none",
+    backgroundRepeat: "no-repeat",
+    backgroundPosition: "right 14px center",
+},
 
 } as const satisfies Record<string, React.CSSProperties>;

@@ -185,7 +185,9 @@ export default function DashScreenScreen() {
 
             case UserPanel:
             {
-                return <HomeSupportDashboard />
+                return <HomeSupportDashboard 
+                    userInfo={userFound}
+                />
             }
         }
     }

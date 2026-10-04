@@ -1,5 +1,5 @@
 
-import React, { useState, useRef, useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import aiUserContact from "../aiPipelines/aiUserContact";
 import getPrioritySuggestion from "../aiPipelines/aiGetPrioritySuggestion";
 import type { i_TicketPriority } from "../../interfaces/i_ticketPriority";
@@ -7,6 +7,9 @@ import getTroubleshootingSuggestion from "../aiPipelines/aiGetTroubleshootingSug
 import type { i_TicketCategory } from "../../interfaces/i_ticketCategory";
 import type { i_Ticket } from "../../interfaces/i_ticket";
 import DetailedTicketInfo from "../detailedTicketInfo";
+import type { i_UserLoginInfoResponse } from "../../interfaces/i_UserResponse";
+import save_new_ticket from "../saveNewTicket/saveNewTicket";
+import type { i_TicketSolicitant } from "../../interfaces/i_ticketSolicitant";
  
 const COLUMNS = [
   { key: "NOVO TICKET", label: "Novos Chamados", color: "#ffa2a2", id: 1 },
@@ -23,44 +26,15 @@ interface i_AiTriageResult {
   ticketTitle?: string;
 }
 
-interface i_userAiResponse 
+interface i_commonUserInterface
 {
-  error: boolean;
-  errorMessage: string;
-  categoryId: number;
-  categoryDescription: string;
-  ticketProblemDescription: string;
-  ticketTitle: string;
+    userInfo: i_UserLoginInfoResponse;
 }
  
 function formatTime(date) {
   return date.toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit" });
 }
 
-function SolvedFeedback({  }) {
-
-  return (
-    <div style={styles.wrap}>
-      <span style={styles.label}>Seu problema foi resolvido?</span>
-
-      <button
-        style={{
-          ...styles.btnSolvedActive
-        }}
-      >
-        ✅ Sim
-      </button>
-
-      <button
-        style={{
-          ...styles.btnNotSolvedActive,
-        }}
-      >
-        ❌ Não
-      </button>
-    </div>
-  );
-}
 
 function TicketCard({ ticket, color,  setInfoDetailedTicket, showDetailedTicket  }) {
   const [hovered, setHovered] = useState(false);
@@ -120,8 +94,8 @@ function TypingIndicator() {
 }
 
  
-export default function HomeSupportDashboard({
-}) {
+export default function HomeSupportDashboard(
+  { userInfo }: i_commonUserInterface ) {
   const [messages, setMessages] = useState([
     {
       sender: "bot",
@@ -139,12 +113,49 @@ export default function HomeSupportDashboard({
   const [userTickets, setUserTickets] = useState<i_Ticket[]>([]);
   const [showDetailedTicket,setShowDetailedTicket] = useState<boolean>(false);
   const [infoDetailedTicket, setInfoDetailedTicket] = useState<i_Ticket>();
+  //new ticket info
+  const [ticketTitle, setTicketTitle] = useState<string>("");
+  const [ticketCategory, setTicketCategory] = useState<i_TicketCategory>();
+  const [ticketPriority, setTicketPriority] = useState<i_TicketPriority>();
+  const [ticketProblemDescription, setTicketProblemDescription] = useState<string>("");
+  const [ticketSolicitant, setTicketSolicitant] = useState<i_TicketSolicitant>();
  
   const sendDisabled = !draft.trim();
+
+  function SolvedFeedback({  }) {
+  return (
+      <div style={styles.wrap}>
+        <span style={styles.label}>Seu problema foi resolvido?</span>
+
+        <button
+          style={{...styles.btnSolvedActive}}>
+          ✅ Sim
+        </button>
+
+        <button
+          onClick={() => { 
+            if(ticketCategory && aiTicketPrioritySuggestion && ticketSolicitant) 
+            {
+              console.log("test"); save_new_ticket({
+                ticketTitle,
+                ticketCategory,
+                ticketPriority: aiTicketPrioritySuggestion,
+                ticketProblemDescription,
+                ticketSolicitant
+              })
+          }
+         
+        }}
+          style={{...styles.btnNotSolvedActive}}>
+          ❌ Não
+        </button>
+      </div>
+    );}
 
    async function handleSend(text: string) {
         const trimmed = (text ?? draft).trim();
         if (!trimmed) return;
+        let capturedPriority: typeof aiTicketPrioritySuggestion;
     
         setMessages((prev) => [...prev, { sender: "user", text: trimmed, time: new Date() }]);
         setDraft("");
@@ -165,8 +176,8 @@ export default function HomeSupportDashboard({
                 ticketCategoryDescription: replyCategory,
                 ticketProblemDescription: replyProblemDescription,
                 ticketTitle: replyTicketName,
-                setAiTicketPrioritySuggestion: setAiTicketPrioritySuggestion,
-                setLoadingAi: setLoadingAi
+                setAiTicketPrioritySuggestion,
+                setLoadingAi,
               });
 
               await getTroubleshootingSuggestion({
@@ -174,10 +185,18 @@ export default function HomeSupportDashboard({
                 ticketPriorityDescription: String(aiTicketPrioritySuggestion?.typepriDescription),
                 ticketProblemDescription: replyProblemDescription,
                 ticketTitle: replyTicketName,
-                setAiSuggestion: setAiSuggestion,
-                setLoadingAi: setLoadingAi
-            }).then(() => setAskProblemSolved(true));
-            setMessages((prev) => [...prev, { sender: "bot", text: aiSuggestion, time: new Date() }]);
+                setAiSuggestion,
+                setLoadingAi,
+              }); 
+
+              setAskProblemSolved(true);
+              setTicketTitle(replyTicketName);
+              setTicketCategory(reply?.category);
+              setTicketPriority(capturedPriority); 
+              setTicketProblemDescription(replyProblemDescription);
+              setTicketSolicitant(userInfo);
+
+            
           }
           else
           {
@@ -197,10 +216,10 @@ export default function HomeSupportDashboard({
         } 
   }
 
-  async function FetchUserTickets(setUserTickets :React.Dispatch<React.SetStateAction<i_Ticket[]>>)
+  async function FetchUserTickets(p_userId: number, setUserTickets :React.Dispatch<React.SetStateAction<i_Ticket[]>>)
   {
     const url = 'http://localhost:3000/Ticket/fetch-tickets-by-solicitant';
-    const userId = 3;
+    const userId = p_userId;
     try 
     {
       const response = await fetch(url, {
@@ -225,11 +244,18 @@ export default function HomeSupportDashboard({
   useEffect(() => 
   {
     const fetchUserTicketsData = async () => {
-        await FetchUserTickets(setUserTickets);
+        await FetchUserTickets(userInfo.Id, setUserTickets);
         
     };
     fetchUserTicketsData();
   }, [])
+
+  useEffect(() => {
+    if (!aiSuggestion) return;
+    console.log("useeffect updating ai SUggestion with " + aiSuggestion);
+    setMessages((prev) => [...prev, { sender: "bot", text: aiSuggestion, time: new Date() }]);
+    setAskProblemSolved(true);
+  }, [aiSuggestion]);
 
  
   return (
@@ -297,15 +323,12 @@ export default function HomeSupportDashboard({
               <DetailedTicketInfo 
                   ticketInfo={infoDetailedTicket}
                   setShowDetailedTicket={setShowDetailedTicket}
-                  userInfo_id={3}
+                  userInfo_id={userInfo.Id}
               />
         }
  
         <div style={styles.board}>
           {COLUMNS.map((column) => {
-            /* const columnTickets = tickets.filter(
-              (ticket) => ticket.ticketStatus?.tickstaDescription === column.key
-            ); */
             const columnTickets = userTickets.filter(
               (ticket) => ticket.ticketStatus.Id === column.id
             );

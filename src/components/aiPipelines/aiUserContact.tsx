@@ -43,7 +43,7 @@ async function aiUserContact({userMessage, setLoadingAi}:i_aiUserContact ): Prom
               if you deem not enough information was provided in order to understand the problem you may answer back with json
               {
                 "Error": true,
-                "ErrorMessage": "your message asking the user for more information"
+                "ErrorMessage": "your message asking the user for more information in portuguese"
               }
               else
               {
