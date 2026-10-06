@@ -1,5 +1,4 @@
 import type { i_TicketCategory } from "../../interfaces/i_ticketCategory";
-import type { i_TicketPriority } from "../../interfaces/i_ticketPriority";
 
 interface i_aiUserContact {
     userMessage: string;

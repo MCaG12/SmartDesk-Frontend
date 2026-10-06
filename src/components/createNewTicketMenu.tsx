@@ -5,8 +5,8 @@ import type { i_UserLoginInfoResponse } from "../interfaces/i_UserResponse";
 import type { i_TicketPriority } from "../interfaces/i_ticketPriority";
 import type { i_TicketSolicitant } from "../interfaces/i_ticketSolicitant";
 import { NewTicketForm } from "./newTicketMenuTicketForm";
-import { AiSuggestionBox } from "./createNewTicketAiSuggestion";
-import { NewTicketAiLoading } from "./createNewTicketAiLoading";
+import { AiSuggestionBox } from "./visualAiComponents/createNewTicketAiSuggestion";
+import { NewTicketAiLoading } from "./visualAiComponents/createNewTicketAiLoading";
 import getPrioritySuggestion from "./aiPipelines/aiGetPrioritySuggestion";
 import getTroubleshootingSuggestion from "./aiPipelines/aiGetTroubleshootingSuggestion";
 import save_new_ticket from "./saveNewTicket/saveNewTicket";
@@ -20,6 +20,15 @@ interface i_Create_New_Ticket_Menu
     ticketCategories: i_TicketCategory[];
     userInfo:i_UserLoginInfoResponse;
 }
+const c_i_initial_ticket_menu = 0;
+const c_i_ai_analyzing_problem = 1;
+const c_i_new_ticket_menu_opened = 1;
+const c_i_fetching_ticket_suggestion = 2;
+const c_i_ai_suggestion = 2;
+const c_i_fetching_priority_suggestion = 3;
+const c_i_ai_choosing_priority = 3;
+const c_i_problem_not_solved = 4;
+const c_i_ticket_opened_message = 5;
 
 export function Create_New_Ticket_Menu
     ({setCreateNewTicketIsActive, ticketPriorities, ticketCategories, userInfo}:i_Create_New_Ticket_Menu)
@@ -35,7 +44,7 @@ export function Create_New_Ticket_Menu
     const [aiTicketPrioritySuggestion, setAiTicketPrioritySuggestion] = useState<i_TicketPriority>();
 
     useEffect(() => {
-    if (pageStatus === 1) {
+    if (pageStatus === c_i_new_ticket_menu_opened) {
         if (ticketCategory && ticketPriority) {
             getTroubleshootingSuggestion({
                 ticketCategoryDescription: ticketCategory.tickcatDescription,
@@ -44,13 +53,13 @@ export function Create_New_Ticket_Menu
                 ticketTitle,
                 setAiSuggestion,
                 setLoadingAi
-            }).then(() => setPageStatus(2));
+            }).then(() => setPageStatus(c_i_fetching_ticket_suggestion));
         } else {
             console.log("failed calling suggestion", ticketCategory, ticketPriority);
         }
     }
 
-    if (pageStatus === 3) {
+    if (pageStatus === c_i_fetching_priority_suggestion) {
         if (ticketCategory) {
             getPrioritySuggestion({
                 ticketCategoryDescription: ticketCategory.tickcatDescription,
@@ -74,7 +83,7 @@ export function Create_New_Ticket_Menu
     }, [aiTicketPrioritySuggestion]);
 
     useEffect(() => {
-    if (pageStatus === 4) {
+    if (pageStatus === c_i_problem_not_solved) {
         if (ticketCategory && ticketPriority) {
             save_new_ticket({
                 ticketTitle,
@@ -82,7 +91,7 @@ export function Create_New_Ticket_Menu
                 ticketPriority,
                 ticketProblemDescription,
                 ticketSolicitant
-            }).then(() => setPageStatus(5));
+            }).then(() => setPageStatus(c_i_ticket_opened_message));
         }
     }
 }, [pageStatus]);
@@ -91,7 +100,7 @@ export function Create_New_Ticket_Menu
     {
         switch(pageStatus)
         {   
-            case 0:
+            case c_i_initial_ticket_menu:
                 {
                     return  <NewTicketForm
                         ticketCategories={ticketCategories}
@@ -105,13 +114,13 @@ export function Create_New_Ticket_Menu
                         setCreateNewTicketIsActive={setCreateNewTicketIsActive}
                     />
                 }
-            case 1:
+            case c_i_ai_analyzing_problem:
                 {
                     return <NewTicketAiLoading 
                         LoadingText={"A IA está analisando seu problema!"}
                     />
                 }
-            case 2:
+            case c_i_ai_suggestion:
             {
                 return <AiSuggestionBox
                         aiSuggestion={aiSuggestion}
@@ -119,13 +128,13 @@ export function Create_New_Ticket_Menu
                         setCreateNewTicketIsActive={setCreateNewTicketIsActive}
                     />
             }
-            case 3:
+            case c_i_ai_choosing_priority:
                 {
                     return <NewTicketAiLoading
                         LoadingText={"A IA está escolhendo a prioridade do problema"}
                     />
                 }
-            case 5:
+            case c_i_ticket_opened_message:
                 {
                     return (
                     <div

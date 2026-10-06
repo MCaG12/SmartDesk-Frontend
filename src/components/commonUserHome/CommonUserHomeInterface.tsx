@@ -31,12 +31,12 @@ interface i_commonUserInterface
     userInfo: i_UserLoginInfoResponse;
 }
  
-function formatTime(date) {
+function formatTime(date:any) {
   return date.toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit" });
 }
 
 
-function TicketCard({ ticket, color,  setInfoDetailedTicket, showDetailedTicket  }) {
+function TicketCard({ ticket, color,  setInfoDetailedTicket, showDetailedTicket  }:any) {
   const [hovered, setHovered] = useState(false);
  
   return (
@@ -60,7 +60,7 @@ function TicketCard({ ticket, color,  setInfoDetailedTicket, showDetailedTicket 
 }
 
  
-function ChatBubble({ message }) {
+function ChatBubble({ message }:any) {
   const isUser = message.sender === "user";
   return (
     <div style={{ ...styles.msgRow, ...(isUser ? styles.msgRowUser : styles.msgRowBot) }}>
@@ -116,9 +116,10 @@ export default function HomeSupportDashboard(
   //new ticket info
   const [ticketTitle, setTicketTitle] = useState<string>("");
   const [ticketCategory, setTicketCategory] = useState<i_TicketCategory>();
-  const [ticketPriority, setTicketPriority] = useState<i_TicketPriority>();
+  const [, setTicketPriority] = useState<i_TicketPriority>();
   const [ticketProblemDescription, setTicketProblemDescription] = useState<string>("");
   const [ticketSolicitant, setTicketSolicitant] = useState<i_TicketSolicitant>();
+  const [refreshTickets, setRefreshTickets] = useState<boolean>(false);
  
   const sendDisabled = !draft.trim();
 
@@ -136,13 +137,15 @@ export default function HomeSupportDashboard(
           onClick={() => { 
             if(ticketCategory && aiTicketPrioritySuggestion && ticketSolicitant) 
             {
-              console.log("test"); save_new_ticket({
+              console.log("creating new ticket");
+              save_new_ticket({
                 ticketTitle,
                 ticketCategory,
                 ticketPriority: aiTicketPrioritySuggestion,
                 ticketProblemDescription,
                 ticketSolicitant
               })
+              setRefreshTickets(true);
           }
          
         }}
@@ -162,7 +165,6 @@ export default function HomeSupportDashboard(
     
         try 
         {
-          console.log(draft)
           const reply : i_AiTriageResult | undefined = await aiUserContact({ userMessage: text, setLoadingAi: setLoadingAi });
           if(!reply?.Error)
             {
@@ -195,7 +197,6 @@ export default function HomeSupportDashboard(
               setTicketPriority(capturedPriority); 
               setTicketProblemDescription(replyProblemDescription);
               setTicketSolicitant(userInfo);
-
             
           }
           else
@@ -243,6 +244,18 @@ export default function HomeSupportDashboard(
 
   useEffect(() => 
   {
+    console.log("THE AI HAS COME UP WITH ITS Pirority SUGGESTION")
+    console.log(aiTicketPrioritySuggestion)
+  }, [aiTicketPrioritySuggestion])
+
+  useEffect(() => 
+  {
+    console.log("THE AI HAS COME UP WITH ITS SUGGESTION")
+    console.log(aiSuggestion)
+  }, [aiSuggestion])
+
+  useEffect(() => 
+  {
     const fetchUserTicketsData = async () => {
         await FetchUserTickets(userInfo.Id, setUserTickets);
         
@@ -256,6 +269,22 @@ export default function HomeSupportDashboard(
     setMessages((prev) => [...prev, { sender: "bot", text: aiSuggestion, time: new Date() }]);
     setAskProblemSolved(true);
   }, [aiSuggestion]);
+
+  useEffect(() => {
+    if (!refreshTickets) return;
+
+    const fetchUserTicketsData = async () => {
+      try {
+        await FetchUserTickets(userInfo.Id, setUserTickets);
+      } catch (err) {
+        console.error("Failed to fetch tickets", err);
+      } finally {
+        setRefreshTickets(false);
+      }
+    };
+
+    fetchUserTicketsData();
+  }, [refreshTickets]);
 
  
   return (

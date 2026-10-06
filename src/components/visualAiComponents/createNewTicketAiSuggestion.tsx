@@ -1,4 +1,4 @@
-import type { i_AiSuggestionBox } from "../interfaces/i_AiSuggestion";
+import type { i_AiSuggestionBox } from "../../interfaces/i_AiSuggestion";
 
 export function AiSuggestionBox({ aiSuggestion, setPageStatus, setCreateNewTicketIsActive }: i_AiSuggestionBox) {
     if (!aiSuggestion) return null;

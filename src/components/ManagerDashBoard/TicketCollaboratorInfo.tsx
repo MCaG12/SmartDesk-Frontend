@@ -53,19 +53,9 @@ export default function TicketMonthsDashBoard()
 
     const [hoveredTicket, setHoveredTicket] = useState<number>(c_i_unpickedTicket);
 
-    function setSelectedRole(pn_roleCode : number)
-    {
-        setPickedRole(pn_roleCode);
-    }
-
     function setSelectedDepartment(pn_departmentCode : number)
     {
         setPickedDepartmentCode(pn_departmentCode);
-    }
-
-    function setSelecteduser(ps_userEmail : string)
-    {
-        setPickedUser(ps_userEmail)
     }
 
     async function fetchDepartments(setDepartment: React.Dispatch<React.SetStateAction<i_department[]>>)
@@ -215,7 +205,7 @@ export default function TicketMonthsDashBoard()
         setPickedUser("");
     }
 
-    function SelectUserHelper(ps_user)
+    function SelectUserHelper(ps_user:any)
     {
         setPickedUser(ps_user);
     }
@@ -270,7 +260,7 @@ export default function TicketMonthsDashBoard()
                 </div>
             ))
         ) : (
-            <p style={styles.EmptyStateText}>Nenhum departamento encontrado.</p>
+            <p>Nenhum departamento encontrado.</p>
         )}
     </div>
 
@@ -291,7 +281,7 @@ export default function TicketMonthsDashBoard()
                     ))}
                 </div>
             ) : (
-                <p style={styles.EmptyStateText}>Nenhum cargo encontrado para este departamento.</p>
+                <p>Nenhum cargo encontrado para este departamento.</p>
             )}
         </div>
     )}
@@ -313,7 +303,7 @@ export default function TicketMonthsDashBoard()
                     ))}
                 </div>
             ) : (
-                <p style={styles.EmptyStateText}>Nenhum usuário encontrado para este cargo.</p>
+                <p>Nenhum usuário encontrado para este cargo.</p>
             )}
         </div>
     )}
@@ -393,7 +383,7 @@ export default function TicketMonthsDashBoard()
                     ))}
                 </div>
             ) : (
-                <p style={styles.EmptyStateText}>Nenhum ticket encontrado para este usuário.</p>
+                <p>Nenhum ticket encontrado para este usuário.</p>
             )}
         </div>
     )}
