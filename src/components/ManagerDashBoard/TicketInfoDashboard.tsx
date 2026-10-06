@@ -1,68 +1,34 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import type { i_Ticket } from "../../interfaces/i_ticket";
 
 interface i_category
 {
-    categoryTitle: string;
-    categoryColor : string;
-}
+    category: Number;
+    count : string;
+};
 
+interface i_categoryTitleInfo
+{
+   categoryCode: Number;
+   categoryTitle : string; 
+   categoryColor : string; 
+}
 
 const NewTicketCode = 1;
 const TicketInProgressCode = 2;
 const PendingTicketCode = 4;
 const ConcludedTicketCode = 5;
 
-const sectorAgents = [
-    {
-        sectorTitle: "Suporte Técnico",
-        sectorColor: "#3b82f6",
-        agents: [
-            { name: "João Silva", ticketCount: 24 },
-            { name: "Mariana Costa", ticketCount: 19 },
-            { name: "Pedro Almeida", ticketCount: 15 },
-        ],
-    },
-    {
-        sectorTitle: "Financeiro",
-        sectorColor: "#10b981",
-        agents: [
-            { name: "Ana Beatriz", ticketCount: 18 },
-            { name: "Carlos Eduardo", ticketCount: 14 },
-            { name: "Fernanda Lima", ticketCount: 9 },
-        ],
-    },
-    {
-        sectorTitle: "Comercial",
-        sectorColor: "#f59e0b",
-        agents: [
-            { name: "Rafael Souza", ticketCount: 21 },
-            { name: "Juliana Rocha", ticketCount: 16 },
-            { name: "Bruno Martins", ticketCount: 11 },
-        ],
-    },
-    {
-        sectorTitle: "RH",
-        sectorColor: "#8b5cf6",
-        agents: [
-            { name: "Camila Ferreira", ticketCount: 12 },
-            { name: "Lucas Oliveira", ticketCount: 8 },
-            { name: "Beatriz Santos", ticketCount: 5 },
-        ],
-    },
-];
-
-
-
-const categories :i_category[] = [
-    { categoryTitle: "Hardware", categoryColor: "#E74C3C" },
-    { categoryTitle: "Software", categoryColor: "#3498DB" },
-    { categoryTitle: "Rede", categoryColor: "#2ECC71" },
-    { categoryTitle: "Acesso / Permissão", categoryColor: "#9B59B6" },
-    { categoryTitle: "Email", categoryColor: "#F39C12" },
-    { categoryTitle: "Erro no Sistema", categoryColor: "#E67E22" },
-    { categoryTitle: "Impressora", categoryColor: "#1ABC9C" },
-    { categoryTitle: "Outros", categoryColor: "#95A5A6" },
-];
+const categoriesInfo :i_categoryTitleInfo[] = [
+  { "categoryTitle": "Hardware", "categoryCode": 1, "categoryColor": "#E74C3C" },
+  { "categoryTitle": "Software", "categoryCode": 2, "categoryColor": "#3498DB" },
+  { "categoryTitle": "Rede", "categoryCode": 3, "categoryColor": "#2ECC71" },
+  { "categoryTitle": "Acesso / Permissão", "categoryCode": 4, "categoryColor": "#9B59B6" },
+  { "categoryTitle": "Email", "categoryCode": 5, "categoryColor": "#F39C12" },
+  { "categoryTitle": "Erro no Sistema", "categoryCode": 6, "categoryColor": "#E67E22" },
+  { "categoryTitle": "Impressora", "categoryCode": 7, "categoryColor": "#1ABC9C" },
+  { "categoryTitle": "Outros", "categoryCode": 8, "categoryColor": "#95A5A6" }
+]
 
 const statusOptions = [
     { label: "Novos Chamados", bgColor: "#ffa2a2", buttonCode: NewTicketCode },
@@ -73,32 +39,94 @@ const statusOptions = [
 
 export default function TicketInfoDashboard()
 {
-    const [currentTicketSector, setCurrentTicketSector] = useState(0);
-    function getSectorAgents(sectorTitle : string) {
-        return sectorAgents.find((sector) => sector.sectorTitle === sectorTitle);
-    }
     
-    const selectedSector = getSectorAgents("Suporte Técnico");
+    const [currentTicketSector, setCurrentTicketSector] = useState(0);
+    const [foundOpenTickets, setFoundOpenTickets] = useState<i_category[]>([]);
+
+    const [foundSectorTickets, setFoundSectorTickets] = useState<i_Ticket[]>([]);
+
+    const [currentSectorTicketStates, setCurrentSectorTicketStates] = useState<Map<Number,Number>>();
+
+    async function GetDepartmentTickets()
+    {
+
+        const categoryTicketsUrl = "http://localhost:3000/Ticket/fetch-open-ticket-counts";
+
+        const openTicketsResponse = await fetch(categoryTicketsUrl, {
+            method: "GET",
+            headers: {
+                "Content-Type": "application/json"
+            }
+        });
+
+        const data = await openTicketsResponse.json() as i_category[]; 
+        setFoundOpenTickets(data);
+    }
+
+    async function FetchCurrentSectorTickets(pn_currentTicketSector: number)
+    {
+        const TicketsPerCategoryUrl = "http://localhost:3000/Ticket/fetch-tickets-by-category";
+
+        try 
+        {
+            const FoundTicketsResponse = await fetch(TicketsPerCategoryUrl, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ "CategoryId": pn_currentTicketSector })
+            }); 
+            
+            const a_ticketsFound = await FoundTicketsResponse.json() as i_Ticket[];
+            console.log(a_ticketsFound)
+            setFoundSectorTickets(a_ticketsFound);
+        } 
+        catch (error) 
+        {
+            console.error("Error " + error);    
+        }
+    }
+
+    useEffect(() => {
+        GetDepartmentTickets();
+    }, []);
+
+    useEffect(() => {
+        let TicketStatesInCategory : Map<Number, Number> = new Map();
+        
+        for (const ticket of foundSectorTickets) {
+            const catId = ticket.ticketStatus.Id;
+            const current = TicketStatesInCategory.get(catId) ?? 0;
+            TicketStatesInCategory.set(catId, Number(current) + 1);
+        }
+
+        setCurrentSectorTicketStates(TicketStatesInCategory);
+        console.log(TicketStatesInCategory)
+    }, [foundSectorTickets]);
+
 
     return <div style={styles.DashBoardBody}>
         <div style={styles.TitleBar}>
-            <p style={styles.TitleFont}>Chamados Dashboard </p>
+            <p style={styles.TitleFont}>Dashboard - Geral </p>
         </div>
         <div style={styles.Container}>
             <p style={styles.SectionTitle}>Tickets Abertos por Setor</p>
 
             <div style={styles.TicketsPerSectorGraph}>
-                {categories.map((category) => (
-                    <div key={category.categoryTitle} style={styles.BarColumn}>
-                        <div
-                            style={{
-                                ...styles.TicketsPerSectorBar,
-                                backgroundColor: category.categoryColor,
-                            }}
-                        />
-                        <span style={styles.BarLabel}>{category.categoryTitle}: 10</span>
+                {foundOpenTickets.map((category) => {
+                const categoryTitle =
+                    categoriesInfo.find((item) => item.categoryCode === category.category)?.categoryTitle
+
+                return (
+                    <div key={Number(category.category)} style={styles.BarColumn}>
+                    <div
+                        style={{
+                        ...styles.TicketsPerSectorBar,
+                        backgroundColor: categoriesInfo.find((item) => item.categoryCode === category.category)?.categoryColor,
+                        }}
+                    />
+                    <span style={styles.BarLabel}>{categoryTitle} : {category.count} chamado(s) aberto(s) </span>
                     </div>
-                ))}
+                );
+                })}
             </div>
         </div>
 
@@ -108,9 +136,16 @@ export default function TicketInfoDashboard()
             <p style={styles.SectionTitle}>Status de Tickets por Setor</p>
 
             <div style={styles.SectorButtonBar}>
-                {categories.map((category) => (
-                    <div key={category.categoryTitle} style={{...styles.CategoryCard, display:"flex",flexDirection:"row"}}>
-                      
+                {categoriesInfo.map((category) => (
+                    <div key={Number(category.categoryCode)} 
+                         style={{...styles.CategoryCard, display:"flex",flexDirection:"row", 
+                                    filter: category.categoryCode == currentTicketSector ? "brightness(75%)" : "brightness(100%)" }}
+                    onClick={() => {
+                        const newSector = Number(category.categoryCode);
+                        setCurrentTicketSector(newSector);
+                        FetchCurrentSectorTickets(newSector);
+                    }}
+                    >
                         <span
                             style={{
                                 ...styles.CategoryDot,
@@ -123,68 +158,31 @@ export default function TicketInfoDashboard()
             </div>
             
             <div style={styles.KanbanBoard}>
-                {statusOptions.map((status) => (
-                    <div key={status.buttonCode} style={styles.KanbanColumn}>
+                {currentSectorTicketStates && Array.from(currentSectorTicketStates.entries()).map(([key, status]) => (
+                    <div key={Number(key)} style={styles.KanbanColumn}>
                         <div style={styles.KanbanColumnHeader}>
                             <span
                                 style={{
                                     ...styles.StatusDot,
-                                    backgroundColor: status.bgColor,
+                                    backgroundColor: statusOptions.find((state) => state.buttonCode === key)?.bgColor,
                                 }}
                             />
-                            <span style={styles.KanbanColumnTitle}>{status.label}</span>
+                            <span style={styles.KanbanColumnTitle}>{statusOptions.find((state) => state.buttonCode === key)?.label}</span>
                         </div>
 
                         <div style={styles.KanbanCountBadge}>
-                            <span style={styles.KanbanCountNumber}>10</span>
-                            <span style={styles.KanbanCountUnit}>tickets</span>
+                            <span style={styles.KanbanCountNumber}>{String(status)}</span>
+                            <span style={styles.KanbanCountUnit}>Ticket(s)</span>
                         </div>
 
                         <div
                             style={{
                                 ...styles.KanbanAccentBar,
-                                backgroundColor: status.bgColor,
+                                backgroundColor: statusOptions.find((state) => state.buttonCode === key)?.bgColor,
                             }}
                         />
                     </div>
                 ))}
-            </div>
-        </div>
-
-        <div style={styles.Container}>
-            <p style={styles.SectionTitle}>Principais Agentes — {selectedSector.sectorTitle}</p>
-
-            <div style={styles.AgentPanel}>
-                <div style={styles.AgentPanelHeader}>
-                    <span
-                        style={{
-                            ...styles.StatusDot,
-                            backgroundColor: selectedSector.sectorColor,
-                        }}
-                    />
-                    <span style={styles.AgentPanelHeaderText}>
-                        {selectedSector.agents.length} agentes ativos
-                    </span>
-                </div>
-
-                <div style={styles.AgentList}>
-                    {selectedSector.agents.map((agent, index) => (
-                        <div key={agent.name} style={styles.AgentRow}>
-                            <span style={styles.AgentRank}>{index + 1}º</span>
-                            <span style={styles.AgentName}>{agent.name}</span>
-                            <div style={styles.AgentBarTrack}>
-                                <div
-                                    style={{
-                                        ...styles.AgentBarFill,
-                                        width: `${(agent.ticketCount / selectedSector.agents[0].ticketCount) * 100}%`,
-                                        backgroundColor: selectedSector.sectorColor,
-                                    }}
-                                />
-                            </div>
-                            <span style={styles.AgentCount}>{agent.ticketCount}</span>
-                        </div>
-                    ))}
-                </div>
             </div>
         </div>
 
@@ -353,6 +351,7 @@ const styles = {
         border: "1px solid #eef1f8",
         borderRadius: "12px",
         padding: "14px 12px",
+        maxWidth: "400px"
     },
 
     KanbanColumnHeader: {

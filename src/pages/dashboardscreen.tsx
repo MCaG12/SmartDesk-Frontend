@@ -1,5 +1,3 @@
-import TickItLogo from "../images/TickItLogo.png";
-import NotificationImage from "../images/NotificationImage.jpg"
 import UserLogoImage from "../images/UserImage.png"
 
 
@@ -12,6 +10,7 @@ import { useLocation } from "react-router-dom";
 import type { i_TicketPriority } from "../interfaces/i_ticketPriority";
 import type { i_Ticket } from "../interfaces/i_ticket";
 import ManagerDashBoard from "../components/ManagerDashBoard/ManagerDashBoard";
+import HomeSupportDashboard from "../components/commonUserHome/CommonUserHomeInterface";
 
 
 
@@ -94,6 +93,7 @@ export default function DashScreenScreen() {
     const TicketTableState = 1;
     const UserInfoState = 2;
     const ManagerPanel = 3; 
+    const UserPanel = 4;
 
     const location = useLocation();
     const { userFound } = location.state;
@@ -129,6 +129,16 @@ export default function DashScreenScreen() {
 
     fetchData();
     }, []);
+
+    useEffect(() => {
+        if (!userFound) return;
+
+        if (userFound.usuarDepartamento.Id !== 2) {
+            setDashBoardState(UserPanel);
+        } else {
+            setDashBoardState(DashBoardState);
+        }
+    }, [userFound]);
 
     function drawDashBoard(dashBoardState : number)
     {
@@ -166,6 +176,7 @@ export default function DashScreenScreen() {
                 }
             case UserInfoState:
             {
+                console.log(userFound)
                 return <UserDashBoard 
                     Name={userFound.usuarNome}
                     Email={userFound.usuarEmail}
@@ -181,6 +192,57 @@ export default function DashScreenScreen() {
                 
                 />
             }
+
+            case UserPanel:
+            {
+                return <HomeSupportDashboard 
+                    userInfo={userFound}
+                />
+            }
+        }
+    }
+
+    function loadUsersButtons(userInfo:any)
+    {
+        if(userInfo.usuarDepartamento.Id != 2)
+        {
+            return (
+                <button
+                        className="tab-btn"
+                        onClick={() => setDashBoardState(UserPanel)}
+                        style={{ backgroundColor: dashBoardState === UserPanel ? "#1b54a3" : "#538fe4" }}
+                        >
+                        Home
+                </button>
+            )
+        }
+        else
+        {
+            return (<>
+                <button
+                    className="tab-btn"
+                    onClick={() => setDashBoardState(DashBoardState)}
+                    style={{ backgroundColor: dashBoardState === DashBoardState ? "#1b54a3" : "#538fe4" }}>
+                    DashBoard
+                </button>
+                <button
+                    className="tab-btn"
+                    onClick={() => setDashBoardState(TicketTableState)}
+                    style={{ backgroundColor: dashBoardState === TicketTableState? "#1b54a3" : "#538fe4" }}>
+                    Chamados
+                </button> 
+                {
+                    userInfo.usuarCargo.Id == 42 && 
+                    <button
+                        className="tab-btn"
+                        onClick={() => setDashBoardState(ManagerPanel)}
+                        style={{ backgroundColor: dashBoardState === ManagerPanel ? "#1b54a3" : "#538fe4" }}
+                        >
+                        Gerenciamento
+                    </button>
+                }
+       
+            </>)
         }
     }
 
@@ -193,7 +255,7 @@ export default function DashScreenScreen() {
                  <div style={{display: "flex", flexDirection:"row", alignItems: "center",
                                 justifyContent: "space-evenly", height: "100%", width:"60%",}}>
                     
-                    <button className="btn-novo-chamado" style={{width:"25%"}} onClick={(() => {setCreateNewTicketIsActive(!createNewTicketActive)})}> Novo Chamado</button>
+                    {userFound.usuarDepartamento.Id == 2 && <button className="btn-novo-chamado" style={{width:"25%"}} onClick={(() => {setCreateNewTicketIsActive(!createNewTicketActive)})}> Novo Chamado</button> }
                 </div>
                 <div style={{display: "flex", flexDirection:"row", justifyContent: "space-evenly", height: "100%", width:"60%"}}>
                     {dashBoardState == TicketTableState && 
@@ -202,11 +264,6 @@ export default function DashScreenScreen() {
                         </div>
                     }
 
-                    <div className="icon-btn" onClick={() => {setNotificationIsActive(!notificationIsActive)}}>
-                        <img src={NotificationImage} alt="NotificationBell" 
-                             style={{ width: "80%", height: "80%", objectFit: "cover", alignSelf: "center",
-                                      marginBottom: "2%", borderRadius: "50%"  }}/>
-                    </div>
 
                     <div className="icon-btn" onClick={() => setDashBoardState(UserInfoState)}>
                        <img src={UserLogoImage} alt="UserLogoOutline" 
@@ -219,35 +276,10 @@ export default function DashScreenScreen() {
 
             <div style={{display: "flex", flexDirection: "row", width:"100%", height: "100%", alignItems: "center"}}>
                 <div className="sidebar">
-                    <button
-                    className="tab-btn"
-                    onClick={() => setDashBoardState(DashBoardState)}
-                    style={{ backgroundColor: dashBoardState === DashBoardState ? "#1b54a3" : "#538fe4" }}
-                    >
-                    DashBoard
-                    </button>
-                    <button
-                    className="tab-btn"
-                    onClick={() => setDashBoardState(TicketTableState)}
-                    style={{ backgroundColor: dashBoardState === TicketTableState? "#1b54a3" : "#538fe4" }}
-                    >
-                    Chamados
-                    </button>
-                    <button
-                    className="tab-btn"
-                    onClick={() => setDashBoardState(UserInfoState)}
-                    style={{ backgroundColor: dashBoardState === UserInfoState ? "#1b54a3" : "#538fe4" }}
-                    >
-                    Usuário
-                    </button>
+             
+                    {loadUsersButtons(userFound)}
 
-                    <button
-                    className="tab-btn"
-                    onClick={() => setDashBoardState(ManagerPanel)}
-                    style={{ backgroundColor: dashBoardState === ManagerPanel ? "#1b54a3" : "#538fe4" }}
-                    >
-                    Gerenciamento
-                    </button>
+              
                 </div>
                 { drawDashBoard(dashBoardState) }
             </div>

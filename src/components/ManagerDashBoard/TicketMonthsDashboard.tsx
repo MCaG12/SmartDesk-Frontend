@@ -1,93 +1,369 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import type { i_Ticket } from "../../interfaces/i_ticket";
 
-interface i_department
+type MonthGraphInfo = Map<Number, i_Ticket[]>
+type YearGraphInfo = Map<Number, MonthGraphInfo>
+
+
+interface i_FetchTicketsInTime 
 {
-    departmentCode: number;
-    departmentName : string;
+    openingDate: Date;
+    closingDate: Date|undefined;
+    selectedCategory: Number;
 }
 
-export default function TicketMonthsDashBoard()
-{
-    const [selectedDepartmentCode, setSelectedDepartmentCode] = useState<i_department[]>();
-    const [companyCode, setCompanyCode] = useState<number>(0);
 
-    async function fetchDepartments(setSelectedDepartmentCode: React.Dispatch<React.SetStateAction<i_department[] | undefined>>)
+const formatDate = (d: Date | string | null | undefined): string => {
+    if (!d) return "—";
+    if (typeof d === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(d)) {
+        const [year, month, day] = d.split('-').map(Number);
+        return `${String(day).padStart(2, '0')}/${String(month).padStart(2, '0')}/${year}`;
+    }
+    const date = new Date(d);
+    return `${String(date.getDate()).padStart(2, '0')}/${String(date.getMonth() + 1).padStart(2, '0')}/${date.getFullYear()}`;
+};
+
+export default function TicketMonthsDashBoard() {
+    const [maxMonthTicketValue , setMaxMonthTicketValue] = useState(0);
+    const [minMonthTicketValue , setMinMonthTicketValue] = useState(0);
+    const [openingDate, setOpeningDate] = useState<Date>()
+    const [closingDate, setClosingDate] = useState<Date>()
+    const [selectedCategory, setSelectedCategory] = useState<number>(0)
+
+    const [TicketsFound, setTicketsFound] = useState<i_Ticket[]>([]);
+
+    const [GraphInfo, setGraphInfo] = useState<YearGraphInfo>();
+
+    const [yearTickets, setYearTickets] = useState<MonthGraphInfo>();
+
+    const [displayGraph, setDisplayGraph] = useState<boolean>(false);
+
+    const [selectedYear, setSelectedYear] = useState<number>(0);
+
+    function updateMaxMinValues()
     {
-        const url = "http://localhost:3000/Departamento/GetAll";
+       const ticketsMonthFound : number[] = [];
 
-        try 
+       console.log(GraphInfo)
+
+       const ticketsInYearSelected : MonthGraphInfo | undefined =  GraphInfo?.get(selectedYear)
+
+       if (!ticketsInYearSelected) {
+            return;
+        }
+
+        setYearTickets(ticketsInYearSelected);
+
+       for(const MonthTickets of ticketsInYearSelected.values())
         {
+            ticketsMonthFound.push(MonthTickets.length);
+        }
+
+       setMinMonthTicketValue(Math.min(...ticketsMonthFound));
+       setMaxMonthTicketValue(Math.max(...ticketsMonthFound));
+
+       console.log("min is " + Math.min(...ticketsMonthFound));
+       console.log("min is " + Math.max(...ticketsMonthFound));
+
+
+    }
+
+    function TurnTicketInfoToGraphData(TicketsFound: i_Ticket[])
+    {
+        let currentTicketData : YearGraphInfo = new Map();
+        let currentBiggestMonth : number = 1; 
+
+        for (let ticket of TicketsFound)
+        {
+         
+            let ticketDate : Date = new Date(ticket.ticketDateOpen);
+            let ticketYear = ticketDate.getFullYear();
+            let ticketMonth = ticketDate.getMonth();    
+
+            if ( !currentTicketData.has(ticketYear) )
+            {
+                const ticketMap: MonthGraphInfo = new Map();
+                const ticketArray : i_Ticket[] = [ticket]
+                ticketMap.set(ticketMonth, ticketArray);
+
+                currentTicketData.set(ticketYear, ticketMap);
+            }
+            else
+            {
+                let ticketsFoundAtCurrentYear : MonthGraphInfo | undefined = currentTicketData.get(ticketYear);
+
+                if (!ticketsFoundAtCurrentYear) { return; }
+
+                if (!ticketsFoundAtCurrentYear.get(ticketMonth))
+                {
+                    ticketsFoundAtCurrentYear.set(ticketMonth, [ticket]);
+                }
+                else
+                {
+                    let ticketsFoundInMonth : i_Ticket[] | undefined = ticketsFoundAtCurrentYear.get(ticketMonth);
+
+                    if (!ticketsFoundInMonth) { return; }
+
+                    if (ticketsFoundInMonth.length > currentBiggestMonth)
+                    {
+                        currentBiggestMonth = ticketsFoundInMonth.length;
+                    }
+                    ticketsFoundInMonth.push(ticket);
+                }
+            }
+        }
+        setGraphInfo(currentTicketData);
+    }
+
+    async function FetchTicketsInTime({ openingDate, closingDate, selectedCategory }: i_FetchTicketsInTime) {
+        const url = `http://localhost:3000/Ticket/fetch-tickets-in-period/`;
+        try {
             const response = await fetch(url, {
-            method: 'POST', 
-            headers: {
-                'Content-Type': 'application/json' 
-            }})
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    InitialDate: openingDate,
+                    FinalDate: closingDate ?? "",
+                    TicketCategory: selectedCategory
+                })
+            });
 
-            const data = await response.json() as i_department[]; 
+        
 
-            setSelectedDepartmentCode(data);
+            if (!response.ok) {
+                throw new Error(`Request failed with status ${response.status}`);
+            }
 
-        } 
-        catch (error) 
-        {   
+            const data = await response.json();
+            setTicketsFound(data);
+        } catch (error) {
             console.error(error);
+            throw error; 
         }
     }
 
-    async function fetchRolesByDepartment(departmentCode : number)
-    {
-        const url = `http://localhost:3000/Cargo/fetch-roles-by-department/${departmentCode}`;
+    useEffect(() => {
+        console.log("TurnTicketInfoToGraphData called")
+        TurnTicketInfoToGraphData(TicketsFound)
+        if(TicketsFound.length > 0)
+            {
+                setDisplayGraph(true);
+            }
+        else
+            {
+               setDisplayGraph(false); 
+            }
 
-        try 
-        {
-            const response = await fetch(url, {
-                method: "GET",
-                headers: { "Content-Type": "application/json"}
-            })
+    }, [TicketsFound])
 
-            const data = await response.json() as i_department[]; 
 
-            setSelectedDepartmentCode(data);
+    return (
+        <div style={styles.DashBoardBody}>
+            <div style={styles.TitleBar}>
+                <p style={styles.TitleFont}>Dashboard - Geral</p>
+            </div>
 
-        } 
-        catch (error) 
-        {   
-            console.error(error);
-        }
-    }
+            <div style={styles.Container}>
+                <p style={styles.SectionTitle}>Tickets Abertos por Setor</p>
 
-    return <div style={styles.DashBoardBody}>
-        <div style={styles.TitleBar}>
-            <p style={styles.TitleFont}>Chamados Dashboard </p>
+                <div style={styles.DateRow}>
+                    <div style={styles.DateCard}>
+                        <p style={styles.InputLabel}>Data Inicio:</p>
+                        <input 
+                            type="date" 
+                            style={styles.InputField} 
+                            placeholder="Insira uma data de inicio" 
+                            onChange={((e) => {setOpeningDate(new Date(e.target.value))})}
+                        />
+                    </div>
+                    <div style={styles.DateCard}>
+                        <p style={styles.InputLabel}>Data Final:</p>
+                        <input 
+                            type="date" 
+                            style={styles.InputField} 
+                            placeholder="Insira uma data final - Opcional" 
+                            onChange={((e) => {setClosingDate(new Date(e.target.value))})}
+                        />
+                    </div>
+
+                </div>
+                <div style={styles.DateRow}>
+                    <div style={styles.DateCard}>
+                        <p style={styles.InputLabel}>Categoria: </p>
+                        <select 
+                            id="languages" 
+                            name="language" 
+                            onChange={((e) => {setSelectedCategory(Number(e.target.value))})}
+                            style={styles.SelectField}>
+             
+                            <option value="" disabled selected>Escolha uma Categoria</option>
+                            <option value="1">Hardware</option>
+                            <option value="2">Software</option>
+                            <option value="3">Rede</option>
+                            <option value="4">Acesso Permissao</option>
+                            <option value="5">Email</option>
+                            <option value="6">Erro no Sistema</option>
+                            <option value="7">Impressora</option>
+                            <option value="8">Outros</option>
+                        </select>
+                        
+          
+                    </div>
+                </div>
+
+                <div style={{"display":"flex", width:"100%", "justifyContent": "center"}}>
+                    <div 
+                        style={styles.Button}
+                        onClick={() => {if(openingDate) FetchTicketsInTime({openingDate, closingDate, selectedCategory})}}
+                    >
+                        Procurar Tickets No Período
+                    </div>
+                </div>
+
+                <div>
+                    <p style={{ ...styles.SectionTitle, textAlign: "center" }}>Tickets Encontrados no periodo {formatDate(openingDate)} - {formatDate(closingDate)}</p>
+                    <div style={styles.separationBar} />
+                </div>
+
+
+                {/*** Graphs */}
+                { (displayGraph && GraphInfo) &&
+                    <>
+
+                    <select value={selectedYear} onChange={(e) => setSelectedYear(Number(e.target.value))} style={{...styles.SelectField, alignSelf:"center"}}>
+                        {[...GraphInfo.keys()].map((option) => (
+                            <option key={Number(option)} value={Number(option)} onClick={() => updateMaxMinValues()}>
+                            {String(option)}
+                            </option>
+                        ))}
+                    </select>
+                    <div style={styles.GraphSection}>
+                        <div style={styles.GraphStatsColumn}>
+                            <p style={styles.BarLabel}>Maior Valor: {maxMonthTicketValue}</p>
+                            <p style={styles.BarLabel}>Menor Valor: {minMonthTicketValue}</p>
+                        </div>
+
+                        <div style={styles.GraphWrapper}>
+                            <div style={styles.TicketsPerSectorGraph}>
+
+                                {yearTickets &&
+                                    Array.from({ length: 12 }, (_, month) => {
+                                        const tickets = yearTickets.get(month) ?? [];
+                                        if(!yearTickets.get(month))
+                                            {
+                                                return (
+                                                    <div key={month} style={styles.DotColumn}>
+                                                        <div style={styles.DotTrack}>
+                                                            <p
+                                                                style={{
+                                                                    ...styles.DotValue,
+                                                                    top: `100%`,
+                                                                }}
+                                                            >
+                                                                {new Date(2000, month, 1).toLocaleString('default', { month: 'long' })}
+                                                            </p>
+                                                        </div>
+                                                    </div>
+                                                )
+                                            }
+                                        else
+                                            {
+                                                return (
+                                                    <div key={month} style={styles.DotColumn}>
+                                                        <div style={styles.DotTrack}>
+                                                            <div
+                                                                style={{
+                                                                    ...styles.Dot,
+                                                                    top: `${100 - (tickets.length / maxMonthTicketValue) * 100}%`,
+                                                                }}
+                                                            />
+                                                            <p
+                                                                style={{
+                                                                    ...styles.DotValue,
+                                                                    top: `${100 - (tickets.length / maxMonthTicketValue) * 100}%`,
+                                                                }}
+                                                            >
+                                                                {tickets.length}
+                                                            </p>
+                                                            <p
+                                                                style={{
+                                                                    ...styles.DotValue,
+                                                                    top: `100%`,
+                                                                }}
+                                                            >
+                                                                {new Date(2000, month, 1).toLocaleString('default', { month: 'long' })}
+                                                            </p>
+
+                                                        </div>
+                                                    </div>
+                                                )
+                                            }
+                                    })
+                                }
+
+                                {/* {TicketsFound.map((Ticket) => {
+                                    const topPercent = 100 - (sector.value / maxMonthTicketValue) * 100;
+
+                                    return (
+                                        w<div key={sector.label} style={styles.DotColumn}>
+                                            <div style={styles.DotTrack}>
+                                                <div
+                                                    style={{
+                                                        ...styles.Dot,
+                                                        top: `${topPercent}%`,
+                                                    }}
+                                                />
+                                                <p
+                                                    style={{
+                                                        ...styles.DotValue,
+                                                        top: `${topPercent}%`,
+                                                    }}
+                                                >
+                                                    {sector.value}
+                                                </p>
+                                            </div>
+                                        </div>
+                                    );
+                                })} */}
+                                
+                            </div>
+                        </div>
+                    </div>
+                    </>
+                }
+                
+              
+            </div>
         </div>
-
-    </div>
-
+    );
 }
 
 const styles = {
-    DashBoardBody : {
+     DashBoardBody: {
         backgroundColor: "white",
         width: "100%",
         height: "100%",
         display: "flex",
-        flexDirection:"column",
-        overflowY: "scroll"
+        flexDirection: "column",
+        overflowY: "scroll",
     },
-    TitleBar : {
+    TitleBar: {
         display: "flex",
         flexDirection: "row",
-        textAlign:"center",
-        justifyContent:"center",
-        backgroundColor: "#e0dddd"
+        justifyContent: "center",
+        backgroundColor: "#e0dddd",
+        padding: "8px 0",
     },
-    TitleFont : {
+    TitleFont: {
         fontFamily: "Nunito",
         fontSize: "2rem",
         fontWeight: "700",
         color: "#4386d8",
         letterSpacing: "-0.01em",
-        lineHeight: "1.2"
+        lineHeight: "1.2",
+        margin: 0,
     },
     AuxFont: {
         fontFamily: "Nunito",
@@ -95,6 +371,273 @@ const styles = {
         fontWeight: "500",
         color: "#8d8c8c",
         letterSpacing: "-0.01em",
-        lineHeight: "1.2"
-    }, 
+        lineHeight: "1.2",
+    },
+    StatusCard: {
+        flex: "1 1 45%",
+        border: "none",
+        borderRadius: "12px",
+        padding: "14px 12px",
+        fontFamily: "Inter",
+        fontWeight: "600",
+        fontSize: "14px",
+        color: "#f3f3f3",
+        cursor: "pointer",
+        transition: "transform 0.15s ease, outline-offset 0.15s ease",
+        outlineOffset: "2px",
+    },
+    CategoryCard: {
+        flex: "1 1 45%",
+        border: "1px solid #e0e0e0",
+        borderRadius: "10px",
+        padding: "12px",
+        fontFamily: "Inter",
+        fontWeight: "500",
+        fontSize: "14px",
+        color: "#4a4a4a",
+        backgroundColor: "#fff",
+        outlineOffset: "2px",
+    },
+
+    DateRow: {
+        display: "flex",
+        flexDirection: "row",
+        gap: "16px",
+        width: "100%",
+    },
+    DateCard: {
+        flex: "1 1 45%",
+        display: "flex",
+        flexDirection: "row",
+        alignItems: "center",
+        gap: "8px",
+        border: "1px solid #e0e0e0",
+        borderRadius: "10px",
+        padding: "12px",
+        backgroundColor: "#fff",
+    },
+
+    GraphWrapper: {
+        flex: "1",
+        display:"flex",
+        width: "100%",
+        minHeight: "220px",
+        flexDirection:"row",
+        justifyContent:"space-evenly",
+    },
+    TicketsPerSectorGraph: {
+        display: "flex",
+        flexDirection: "row",
+        alignItems: "flex-end",
+        justifyContent: "space-evenly",
+        width: "100%",
+        height: "100%",
+        backgroundColor: "#fafbff",
+        border: "1px solid #eef1f8",
+        borderRadius: "14px",
+        padding: "20px 12px 12px",
+        boxSizing: "border-box",
+    },
+
+    InputField: {
+        width: "85%",
+        boxSizing: "border-box",
+        border: "1px solid #e0e0e0",
+        borderRadius: "10px",
+        padding: "8px",
+        fontFamily: "Inter",
+        fontWeight: "700",
+        fontSize: "16px",
+        color: "#4a4a4a",
+        backgroundColor: "#fff",
+        outline: "none",
+        outlineOffset: "2px",
+        transition: "border-color 0.15s ease, outline-offset 0.15s ease",
+    },
+    InputFieldFocus: {
+        borderColor: "#b0b0b0",
+    },
+    InputLabel: {
+        display: "block",
+        fontFamily: "Inter",
+        fontWeight: "700",
+        fontSize: "16px",
+        color: "#4a4a4a",
+        marginBottom: "6px",
+        whiteSpace: "nowrap",
+    },
+
+    BarColumn: {
+        display: "flex",
+        flexDirection: "column",
+        alignItems: "center",
+        gap: "8px",
+        height: "100%",
+        justifyContent: "flex-end",
+    },
+    TicketsPerSectorBar: {
+        width: "28px",
+        borderRadius: "6px 6px 2px 2px",
+        transition: "height 0.3s ease",
+    },
+    BarLabel: {
+        fontFamily: "Inter",
+        fontWeight: "500",
+        fontSize: "12px",
+        color: "#6b7280",
+        whiteSpace: "nowrap",
+    },
+
+    Container: {
+        display: "flex",
+        flexDirection: "column",
+        gap: "16px",
+        padding: "20px",
+        backgroundColor: "#ffffff",
+        flex: "1",
+        minHeight: 0,
+    },
+    SectionTitle: {
+        fontFamily: "Inter",
+        fontWeight: "600",
+        fontSize: "25px",
+        color: "#4386d8",
+        margin: 0,
+    },
+    SectorButtonBar: {
+        display: "flex",
+        flexDirection: "row",
+        flexWrap: "wrap",
+        gap: "8px",
+    },
+    CategoryDot: {
+        width: "12px",
+        height: "12px",
+        borderRadius: "50%",
+        flexShrink: 0,
+        marginRight: "15px",
+    },
+    CategoryLabel: {
+        fontFamily: "Inter",
+        fontWeight: "500",
+        fontSize: "13px",
+        color: "#3f3f46",
+    },
+    separationBar: {
+        width: "100%",
+        height: "1px",
+        backgroundColor: "#f0f0f0",
+    },
+
+    GraphSection: {
+        display: "flex",
+        flexDirection: "row",
+        alignItems: "stretch",
+        gap: "16px",
+        width: "100%",
+        flex: "1",
+        minHeight: 0,
+    },
+    GraphStatsColumn: {
+        flex: "0 0 auto",
+        display: "flex",
+        flexDirection: "column",
+        justifyContent: "space-between",
+        minWidth: "110px",
+        padding: "20px 0 12px", 
+        boxSizing: "border-box",
+    },
+
+    DotColumn: {
+        display: "flex",
+        flexDirection: "column",
+        alignItems: "center",
+        gap: "8px",
+        height: "100%",
+        justifyContent: "flex-end",
+    },
+    DotTrack: {
+        position: "relative",
+        width: "2px",
+        height: "100%",
+        backgroundColor: "#eef1f8",
+    },
+    Dot: {
+        position: "absolute",
+        left: "50%",
+        width: "16px",
+        height: "16px",
+        borderRadius: "50%",
+        backgroundColor: "#7fb8f0",
+        transform: "translate(-50%, -50%)",
+        transition: "top 0.3s ease",
+        boxShadow: "0 0 0 4px rgba(127, 184, 240, 0.15)",
+    },
+
+    DotValue: {
+        position: "absolute",
+        left: "50%",
+        fontFamily: "Inter",
+        fontWeight: "600",
+        fontSize: "12px",
+        color: "#4a4a4a",
+        transform: "translate(14px, -50%)",
+        whiteSpace: "nowrap",
+        margin: 0,
+    },
+
+    Button: {
+        width:"40%",
+        display: "inline-flex",
+        alignItems: "center",
+        justifyContent: "center",
+        border: "1px solid #e0e0e0",
+        borderRadius: "10px",
+        padding: "8px 16px",
+        fontFamily: "Inter",
+        fontWeight: "600",
+        fontSize: "14px",
+        color: "#4386d8",
+        backgroundColor: "#fff",
+        cursor: "pointer",
+        outline: "none",
+        outlineOffset: "2px",
+        transition: "background-color 0.15s ease, border-color 0.15s ease, transform 0.1s ease",
+    },
+    ButtonHover: {
+        backgroundColor: "#f5f8fd",
+        borderColor: "#4386d8",
+    },
+    ButtonActive: {
+        transform: "scale(0.98)",
+    },
+    ButtonPrimary: {
+        backgroundColor: "#4386d8",
+        borderColor: "#4386d8",
+        color: "#fff",
+    },
+    ButtonPrimaryHover: {
+        backgroundColor: "#3574c2",
+    },
+    SelectField: {
+    width: "50%",
+    boxSizing: "border-box",
+    border: "1px solid #e0e0e0",
+    borderRadius: "10px",
+    padding: "10px 40px 10px 12px",
+    fontFamily: "Inter",
+    fontWeight: "600",
+    fontSize: "14px",
+    color: "#4a4a4a",
+    backgroundColor: "#fff",
+    cursor: "pointer",
+    outline: "none",
+    outlineOffset: "2px",
+    appearance: "none",
+    WebkitAppearance: "none",
+    MozAppearance: "none",
+    backgroundRepeat: "no-repeat",
+    backgroundPosition: "right 14px center",
+},
+
 } as const satisfies Record<string, React.CSSProperties>;

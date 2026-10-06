@@ -82,11 +82,6 @@ export default function UserDashBoard({Name, Email, Type, Role, Department}: Das
                             onClick={() => {setUserDashBoardState(1)}}
                             style={{ width: "30%" }}
                         >Informações Pessoais</button>
-                        <button
-                            className="tab-btn"
-                            onClick={() => {setUserDashBoardState(2)}}
-                            style={{ width: "30%" }}
-                        >Segurança</button>
                     </div>
                 </>
             );

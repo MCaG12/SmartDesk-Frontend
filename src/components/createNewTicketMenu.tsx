@@ -4,12 +4,12 @@ import type { i_TicketCategory } from "../interfaces/i_ticketCategory";
 import type { i_UserLoginInfoResponse } from "../interfaces/i_UserResponse";
 import type { i_TicketPriority } from "../interfaces/i_ticketPriority";
 import type { i_TicketSolicitant } from "../interfaces/i_ticketSolicitant";
-import type { i_ticketAgentResponse } from "../interfaces/i_ticketAgentResponse";
-import type { i_GetTroubleshootingSuggestion } from "../interfaces/i_TroubleShootingInterface";
 import { NewTicketForm } from "./newTicketMenuTicketForm";
-import { AiSuggestionBox } from "./createNewTicketAiSuggestion";
-import { NewTicketAiLoading } from "./createNewTicketAiLoading";
-import type { i_GetPrioritySuggestion } from "../interfaces/i_GetPrioritySuggestion";
+import { AiSuggestionBox } from "./visualAiComponents/createNewTicketAiSuggestion";
+import { NewTicketAiLoading } from "./visualAiComponents/createNewTicketAiLoading";
+import getPrioritySuggestion from "./aiPipelines/aiGetPrioritySuggestion";
+import getTroubleshootingSuggestion from "./aiPipelines/aiGetTroubleshootingSuggestion";
+import save_new_ticket from "./saveNewTicket/saveNewTicket";
 
 interface i_Create_New_Ticket_Menu
 {
@@ -20,175 +20,15 @@ interface i_Create_New_Ticket_Menu
     ticketCategories: i_TicketCategory[];
     userInfo:i_UserLoginInfoResponse;
 }
-
-interface SaveTicket
-{
-    ticketTitle: string,
-    ticketCategory: i_TicketCategory,
-    ticketPriority: i_TicketPriority,
-    ticketProblemDescription: string,
-    ticketSolicitant: i_TicketSolicitant;
-}
-
-async function getPrioritySuggestion({ticketCategoryDescription, ticketProblemDescription, ticketTitle, setAiTicketPrioritySuggestion, setLoadingAi}:i_GetPrioritySuggestion ) {
-  if (!ticketCategoryDescription  || !ticketProblemDescription) {console.log("Failed"); return;}
-
-  setLoadingAi(true);
-  try {
-    const response = await fetch(
-      `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${import.meta.env.VITE_GEMINI_API_KEY}`,
-      {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          contents: [{
-            parts: [{
-              text: `You are an IT helpdesk assistant. A user has opened a support ticket with the following details:
-              
-              Title: ${ticketTitle}
-              Category: ${ticketCategoryDescription}
-              Description: ${ticketProblemDescription}
-              Choose the priority based on the following list of options
-                id: 1 - BAIXA PRIORIDADE
-                id: 2 - MEDIA PRIORIDADE
-                id: 3 - ALTA PRIORIDADE
-                id: 4 - CRITICA PRIORIDADE
-            
-              Respond with ONLY valid JSON, no markdown, no explanation:
-              {
-                    "Id": id of priority selected,
-                    "typepriDescription": "priority text"
-                }
-              `
-            }]
-          }]
-        })
-      }
-    );
-    const data = await response.json();
-    console.log("the suggested priority is -> ", data);
-    const raw = data.candidates[0].content.parts[0].text ?? "";
-    const clean = raw.replace(/```json|```/g, "").trim();
-
-    try {
-        const parsed : i_TicketPriority = JSON.parse(clean);
-        if (parsed.Id && [1, 2, 3, 4].includes(parsed.Id)) {
-            setAiTicketPrioritySuggestion(parsed);
-        } else {
-            console.error("Unexpected priority response:", parsed);
-        }
-    } catch {
-        console.error("Failed to parse priority JSON:", raw);
-    }
-  } catch (err) {
-    console.error(err);
-  } finally {
-    setLoadingAi(false);
-  }
-}
-
-
-async function getTroubleshootingSuggestion({ticketCategoryDescription, ticketPriorityDescription, ticketProblemDescription, ticketTitle, setAiSuggestion, setLoadingAi}:i_GetTroubleshootingSuggestion ) {
-  if (!ticketCategoryDescription || !ticketPriorityDescription || !ticketProblemDescription) return;
-  console.log(ticketTitle, ticketCategoryDescription, ticketPriorityDescription, ticketProblemDescription)
-  setLoadingAi(true);
-  try {
-    const response = await fetch(
-      `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${import.meta.env.VITE_GEMINI_API_KEY}`,
-      {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          contents: [{
-            parts: [{
-              text: `You are an IT helpdesk assistant. A user has opened a support ticket with the following details:
-              
-              Title: ${ticketTitle}
-              Category: ${ticketCategoryDescription}
-              Priority: ${ticketPriorityDescription}
-              Description: ${ticketProblemDescription}
-              Provide 3 to 5 basic troubleshooting steps the user can try before an agent responds. Be concise and practical. answer in portuguese `
-            }]
-          }]
-        })
-      }
-    );
-    const data = await response.json();
-    const text = data.candidates[0].content.parts[0].text ?? "";
-    setAiSuggestion(text);
-  } catch (err) {
-    console.error(err);
-    setAiSuggestion("Não foi possível carregar sugestões.");
-  } finally {
-    setLoadingAi(false);
-  }
-}
-
-async function save_new_ticket({ticketTitle, ticketCategory, ticketPriority, ticketProblemDescription,
-                             ticketSolicitant}: SaveTicket)
-{
-    const NewTicket: i_Ticket = {
-    Id: 0,  
-    ticketTitle: ticketTitle,
-    ticketStatus: { Id: 1, tickstaDescription: "NOVO TICKET" },
-    ticketPriority: ticketPriority,
-    ticketCategory: ticketCategory,
-    ticketDescription: ticketProblemDescription,
-    ticketDateOpen: new Date().toISOString(),  
-    ticketDateClose: null,
-    ticketSolicitant: ticketSolicitant,
-    ticketAgent: null
-};
-    try 
-    {
-        const url = "http://localhost:3000/Ticket/";
-        const agentsUrl = "http://localhost:3000/Usuario/GetAll";
-
-        const ticketAgentsResponse = await fetch(agentsUrl, {
-            method: "GET",
-            headers: {
-                "Content-Type": "application/json"
-            }
-        });
-
-        const ticketAgents =
-            await ticketAgentsResponse.json() as i_ticketAgentResponse[]; 
-
-        const randomAgent = ticketAgents[Math.floor(Math.random() * ticketAgents.length)];
-
-        const response = await fetch(url, {
-        method: 'POST', 
-        headers: {
-            'Content-Type': 'application/json' 
-        },
-        body: 
-            JSON.stringify({   
-                "ticketTitle": NewTicket.ticketTitle,
-                "ticketStatus": NewTicket.ticketStatus.Id,
-                "ticketPriority":  NewTicket.ticketPriority.Id,
-                "ticketDescription": NewTicket.ticketDescription,
-                "ticketCategory": NewTicket.ticketCategory.Id,
-                "ticketDateOpen": NewTicket.ticketDateOpen,
-                "ticketDateClose": NewTicket.ticketDateClose,
-                "ticketSolicitant": NewTicket.ticketSolicitant.Id,
-                "ticketAgent": randomAgent.Id
-            })
-        })   
-
-        if (!response.ok) {
-            throw new Error(`HTTP error: ${response.status}`);
-        }
-        else
-            {
-                console.log("post was a sucess!")
-            }
-        
-    } 
-    catch (error) 
-    {
-        console.error(error);
-    }
-}
+const c_i_initial_ticket_menu = 0;
+const c_i_ai_analyzing_problem = 1;
+const c_i_new_ticket_menu_opened = 1;
+const c_i_fetching_ticket_suggestion = 2;
+const c_i_ai_suggestion = 2;
+const c_i_fetching_priority_suggestion = 3;
+const c_i_ai_choosing_priority = 3;
+const c_i_problem_not_solved = 4;
+const c_i_ticket_opened_message = 5;
 
 export function Create_New_Ticket_Menu
     ({setCreateNewTicketIsActive, ticketPriorities, ticketCategories, userInfo}:i_Create_New_Ticket_Menu)
@@ -204,7 +44,7 @@ export function Create_New_Ticket_Menu
     const [aiTicketPrioritySuggestion, setAiTicketPrioritySuggestion] = useState<i_TicketPriority>();
 
     useEffect(() => {
-    if (pageStatus === 1) {
+    if (pageStatus === c_i_new_ticket_menu_opened) {
         if (ticketCategory && ticketPriority) {
             getTroubleshootingSuggestion({
                 ticketCategoryDescription: ticketCategory.tickcatDescription,
@@ -213,13 +53,13 @@ export function Create_New_Ticket_Menu
                 ticketTitle,
                 setAiSuggestion,
                 setLoadingAi
-            }).then(() => setPageStatus(2));
+            }).then(() => setPageStatus(c_i_fetching_ticket_suggestion));
         } else {
             console.log("failed calling suggestion", ticketCategory, ticketPriority);
         }
     }
 
-    if (pageStatus === 3) {
+    if (pageStatus === c_i_fetching_priority_suggestion) {
         if (ticketCategory) {
             getPrioritySuggestion({
                 ticketCategoryDescription: ticketCategory.tickcatDescription,
@@ -243,7 +83,7 @@ export function Create_New_Ticket_Menu
     }, [aiTicketPrioritySuggestion]);
 
     useEffect(() => {
-    if (pageStatus === 4) {
+    if (pageStatus === c_i_problem_not_solved) {
         if (ticketCategory && ticketPriority) {
             save_new_ticket({
                 ticketTitle,
@@ -251,7 +91,7 @@ export function Create_New_Ticket_Menu
                 ticketPriority,
                 ticketProblemDescription,
                 ticketSolicitant
-            }).then(() => setPageStatus(5));
+            }).then(() => setPageStatus(c_i_ticket_opened_message));
         }
     }
 }, [pageStatus]);
@@ -260,7 +100,7 @@ export function Create_New_Ticket_Menu
     {
         switch(pageStatus)
         {   
-            case 0:
+            case c_i_initial_ticket_menu:
                 {
                     return  <NewTicketForm
                         ticketCategories={ticketCategories}
@@ -274,13 +114,13 @@ export function Create_New_Ticket_Menu
                         setCreateNewTicketIsActive={setCreateNewTicketIsActive}
                     />
                 }
-            case 1:
+            case c_i_ai_analyzing_problem:
                 {
                     return <NewTicketAiLoading 
                         LoadingText={"A IA está analisando seu problema!"}
                     />
                 }
-            case 2:
+            case c_i_ai_suggestion:
             {
                 return <AiSuggestionBox
                         aiSuggestion={aiSuggestion}
@@ -288,13 +128,13 @@ export function Create_New_Ticket_Menu
                         setCreateNewTicketIsActive={setCreateNewTicketIsActive}
                     />
             }
-            case 3:
+            case c_i_ai_choosing_priority:
                 {
                     return <NewTicketAiLoading
                         LoadingText={"A IA está escolhendo a prioridade do problema"}
                     />
                 }
-            case 5:
+            case c_i_ticket_opened_message:
                 {
                     return (
                     <div

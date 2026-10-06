@@ -48,22 +48,14 @@ export default function TicketMonthsDashBoard()
     const [foundTickets, setFoundTickets] = useState<i_Ticket[]>([])
     const [selectedTicket, setSelectedTicket] = useState<i_Ticket>()
     const [displayDetailedTicket,setDisplayDetailedTicket] = useState<boolean>(false);
+    const [agentTicketsCompletedInTime, setAgentTicketsCompletedInTime] = useState<number>(0);
+    const [agentTicketsNotCompletedInTime, setAgentTicketsNotCompletedInTime] = useState<number>(0);
 
     const [hoveredTicket, setHoveredTicket] = useState<number>(c_i_unpickedTicket);
-
-    function setSelectedRole(pn_roleCode : number)
-    {
-        setPickedRole(pn_roleCode);
-    }
 
     function setSelectedDepartment(pn_departmentCode : number)
     {
         setPickedDepartmentCode(pn_departmentCode);
-    }
-
-    function setSelecteduser(ps_userEmail : string)
-    {
-        setPickedUser(ps_userEmail)
     }
 
     async function fetchDepartments(setDepartment: React.Dispatch<React.SetStateAction<i_department[]>>)
@@ -170,6 +162,55 @@ export default function TicketMonthsDashBoard()
         }
     }
 
+    async function FetchUserTicketCount(pi_agentId : number)
+    {
+        const url = `http://localhost:3000/Ticket/fetch-agent-ticket-count`;
+
+        try 
+        {
+            const response = await fetch(url, {
+            method: 'POST',  
+            headers: {
+                'Content-Type': 'application/json' 
+            },
+            body: 
+                JSON.stringify({   
+                    "agentId": pi_agentId
+                })
+            })
+
+            let data = await response.json();
+            
+            const TicketsFound = data;
+
+            setAgentTicketsCompletedInTime(TicketsFound.completedInTime);
+            setAgentTicketsNotCompletedInTime(TicketsFound.notCompletedInTime);
+        } 
+        catch (error) 
+        {   
+            console.error(error);
+        }
+    }
+
+    function SelectDepartmentHelper(pi_departmentId:number)
+    {
+        setSelectedDepartment(pi_departmentId);
+        setPickedRole(c_i_unpickedRole);
+        setPickedUser("");
+    }
+
+    function SelectRoleHelper(pi_roleId:number)
+    {
+        setPickedRole(pi_roleId);
+        setPickedUser("");
+    }
+
+    function SelectUserHelper(ps_user:any)
+    {
+        setPickedUser(ps_user);
+    }
+
+
     useEffect(() => {
         fetchRolesByDepartment(pickedDepartmentCode)
 
@@ -191,102 +232,163 @@ export default function TicketMonthsDashBoard()
         if(pickedUser){FetchTicketsByUser(pickedUser)}
     }, [pickedUser]);
 
+    const total = agentTicketsCompletedInTime + agentTicketsNotCompletedInTime;
+    const sla = total > 0 ? (agentTicketsCompletedInTime / total) * 100 : 0;
+    const slaColor = sla >= 90 ? "#22c55e" : sla >= 70 ? "#f59e0b" : "#ef4444";
 
     return <div style={styles.DashBoardBody}>
-        {
-           (displayDetailedTicket && selectedTicket) && <DetailedTicketInfo 
-                                        ticketInfo={selectedTicket} 
-                                        setShowDetailedTicket={setDisplayDetailedTicket}/>
-                                    
-        }
-        <div style={styles.TitleBar}>
-            <p style={styles.TitleFont}> Status Colaboradores </p>
-        </div>
-        {/***Departments Graph */}
-        <div style={styles.Container}>
-            <p style={styles.SectionTitle}>Departamento</p>
-                {departments.map((department) => (
-                    <div key={department.Id} 
-                        style={{...styles.CategoryCard, backgroundColor: pickedDepartmentCode === department.Id ? "#4386d8" : "#eef4fc" }}
-                        onClick={() => {setSelectedDepartment(department.Id)}}>
-                        <p style={styles.BarLabel}>{department.depNomeDepartamento}</p>
-                    </div>
-                ))}
-        </div>
+        
+    {
+       (displayDetailedTicket && selectedTicket) && <DetailedTicketInfo 
+                                    ticketInfo={selectedTicket} 
+                                    setShowDetailedTicket={setDisplayDetailedTicket}/>
+                                
+    }
+    <div style={styles.TitleBar}>
+        <p style={styles.TitleFont}> Status Colaboradores </p>
+    </div>
 
-        {/***Areas in department */}
+    {/***Departments Graph */}
+    <div style={styles.Container}>
+        <p style={styles.SectionTitle}>Departamento</p>
+        {departments.length > 0 ? (
+            departments.map((department) => (
+                <div key={department.Id} 
+                    style={{...styles.CategoryCard, backgroundColor: pickedDepartmentCode === department.Id ? "#4386d8" : "#eef4fc" }}
+                    onClick={() => {SelectDepartmentHelper(department.Id)}}>
+                    <p style={styles.BarLabel}>{department.depNomeDepartamento}</p>
+                </div>
+            ))
+        ) : (
+            <p>Nenhum departamento encontrado.</p>
+        )}
+    </div>
+
+    {/***Areas in department - only shows after a department is picked */}
+    {pickedDepartmentCode != c_i_unpickedDep && (
         <div style={styles.Container}>
             <p style={styles.SectionTitle}>Cargos por Setor</p>
+            {roles.length > 0 ? (
                 <div style={{display:"flex", flexDirection: "row", justifyContent:"space-evenly", width:"100%"}}>
                     {roles.map((role) => (
                         <div
                             key={role.Id}
                             style={{...styles.roleButton, backgroundColor: pickedRole === role.Id ? "#4386d8" : "#eef4fc"}}
-                            onClick={() => {setSelectedRole(role.Id)}}
+                            onClick={() => {SelectRoleHelper(role.Id)}}
                             >
                             <p style={styles.roleButtonText}>{role.carNome}</p>
                         </div>
                     ))}
                 </div>
+            ) : (
+                <p>Nenhum cargo encontrado para este departamento.</p>
+            )}
         </div>
+    )}
 
-        {/** Colaboradores Encotrados */}
+    {/** Colaboradores Encontrados - only shows after a role is picked */}
+    {pickedDepartmentCode != c_i_unpickedDep && pickedRole != c_i_unpickedRole && (
         <div style={styles.Container}>
             <p style={styles.SectionTitle}>Usuários encontrados </p>
+            {foundUsers.length > 0 ? (
                 <div style={{display:"flex", flexDirection: "row", justifyContent:"space-evenly", width:"100%"}}>
                     {foundUsers.map((user) => (
                         <div
                             key={user.Id}
                             style={{...styles.roleButton, backgroundColor: pickedUser === user.usuarEmail ? "#4386d8" : "#eef4fc"}}
-                            onClick={() => {setSelecteduser(user.usuarEmail)}}
+                            onClick={() => {SelectUserHelper(user.usuarEmail); FetchUserTicketCount(user.Id);}}
                             >
                             <p style={styles.roleButtonText}>{user.usuarNome}</p>
-                        </div>))    
-                    }
+                        </div>
+                    ))}
                 </div>
+            ) : (
+                <p>Nenhum usuário encontrado para este cargo.</p>
+            )}
         </div>
+    )}
 
-        {/** Tickets Encontrados */}
+    {/** Tickets Encontrados - only shows after a user is picked */}
+    {pickedDepartmentCode != c_i_unpickedDep && pickedRole != c_i_unpickedRole && pickedUser != "" && (
         <div style={styles.Container}>
-            <p style={styles.SectionTitle}>Tickets Associados ao Usuário</p>  
-            <div style={styles.KanbanBoard}>
-                {foundTickets.map((ticket) => (
-                    <div key={ticket.Id} style={{...styles.KanbanColumn, backgroundColor: hoveredTicket == ticket.Id ? "#eeeeee" : "#ffffff", 
-                                                                         cursor: "pointer" }} 
-                        onMouseEnter={() => setHoveredTicket(ticket.Id)}
-                        onMouseLeave={() => setHoveredTicket(c_i_unpickedTicket)} 
-                        onClick={() => {setDisplayDetailedTicket(true); setSelectedTicket(ticket);}}>
-                        <div style={styles.KanbanColumnHeader}>
-                            <span
-                                style={{
-                                    ...styles.StatusDot,
-                                    backgroundColor: statusOptions.find(
-                                    (status) => status.label === ticket.ticketStatus.tickstaDescription
-                                    )?.bgColor
-                                }}
-                            />
-                            <span style={styles.KanbanCountNumber}> N° Chamado: {ticket.Id}</span>
-                            <div style={styles.KanbanCountBadge}>
-                                <span style={styles.KanbanCountUnit}>{ticket.ticketTitle}</span>
-                            </div>
+           <div style={{ display: "flex", flexDirection: "column", textAlign: "center", gap: "12px" }}>
+            <p style={styles.SectionTitle}>Status do usuário</p>
 
-                            <div
-                                style={{
-                                    ...styles.KanbanAccentBar,
-                                    backgroundColor: statusOptions.find(
+            <div style={styles.StatsCard}>
+                <div style={styles.StatRow}>
+                    <div style={styles.StatLabelWrap}>
+                        <div style={{ ...styles.StatusDot, backgroundColor: "#ef4444" }} />
+                        <p style={styles.StatLabel}>Tickets não completos no prazo esperado</p>
+                    </div>
+                    <p style={styles.StatValue}>{agentTicketsNotCompletedInTime}</p>
+                </div>
+
+                <div style={styles.StatRow}>
+                    <div style={styles.StatLabelWrap}>
+                        <div style={{ ...styles.StatusDot, backgroundColor: "#22c55e" }} />
+                        <p style={styles.StatLabel}>Tickets completos no prazo esperado</p>
+                    </div>
+                    <p style={styles.StatValue}>{agentTicketsCompletedInTime}</p>
+                </div>
+
+                <div style={styles.StatDivider} />
+
+                <div style={{ ...styles.StatRow, borderColor: slaColor }}>
+                    <div style={styles.StatLabelWrap}>
+                        <div style={{ ...styles.StatusDot, backgroundColor: slaColor }} />
+                        <p style={{ ...styles.StatLabel, color: "#4386d8", fontWeight: "600" }}>SLA do agente</p>
+                    </div>
+                    <p style={{ ...styles.StatValue, color: slaColor }}>{sla.toFixed(1)}%</p>
+                </div>
+
+                <div style={{ ...styles.KanbanAccentBar, backgroundColor: "#eef1f8", overflow: "hidden" }}>
+                    <div style={{ width: `${sla}%`, height: "100%", backgroundColor: slaColor }} />
+                </div>
+            </div>
+        </div>
+         
+            <p style={styles.SectionTitle}>Tickets Associados ao Usuário</p>  
+            {foundTickets.length > 0 ? (
+                <div style={styles.KanbanBoard}>
+                    {foundTickets.map((ticket) => (
+                        <div key={ticket.Id} style={{...styles.KanbanColumn, backgroundColor: hoveredTicket == ticket.Id ? "#eeeeee" : "#ffffff", 
+                                                                             cursor: "pointer" }} 
+                            onMouseEnter={() => setHoveredTicket(ticket.Id)}
+                            onMouseLeave={() => setHoveredTicket(c_i_unpickedTicket)} 
+                            onClick={() => {setDisplayDetailedTicket(true); setSelectedTicket(ticket);}}>
+                            <div style={styles.KanbanColumnHeader}>
+                                <span
+                                    style={{
+                                        ...styles.StatusDot,
+                                        backgroundColor: statusOptions.find(
                                         (status) => status.label === ticket.ticketStatus.tickstaDescription
                                         )?.bgColor
-                                }}
-                            />
+                                    }}
+                                />
+                                <span style={styles.KanbanCountNumber}> N° Chamado: {ticket.Id}</span>
+                                <div style={styles.KanbanCountBadge}>
+                                    <span style={styles.KanbanCountUnit}>{ticket.ticketTitle}</span>
+                                </div>
+
+                                <div
+                                    style={{
+                                        ...styles.KanbanAccentBar,
+                                        backgroundColor: statusOptions.find(
+                                            (status) => status.label === ticket.ticketStatus.tickstaDescription
+                                            )?.bgColor
+                                    }}
+                                />
+                            </div>
                         </div>
+                    ))}
+                </div>
+            ) : (
+                <p>Nenhum ticket encontrado para este usuário.</p>
+            )}
+        </div>
+    )}
 
-                    </div>
-                ))}
-            </div>
-
-        </div>               
-
-    </div>
+</div>
            
 
 
@@ -487,5 +589,59 @@ const styles = {
         borderRadius: "2px",
         opacity: 0.85,
     },
+    StatsCard: {
+    display: "flex",
+    flexDirection: "column",
+    gap: "8px",
+    width: "100%",
+    maxWidth: "420px",
+    margin: "0 auto",
+    padding: "16px",
+    border: "1px solid #e0e0e0",
+    borderRadius: "12px",
+    backgroundColor: "#fafbff",
+},
+
+StatRow: {
+    display: "flex",
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    gap: "12px",
+    padding: "10px 12px",
+    backgroundColor: "#fff",
+    border: "1px solid #eef1f8",
+    borderRadius: "8px",
+},
+
+StatLabelWrap: {
+    display: "flex",
+    alignItems: "center",
+    gap: "10px",
+},
+
+StatLabel: {
+    margin: 0,
+    fontFamily: "Inter",
+    fontWeight: "500",
+    fontSize: "13px",
+    color: "#6b7280",
+    textAlign: "left",
+},
+
+StatValue: {
+    margin: 0,
+    fontFamily: "Inter",
+    fontWeight: "700",
+    fontSize: "16px",
+    color: "#1a1a1a",
+},
+
+StatDivider: {
+    width: "100%",
+    height: "1px",
+    backgroundColor: "#f0f0f0",
+    margin: "4px 0",
+},
 
 } as const satisfies Record<string, React.CSSProperties>;

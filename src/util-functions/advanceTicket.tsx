@@ -4,7 +4,7 @@ export default async function advanceTicket(ticketId: number)
 
     try
     {
-        const response = await fetch(url, {
+        await fetch(url, {
             method: "GET",
             headers: {
                 "Content-Type": "application/json"
